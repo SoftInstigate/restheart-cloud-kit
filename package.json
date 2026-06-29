@@ -1,8 +1,16 @@
 {
   "name": "restheart-cloud-kit-monorepo",
   "private": true,
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "build": "npm run build -w packages/kit && npm run build -w packages/kit-ng"
+    "build": "npm run build -w packages/kit && npm run build -w packages/kit-ng",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "npm run build && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.31.0"
   }
 }
