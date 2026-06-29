@@ -9,7 +9,7 @@ npm workspaces monorepo for the RESTHeart Cloud Kit packages.
 | [`@restheart-cloud/kit`](./packages/kit) | Pure TypeScript — auth logic, types, HTTP client |
 | [`@restheart-cloud/kit-ng`](./packages/kit-ng) | Angular adapter — signals, guards, interceptor |
 
-These packages are consumed by framework-specific apps. See [`restheart-cloud-starter-ng`](https://github.com/softinstigate/restheart-cloud-starter-ng) for the Angular app built on top of them.
+**Building something?** Create a service on [RESTHeart Cloud](https://restheart.org/cloud), then fork [`restheart-cloud-starter-ng`](https://github.com/SoftInstigate/restheart-cloud-starter-ng) — you'll have a working Angular app with auth and multi-tenancy in minutes.
 
 ## Structure
 
