@@ -4,15 +4,24 @@
 
 This kit gives you the same speed on the frontend.
 
-## Packages
+This is a monorepo with two layers: a **framework-agnostic core** and **framework adapters** built on top of it. Pick what you need.
+
+## Core
 
 **[`@restheart-cloud/kit`](./packages/kit/README.md)** [![npm](https://img.shields.io/npm/v/@restheart-cloud/kit)](https://www.npmjs.com/package/@restheart-cloud/kit)  
-TypeScript core — zero dependencies, works with Angular, React, Vue, or vanilla JS.
+Pure TypeScript, zero dependencies. All the auth logic: signup, login, email verification, invitations, password reset, multi-team. Works with any framework or none.
+
+## Framework adapters
 
 **[`@restheart-cloud/kit-ng`](./packages/kit-ng/README.md)** [![npm](https://img.shields.io/npm/v/@restheart-cloud/kit-ng)](https://www.npmjs.com/package/@restheart-cloud/kit-ng)  
-Angular adapter — signals, guards, interceptor.
+Angular — signals, route guards, HTTP interceptor.
+
+`@restheart-cloud/kit-react` — coming soon.  
+`@restheart-cloud/kit-vue` — coming soon.
 
 ## Quickstart
+
+The fastest path to a working Angular app:
 
 1. Create a service on [RESTHeart Cloud](https://restheart.org/cloud)
 2. Fork [`restheart-cloud-starter-ng`](https://github.com/SoftInstigate/restheart-cloud-starter-ng)
