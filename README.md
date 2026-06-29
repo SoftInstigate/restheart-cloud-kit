@@ -6,12 +6,11 @@ This kit gives you the same speed on the frontend.
 
 ## Packages
 
-| Package | Description | npm |
-|---|---|---|
-| [`@restheart-cloud/kit`](./packages/kit) | TypeScript core — zero dependencies, works with any framework | [![npm](https://img.shields.io/npm/v/@restheart-cloud/kit)](https://www.npmjs.com/package/@restheart-cloud/kit) |
-| [`@restheart-cloud/kit-ng`](./packages/kit-ng) | Angular adapter — signals, guards, interceptor | [![npm](https://img.shields.io/npm/v/@restheart-cloud/kit-ng)](https://www.npmjs.com/package/@restheart-cloud/kit-ng) |
+**[`@restheart-cloud/kit`](./packages/kit/README.md)** [![npm](https://img.shields.io/npm/v/@restheart-cloud/kit)](https://www.npmjs.com/package/@restheart-cloud/kit)  
+TypeScript core — zero dependencies, works with Angular, React, Vue, or vanilla JS.
 
-**Looking for the docs?** → [`@restheart-cloud/kit`](./packages/kit/README.md) · [`@restheart-cloud/kit-ng`](./packages/kit-ng/README.md)
+**[`@restheart-cloud/kit-ng`](./packages/kit-ng/README.md)** [![npm](https://img.shields.io/npm/v/@restheart-cloud/kit-ng)](https://www.npmjs.com/package/@restheart-cloud/kit-ng)  
+Angular adapter — signals, guards, interceptor.
 
 ## Quickstart
 
