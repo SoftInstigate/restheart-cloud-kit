@@ -1,0 +1,8 @@
+{
+  "name": "restheart-cloud-kit-monorepo",
+  "private": true,
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "build": "npm run build -w packages/kit && npm run build -w packages/kit-ng"
+  }
+}
