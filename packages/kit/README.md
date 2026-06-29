@@ -1,8 +1,10 @@
 # @restheart-cloud/kit
 
-TypeScript client for RESTHeart Cloud. Zero framework dependencies — works with Angular, React, Vue, or vanilla JS.
+[RESTHeart Cloud](https://restheart.org/cloud) gives you a production-ready backend — MongoDB, REST API, authentication, multi-tenancy, all managed.
 
-Implements all [`restheart-accounts`](https://restheart.org/docs/accounts) flows: signup, login, email verification, invitations, password reset, OAuth, multi-team.
+This package gives you the same speed on the frontend. Zero dependencies, works with Angular, React, Vue, or vanilla JS.
+
+Covers every [`restheart-accounts`](https://restheart.org/docs/accounts) flow: signup, login, email verification, invitations, password reset, multi-team switching.
 
 ## Installation
 
@@ -13,12 +15,18 @@ npm install @restheart-cloud/kit
 ## Usage
 
 ```typescript
-import { checkSession, register, logout } from '@restheart-cloud/kit';
+import { checkSession, login, logout } from '@restheart-cloud/kit';
 
 const config = { apiBaseUrl: 'https://api.example.com' };
 
-const user = await checkSession(config);
+const user = await checkSession(config);  // UserInfo | null
+await login(config, 'user@example.com', 'secret');
+await logout(config);
 ```
+
+All calls use `credentials: 'include'` — authentication is handled via httpOnly JWT cookie.
+
+Errors are thrown as `{ status: number; message: string }`.
 
 ## API
 
@@ -26,8 +34,9 @@ const user = await checkSession(config);
 
 | Function | Description |
 |---|---|
-| `checkSession(config)` | Check the current session from the JWT cookie |
+| `checkSession(config)` | Returns `UserInfo` from the active JWT cookie, or `null` |
 | `register(config, payload)` | Sign up — creates user and team |
+| `verify(config, email, token)` | Verify email after signup |
 | `login(config, email, password)` | Email/password login |
 | `logout(config)` | Invalidates the cookie |
 
@@ -58,6 +67,10 @@ const user = await checkSession(config);
 ## Types
 
 ```typescript
+interface AuthConfig {
+  apiBaseUrl: string;
+}
+
 interface UserInfo {
   _id: string;
   roles: string[];
@@ -84,5 +97,5 @@ interface Invitation {
 
 ## Framework adapters
 
-- Angular → [`@restheart-cloud/kit-ng`](../kit-ng)
-- React → `@restheart-cloud/kit-react` (coming soon)
+- **Angular** → [`@restheart-cloud/kit-ng`](https://www.npmjs.com/package/@restheart-cloud/kit-ng) — signals, guards, interceptor
+- React → `@restheart-cloud/kit-react` *(coming soon)*
