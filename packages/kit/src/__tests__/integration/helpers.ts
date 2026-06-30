@@ -44,6 +44,7 @@ export function installCookieJar(): void {
     const existing = cookieJar.get(origin) ?? [];
     const headers  = new Headers(init?.headers);
     if (existing.length) headers.set('Cookie', existing.join('; '));
+    headers.set('X-Skip-Email', 'true');
 
     const res = await _originalFetch(input, { ...init, headers, redirect: 'manual' });
 
