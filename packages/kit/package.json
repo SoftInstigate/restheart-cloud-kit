@@ -11,6 +11,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
+    "@vitest/ui": "^3",
     "typescript": "^5",
     "vitest": "^3"
   }
