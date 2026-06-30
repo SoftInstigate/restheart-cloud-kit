@@ -19,6 +19,8 @@ jobs:
 
       - run: npm run build -w packages/kit
 
+      - run: mkdir -p packages/kit/test-results
+
       - run: npm test -w packages/kit
         env:
           RH_TEST_API_URL: ${{ secrets.RH_TEST_API_URL }}

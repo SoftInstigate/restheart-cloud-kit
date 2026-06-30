@@ -27,6 +27,8 @@ jobs:
 
       - run: npm run build
 
+      - run: mkdir -p packages/kit/test-results
+
       - name: Integration tests
         run: npm test -w @restheart-cloud/kit
         env:
