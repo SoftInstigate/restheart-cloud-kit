@@ -20,7 +20,7 @@ describe('auth flow', () => {
     await expect(register(config, {
       email,
       password,
-      orgName:   'Test Org',
+      teamName:   'Test Org',
       firstName: 'Test',
       lastName:  'User',
     })).resolves.toBeUndefined();

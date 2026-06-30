@@ -6,7 +6,7 @@ export async function invite(
   email: string,
   role: 'owner' | 'member'
 ): Promise<void> {
-  await apiFetch(config, '/restheart-accounts/invitations', {
+  await apiFetch(config, '/auth/invite', {
     method: 'POST',
     body: JSON.stringify({ email, role }),
   });
@@ -19,7 +19,7 @@ export async function getInvitation(
 ): Promise<Invitation> {
   const res = await apiFetch(
     config,
-    `/restheart-accounts/invitations/${encodeURIComponent(email)}?token=${encodeURIComponent(token)}`
+    `/auth/invitation?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`
   );
   return res.json() as Promise<Invitation>;
 }
@@ -28,21 +28,21 @@ export async function activate(
   config: AuthConfig,
   payload: { email: string; token: string; password: string }
 ): Promise<void> {
-  await apiFetch(config, '/restheart-accounts/users/activate', {
-    method: 'POST',
+  await apiFetch(config, '/auth/activate', {
+    method: 'PATCH',
     body: JSON.stringify(payload),
   });
 }
 
 export async function acceptInvite(config: AuthConfig, token: string): Promise<void> {
-  await apiFetch(config, '/restheart-accounts/invitations/accept', {
+  await apiFetch(config, '/auth/accept-invite', {
     method: 'POST',
     body: JSON.stringify({ token }),
   });
 }
 
 export async function resendInvite(config: AuthConfig, email: string): Promise<void> {
-  await apiFetch(config, '/restheart-accounts/invitations/resend', {
+  await apiFetch(config, '/auth/resend-invite', {
     method: 'POST',
     body: JSON.stringify({ email }),
   });

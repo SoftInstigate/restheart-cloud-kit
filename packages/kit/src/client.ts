@@ -6,13 +6,15 @@ export async function apiFetch(
   init?: RequestInit
 ): Promise<Response> {
   const url = `${config.apiBaseUrl}${path}`;
+  const headers = new Headers(init?.headers);
+  if (init?.body && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
+  }
+
   const res = await fetch(url, {
     ...init,
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...init?.headers,
-    },
+    headers,
   });
 
   if (!res.ok) {

@@ -14,7 +14,7 @@ const newPassword = 'NewTest-Password-88!';
 
 beforeAll(async () => {
   installCookieJar();
-  await register(config, { email, password, orgName: 'PwdOrg' });
+  await register(config, { email, password, teamName: 'PwdOrg' });
   const token = await readVerificationToken(email);
   await fetch(`${config.apiBaseUrl}/auth/verify?email=${encodeURIComponent(email)}&token=${token}`, {
     credentials: 'include',
