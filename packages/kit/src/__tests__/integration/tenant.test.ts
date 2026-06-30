@@ -14,7 +14,7 @@ const memberEmail = testEmail('tenant-member');
 const password    = 'Test-Password-99!';
 
 async function registerAndVerify(email: string) {
-  await register(config, { email, password, teamName: `Org-${email.slice(0, 8)}` });
+  await register(config, { email, password, teamName: `Org-${email.slice(0, 8)}`, firstName: 'Test', lastName: 'User' });
   const token = await readVerificationToken(email);
   await fetch(`${config.apiBaseUrl}/auth/verify?email=${encodeURIComponent(email)}&token=${token}`, {
     credentials: 'include',

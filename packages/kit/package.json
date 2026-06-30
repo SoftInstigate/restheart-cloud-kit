@@ -4,7 +4,9 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "exports": { ".": "./dist/index.js" },
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "license": "MIT",
   "scripts": {
     "build": "tsc",
@@ -12,6 +14,7 @@
   },
   "devDependencies": {
     "@vitest/ui": "^3",
+    "dotenv": "^17.4.2",
     "typescript": "^5",
     "vitest": "^3"
   }

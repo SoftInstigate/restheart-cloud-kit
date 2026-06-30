@@ -1,4 +1,7 @@
 import { defineConfig } from 'vitest/config';
+import { config } from 'dotenv';
+
+config(); // loads .env if present; no-op otherwise (CI uses env vars from secrets)
 
 export default defineConfig({
   test: {

@@ -86,28 +86,37 @@ export async function adminFetch(path: string, init?: RequestInit): Promise<Resp
   });
 }
 
+async function adminGet<T>(path: string): Promise<T> {
+  const res = await adminFetch(path);
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`adminFetch GET ${path} → ${res.status}: ${body}`);
+  }
+  return res.json() as Promise<T>;
+}
+
 // ── Token readers ─────────────────────────────────────────────────────────────
 
 export async function readVerificationToken(email: string): Promise<string> {
-  const res = await adminFetch(`/users/${encodeURIComponent(email)}`);
-  const doc = await res.json() as { verificationToken?: string };
-  if (!doc.verificationToken) throw new Error(`verificationToken not found for ${email}`);
-  return doc.verificationToken;
+  const doc = await adminGet<Record<string, unknown>>(`/users/${encodeURIComponent(email)}`);
+  const token = doc['emailVerificationToken'];
+  if (!token) throw new Error(`emailVerificationToken not found for ${email}. Doc keys: ${Object.keys(doc).join(', ')}`);
+  return token as string;
 }
 
 export async function readInvitationToken(email: string): Promise<string> {
   const filter = encodeURIComponent(JSON.stringify({ email }));
-  const res    = await adminFetch(`/auth_invitations?filter=${filter}&pagesize=1`);
-  const docs   = await res.json() as Array<{ token?: string }>;
-  if (!docs[0]?.token) throw new Error(`invitation token not found for ${email}`);
-  return docs[0].token;
+  const docs   = await adminGet<Array<Record<string, unknown>>>(`/auth_invitations?filter=${filter}&pagesize=1`);
+  const token  = docs[0]?.['token'];
+  if (!token) throw new Error(`invitation token not found for ${email}`);
+  return token as string;
 }
 
 export async function readPasswordResetToken(email: string): Promise<string> {
-  const res = await adminFetch(`/users/${encodeURIComponent(email)}`);
-  const doc = await res.json() as { resetToken?: string };
-  if (!doc.resetToken) throw new Error(`resetToken not found for ${email}`);
-  return doc.resetToken;
+  const doc = await adminGet<Record<string, unknown>>(`/users/${encodeURIComponent(email)}`);
+  const token = doc['emailPasswordResetToken'] ?? doc['passwordResetToken'];
+  if (!token) throw new Error(`password reset token not found for ${email}. Doc keys: ${Object.keys(doc).join(', ')}`);
+  return token as string;
 }
 
 // ── Cleanup ───────────────────────────────────────────────────────────────────
