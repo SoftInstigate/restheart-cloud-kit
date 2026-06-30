@@ -28,7 +28,7 @@ export class RhAuthService {
   register(payload: {
     email: string;
     password: string;
-    orgName: string;
+    teamName: string;
     firstName?: string;
     lastName?: string;
   }): Observable<void> {

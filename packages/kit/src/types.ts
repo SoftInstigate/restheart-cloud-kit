@@ -5,13 +5,21 @@ export interface AuthConfig {
 export interface UserInfo {
   _id: string;
   roles: string[];
-  tenant: string;
-  tenants?: TenantMembership[];
+  tenant?: string;
   profile?: {
     firstName?: string;
     lastName?: string;
     avatarUrl?: string;
   };
+}
+
+export interface TokenInfo {
+  username: string;
+  roles: string[];
+  tenant?: string;
+  expires_in: number;
+  access_token: string;
+  token_type: string;
 }
 
 export interface TenantMembership {
