@@ -106,11 +106,11 @@ Pure TypeScript, zero framework dependencies. Contains all `restheart-accounts` 
 
 ```
 packages/kit/src/
-  types.ts          ← UserInfo, TenantMembership, Invitation, AuthConfig
+  types.ts          ← UserInfo, TeamMembership, Invitation, AuthConfig
   client.ts         ← fetch wrapper (base URL, credentials: 'include')
   auth.ts           ← register, verify, login, logout, checkSession
   invite.ts         ← invite, getInvitation, activate, acceptInvite, resendInvite
-  tenant.ts         ← getTenants, switchTenant
+  team.ts         ← getTeams, switchTeam
   password.ts       ← forgotPassword, resetPassword
   index.ts          ← re-exports everything
 ```
@@ -126,7 +126,7 @@ export interface UserInfo {
   _id: string;
   roles: string[];
   tenant: string;
-  tenants?: TenantMembership[];
+  tenants?: TeamMembership[];
   profile?: {
     firstName?: string;
     lastName?: string;
@@ -134,7 +134,7 @@ export interface UserInfo {
   };
 }
 
-export interface TenantMembership {
+export interface TeamMembership {
   id: { $oid: string };
   name?: string;
   role: 'owner' | 'member';
@@ -143,7 +143,7 @@ export interface TenantMembership {
 
 export interface Invitation {
   email: string;
-  orgName: string;
+  teamName: string;
   role: 'owner' | 'member';
   isNewUser: boolean;
   expiresAt: string;
@@ -161,7 +161,7 @@ export interface Invitation {
 ```typescript
 // auth.ts
 export async function register(config: AuthConfig, payload: {
-  email: string; password: string; orgName: string;
+  email: string; password: string; teamName: string;
   firstName?: string; lastName?: string;
 }): Promise<void>
 
@@ -182,10 +182,10 @@ export async function acceptInvite(config: AuthConfig, token: string): Promise<v
 
 export async function resendInvite(config: AuthConfig, email: string): Promise<void>
 
-// tenant.ts
-export async function getTenants(config: AuthConfig): Promise<TenantMembership[]>
+// team.ts
+export async function getTeams(config: AuthConfig): Promise<TeamMembership[]>
 
-export async function switchTenant(config: AuthConfig, tenantId: { $oid: string }): Promise<void>
+export async function switchTeam(config: AuthConfig, tenantId: { $oid: string }): Promise<void>
 
 // password.ts
 export async function forgotPassword(config: AuthConfig, email: string): Promise<void>
@@ -246,23 +246,23 @@ export class RhAuthService {
   private readonly config = inject(RH_AUTH_CONFIG);
 
   private readonly _user    = signal<UserInfo | null>(null);
-  private readonly _tenants = signal<TenantMembership[]>([]);
+  private readonly _teams = signal<TeamMembership[]>([]);
 
   readonly user             = this._user.asReadonly();
-  readonly tenants          = this._tenants.asReadonly();
+  readonly tenants          = this._teams.asReadonly();
   readonly isAuthenticated  = computed(() => this._user() !== null);
-  readonly hasMultipleTeams = computed(() => this._tenants().length > 1);
+  readonly hasMultipleTeams = computed(() => this._teams().length > 1);
 
   checkSession(): Observable<UserInfo | null> {
     return from(kit.checkSession(this.config)).pipe(
       tap(u  => this._user.set(u)),
-      switchMap(() => from(kit.getTenants(this.config))),
-      tap(ts => this._tenants.set(ts)),
+      switchMap(() => from(kit.getTeams(this.config))),
+      tap(ts => this._teams.set(ts)),
       map(() => this._user())
     );
   }
 
-  // register, login, logout, invite, switchTenant, forgotPassword, resetPassword
+  // register, login, logout, invite, switchTeam, forgotPassword, resetPassword
   // — all delegate to @restheart-cloud/kit
 }
 ```

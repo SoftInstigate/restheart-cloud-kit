@@ -36,7 +36,7 @@ Inject it anywhere and use signals directly in templates:
     @if (auth.isAuthenticated()) {
       <span>{{ auth.user()?.profile?.firstName }}</span>
       @if (auth.hasMultipleTeams()) {
-        <team-switcher [tenants]="auth.tenants()" />
+        <team-switcher [teams]="auth.teams()" />
       }
     }
   `
@@ -52,7 +52,7 @@ export class AppComponent {
 |---|---|---|
 | `user` | `Signal<UserInfo \| null>` | Authenticated user, or `null` |
 | `isAuthenticated` | `Signal<boolean>` | Derived from `user` |
-| `tenants` | `Signal<TenantMembership[]>` | Teams the user belongs to |
+| `teams` | `Signal<TeamMembership[]>` | Teams the user belongs to |
 | `hasMultipleTeams` | `Signal<boolean>` | `true` when user has more than one team |
 
 ### Methods
@@ -69,7 +69,7 @@ auth.invite(email, role)           // Observable<void>
 auth.getInvitation(email, token)   // Observable<Invitation>
 auth.activate(payload)             // Observable<void>
 auth.acceptInvite(token)           // Observable<void>
-auth.switchTenant(tenantId)        // Observable<void> — re-fetches session
+auth.switchTeam(teamId)            // Observable<void> — re-fetches session
 auth.forgotPassword(email)         // Observable<void>
 auth.resetPassword(payload)        // Observable<void>
 ```

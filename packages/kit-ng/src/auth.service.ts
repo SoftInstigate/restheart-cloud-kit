@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, from, map, switchMap, tap } from 'rxjs';
-import type { UserInfo, TenantMembership, AuthConfig } from '@restheart-cloud/kit';
+import type { UserInfo, TeamMembership, AuthConfig } from '@restheart-cloud/kit';
 import * as kit from '@restheart-cloud/kit';
 import { RH_AUTH_CONFIG } from './tokens.js';
 
@@ -9,18 +9,18 @@ export class RhAuthService {
   private readonly config: AuthConfig = inject(RH_AUTH_CONFIG);
 
   private readonly _user = signal<UserInfo | null>(null);
-  private readonly _tenants = signal<TenantMembership[]>([]);
+  private readonly _teams = signal<TeamMembership[]>([]);
 
   readonly user = this._user.asReadonly();
-  readonly tenants = this._tenants.asReadonly();
+  readonly teams = this._teams.asReadonly();
   readonly isAuthenticated = computed(() => this._user() !== null);
-  readonly hasMultipleTeams = computed(() => this._tenants().length > 1);
+  readonly hasMultipleTeams = computed(() => this._teams().length > 1);
 
   checkSession(): Observable<UserInfo | null> {
     return from(kit.checkSession(this.config)).pipe(
       tap(u => this._user.set(u)),
-      switchMap(() => from(kit.getTenants(this.config))),
-      tap(ts => this._tenants.set(ts)),
+      switchMap(() => from(kit.getTeams(this.config))),
+      tap(ts => this._teams.set(ts)),
       map(() => this._user())
     );
   }
@@ -49,7 +49,7 @@ export class RhAuthService {
     return from(kit.logout(this.config)).pipe(
       tap(() => {
         this._user.set(null);
-        this._tenants.set([]);
+        this._teams.set([]);
       })
     );
   }
@@ -74,8 +74,8 @@ export class RhAuthService {
     return from(kit.resendInvite(this.config, email));
   }
 
-  switchTenant(tenantId: { $oid: string }): Observable<void> {
-    return from(kit.switchTenant(this.config, tenantId)).pipe(
+  switchTeam(teamId: { $oid: string }): Observable<void> {
+    return from(kit.switchTeam(this.config, teamId)).pipe(
       switchMap(() => this.checkSession()),
       map(() => undefined)
     );
@@ -83,7 +83,7 @@ export class RhAuthService {
 
   clearSession(): void {
     this._user.set(null);
-    this._tenants.set([]);
+    this._teams.set([]);
   }
 
   forgotPassword(email: string): Observable<void> {

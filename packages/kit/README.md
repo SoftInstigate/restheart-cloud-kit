@@ -61,8 +61,8 @@ Errors are thrown as `{ status: number; message: string }`.
 
 | Function | Description |
 |---|---|
-| `getTenants(config)` | List teams the authenticated user belongs to |
-| `switchTenant(config, tenantId)` | Switch active team, re-issues JWT cookie |
+| `getTeams(config)` | List teams the authenticated user belongs to |
+| `switchTeam(config, teamId)` | Switch active team, re-issues JWT cookie |
 
 ## Types
 
@@ -74,12 +74,12 @@ interface AuthConfig {
 interface UserInfo {
   _id: string;
   roles: string[];
-  tenant: string;
-  tenants?: TenantMembership[];
+  team: string;
+  teams?: TeamMembership[];
   profile?: { firstName?: string; lastName?: string; avatarUrl?: string };
 }
 
-interface TenantMembership {
+interface TeamMembership {
   id: { $oid: string };
   name?: string;
   role: 'owner' | 'member';
@@ -88,7 +88,7 @@ interface TenantMembership {
 
 interface Invitation {
   email: string;
-  orgName: string;
+  teamName: string;
   role: 'owner' | 'member';
   isNewUser: boolean;
   expiresAt: string;

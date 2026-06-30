@@ -5,7 +5,7 @@ export interface AuthConfig {
 export interface UserInfo {
   _id: string;
   roles: string[];
-  tenant?: string;
+  team?: string;
   profile?: {
     firstName?: string;
     lastName?: string;
@@ -16,13 +16,13 @@ export interface UserInfo {
 export interface TokenInfo {
   username: string;
   roles: string[];
-  tenant?: string;
+  team?: string;
   expires_in: number;
   access_token: string;
   token_type: string;
 }
 
-export interface TenantMembership {
+export interface TeamMembership {
   id: { $oid: string };
   name?: string;
   role: 'owner' | 'member';
@@ -31,7 +31,7 @@ export interface TenantMembership {
 
 export interface Invitation {
   email: string;
-  orgName: string;
+  teamName: string;
   role: 'owner' | 'member';
   isNewUser: boolean;
   expiresAt: string;

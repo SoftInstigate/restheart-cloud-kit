@@ -37,7 +37,7 @@ afterAll(async () => {
 });
 
 describe('invite — new user', () => {
-  beforeAll(() => login(config, ownerEmail, password));
+  beforeAll(() => { clearCookieJar(); return login(config, ownerEmail, password); });
 
   it('invite sends invitation to a new user', async () => {
     await expect(invite(config, newUserEmail, 'member')).resolves.toBeUndefined();
@@ -59,7 +59,7 @@ describe('invite — new user', () => {
 });
 
 describe('invite — existing user', () => {
-  beforeAll(() => login(config, ownerEmail, password));
+  beforeAll(() => { clearCookieJar(); return login(config, ownerEmail, password); });
 
   it('invite sends invitation to an existing user', async () => {
     await expect(invite(config, existingUserEmail, 'member')).resolves.toBeUndefined();
