@@ -1,4 +1,4 @@
-import type { AuthConfig, UserInfo, TokenInfo } from './types.js';
+import type { AuthConfig, UserInfo } from './types.js';
 import { apiFetch } from './client.js';
 
 export async function register(
@@ -25,10 +25,8 @@ export async function verify(config: AuthConfig, email: string, token: string): 
 }
 
 async function fetchUserInfo(config: AuthConfig): Promise<UserInfo> {
-  const tokenRes = await apiFetch(config, '/token');
-  const { username } = await tokenRes.json() as TokenInfo;
-  const userRes = await apiFetch(config, `/users/${encodeURIComponent(username)}`);
-  return userRes.json() as Promise<UserInfo>;
+  const res = await apiFetch(config, '/users/me');
+  return res.json() as Promise<UserInfo>;
 }
 
 export async function login(
