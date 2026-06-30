@@ -34,7 +34,7 @@ export async function login(
     method: 'POST',
     headers: { Authorization: `Basic ${credentials}` },
   });
-  const res = await apiFetch(config, '/users/me');
+  const res = await apiFetch(config, '/token');
   return res.json() as Promise<UserInfo>;
 }
 
@@ -44,7 +44,7 @@ export async function logout(config: AuthConfig): Promise<void> {
 
 export async function checkSession(config: AuthConfig): Promise<UserInfo | null> {
   try {
-    const res = await apiFetch(config, '/users/me');
+    const res = await apiFetch(config, '/token');
     return res.json() as Promise<UserInfo>;
   } catch (err: unknown) {
     const e = err as { status?: number };
