@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { register, verify, login } from '../../auth';
-import { invite, activate } from '../../invite';
+import { invite, acceptInvite } from '../../invite';
 import { getTeams, switchTeam } from '../../team';
 import {
   getConfig, testEmail,
@@ -33,7 +33,7 @@ beforeAll(async () => {
   const inviteToken = await readInvitationToken(memberEmail);
   clearCookieJar();
   await login(config, memberEmail, password);
-  await activate(config, { email: memberEmail, token: inviteToken, password });
+  await acceptInvite(config, inviteToken);
 });
 
 afterAll(async () => {
