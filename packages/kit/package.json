@@ -8,9 +8,10 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "test": "node --test"
+    "test": "vitest run"
   },
   "devDependencies": {
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3"
   }
 }

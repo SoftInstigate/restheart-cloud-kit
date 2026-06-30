@@ -1,0 +1,25 @@
+name: Integration Tests
+
+on:
+  workflow_dispatch:
+
+jobs:
+  integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    environment: integration-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm ci
+
+      - run: npm run build -w packages/kit
+
+      - run: npm test -w packages/kit
+        env:
+          RH_TEST_API_URL: ${{ secrets.RH_TEST_API_URL }}
+          RH_TEST_ADMIN_PASSWORD: ${{ secrets.RH_TEST_ADMIN_PASSWORD }}

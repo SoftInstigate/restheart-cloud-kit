@@ -11,6 +11,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    environment: integration-test
     steps:
       - uses: actions/checkout@v4
 
@@ -21,10 +22,18 @@ jobs:
 
       - run: npm ci
 
+      - run: npm run build
+
+      - name: Integration tests
+        run: npm test -w packages/kit
+        env:
+          RH_TEST_API_URL: ${{ secrets.RH_TEST_API_URL }}
+          RH_TEST_ADMIN_PASSWORD: ${{ secrets.RH_TEST_ADMIN_PASSWORD }}
+
       - name: Create Release PR or Publish
         uses: changesets/action@v1
         with:
-          publish: npm run release
+          publish: changeset publish
           title: "🔖 chore: version packages"
           commit: "chore: version packages"
         env:
