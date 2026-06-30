@@ -9,6 +9,6 @@ export default defineConfig({
     hookTimeout: 30_000,
     sequence: { concurrent: false },
     typecheck: { tsconfig: './tsconfig.test.json' },
-    reporters: ['verbose', ['junit', { outputFile: './test-results/junit.xml' }]],
+    reporters: ['verbose', ['junit', { outputFile: './test-results/junit.xml' }], ['html', { outputFile: './test-results/index.html' }]],
   },
 });
