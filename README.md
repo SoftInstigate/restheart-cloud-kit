@@ -31,14 +31,34 @@ The fastest path to a working Angular app:
 ## Contributing
 
 ```bash
-npm install        # install all workspace dependencies
-npm run build      # build kit, then kit-ng
-npm run changeset  # describe your change before opening a PR
+npm install     # install all workspace dependencies
+npm run build   # build kit, then kit-ng
+```
+
+### Running integration tests locally
+
+Create `packages/kit/.env` (not committed):
+
+```
+RH_TEST_API_URL=https://<your-instance>.restheart.com
+RH_TEST_ADMIN_PASSWORD=<root-password>
+```
+
+Then run:
+
+```bash
+npm test -w packages/kit
+```
+
+To open the HTML report after the run:
+
+```bash
+./packages/kit/open-report.sh
 ```
 
 ### Release pipeline
 
-Push a version tag to trigger a release:
+Releases are tag-driven — no manual versioning step needed.
 
 ```bash
 git tag 1.2.3

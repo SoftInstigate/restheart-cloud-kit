@@ -124,3 +124,9 @@ export async function readPasswordResetToken(email: string): Promise<string> {
 export async function deleteUser(email: string): Promise<void> {
   await adminFetch(`/users/${encodeURIComponent(email)}`, { method: 'DELETE' });
 }
+
+export async function cleanupTestUsers(): Promise<void> {
+  const filter = encodeURIComponent(JSON.stringify({ _id: { $regex: '@restheart-test\\.com$' } }));
+  await adminFetch(`/users/*?filter=${filter}`, { method: 'DELETE' });
+  await adminFetch(`/auth_invitations/*?filter=${filter}`, { method: 'DELETE' });
+}
