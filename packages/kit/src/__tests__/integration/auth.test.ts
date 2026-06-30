@@ -32,11 +32,12 @@ describe('auth flow', () => {
 
   it('verify activates the account', async () => {
     const token = await readVerificationToken(email);
-    // GET /auth/verify redirects to frontend — we follow it and accept any outcome
+    // GET /auth/verify → 302 to frontend (cross-origin, not followed by cookie jar)
     const res = await fetch(`${config.apiBaseUrl}/auth/verify?email=${encodeURIComponent(email)}&token=${token}`, {
       credentials: 'include',
     });
-    expect(res.ok || res.status === 302 || res.redirected).toBe(true);
+    // accept 302 (redirect to frontend) or 2xx (if frontend-app-url is same origin)
+    expect(res.status === 302 || res.ok || res.redirected).toBe(true);
   });
 
   it('login returns UserInfo', async () => {

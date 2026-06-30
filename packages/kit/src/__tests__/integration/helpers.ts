@@ -54,10 +54,10 @@ export function installCookieJar(): void {
       cookieJar.set(origin, updated);
     }
 
-    // unwrap manual redirect — follow but with updated cookies
+    // follow same-origin redirects only (cross-origin = frontend, ignore)
     if (res.status >= 300 && res.status < 400) {
       const location = res.headers.get('location');
-      if (location) {
+      if (location && getOrigin(location) === origin) {
         return globalThis.fetch(location, { method: 'GET', credentials: 'include' });
       }
     }
