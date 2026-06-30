@@ -19,13 +19,16 @@ export async function apiFetch(
 
   if (!res.ok) {
     let message = res.statusText;
+    let body: unknown;
     try {
-      const body = await res.json();
-      message = body.message ?? body.msg ?? message;
+      body = await res.json();
+      const b = body as Record<string, unknown>;
+      message = (b['message'] ?? b['msg'] ?? message) as string;
     } catch {
       // ignore parse errors
     }
     const err: ApiError = { status: res.status, message };
+    console.error(`[apiFetch] ${init?.method ?? 'GET'} ${url} → ${res.status} ${res.statusText}`, body ?? '');
     throw err;
   }
 
