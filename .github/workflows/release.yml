@@ -49,7 +49,5 @@ jobs:
       - name: Publish
         if: success()
         run: |
-          npm --version
-          echo "ACTIONS_ID_TOKEN_REQUEST_URL set: $([ -n "$ACTIONS_ID_TOKEN_REQUEST_URL" ] && echo yes || echo no)"
           npm publish --access public -w packages/kit
-          npm publish --access public -w packages/kit-ng
+          npm publish --access public packages/kit-ng/dist
