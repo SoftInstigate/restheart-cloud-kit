@@ -1,6 +1,7 @@
 {
   "name": "@restheart-cloud/kit",
   "version": "0.1.0",
+  "description": "Signup and login for your frontend, plus email verification and password reset — with optional team invitations and multi-team switching, for RESTHeart Cloud.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

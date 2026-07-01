@@ -1,10 +1,10 @@
 # @restheart-cloud/kit
 
-[RESTHeart Cloud](https://restheart.org/cloud) gives you a production-ready backend — MongoDB, REST API, authentication, multi-tenancy, all managed.
+Adds signup and login to your frontend — zero dependencies, works with Angular, React, Vue, or vanilla JS.
 
-This package gives you the same speed on the frontend. Zero dependencies, works with Angular, React, Vue, or vanilla JS.
+Covers every [`restheart-accounts`](https://restheart.org/docs/accounts) flow: signup, login, email verification, password reset — plus team management for apps that need it: invitations, member roles, multi-team switching.
 
-Covers every [`restheart-accounts`](https://restheart.org/docs/accounts) flow: signup, login, email verification, invitations, password reset, multi-team switching.
+Pairs with [RESTHeart Cloud](https://restheart.org/cloud), which gives you a production-ready backend — MongoDB, REST API, authentication, signup/signin, all managed.
 
 ## Installation
 

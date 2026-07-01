@@ -1,8 +1,8 @@
 # @restheart-cloud/kit-ng
 
-[RESTHeart Cloud](https://restheart.org/cloud) gives you a production-ready backend — MongoDB, REST API, authentication, multi-tenancy, all managed.
+Wraps [`@restheart-cloud/kit`](https://www.npmjs.com/package/@restheart-cloud/kit) in an Angular service with signals, route guards, and an HTTP interceptor.
 
-This package gives you the same speed on the Angular frontend. Wraps [`@restheart-cloud/kit`](https://www.npmjs.com/package/@restheart-cloud/kit) in an Angular service with signals, route guards, and an HTTP interceptor.
+Pairs with [RESTHeart Cloud](https://restheart.org/cloud), which gives you a production-ready backend — MongoDB, REST API, authentication, signup/signin, all managed.
 
 ## Installation
 
