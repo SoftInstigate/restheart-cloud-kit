@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, from, map, of, switchMap, tap } from 'rxjs';
+import { Observable, catchError, from, map, of, switchMap, tap } from 'rxjs';
 import type { UserInfo, TeamMembership, AuthConfig } from '@restheart-cloud/kit';
 import * as kit from '@restheart-cloud/kit';
 import { RH_AUTH_CONFIG } from './tokens.js';
@@ -19,7 +19,16 @@ export class RhAuthService {
   checkSession(): Observable<UserInfo | null> {
     return from(kit.checkSession(this.config)).pipe(
       tap(u => this._user.set(u)),
-      switchMap(u => (u === null ? of([]) : from(kit.getTeams(this.config)))),
+      // Team invitations is an optional, toggleable feature — /auth/teams
+      // returns 403 when it's disabled for the service. checkSession() is
+      // a foundational flow (every guarded route depends on it), so it
+      // must not fail just because that feature is off, or the user isn't
+      // logged in yet.
+      switchMap(u =>
+        u === null
+          ? of([])
+          : from(kit.getTeams(this.config)).pipe(catchError(() => of([])))
+      ),
       tap(ts => this._teams.set(ts)),
       map(() => this._user())
     );
