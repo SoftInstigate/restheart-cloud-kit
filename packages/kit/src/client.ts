@@ -10,6 +10,10 @@ export async function apiFetch(
   if (init?.body && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
+  // Suppress RESTHeart's WWW-Authenticate challenge on 401 responses —
+  // without this, browsers show their native Basic Auth popup whenever
+  // an unauthenticated request (e.g. a session check) gets a 401.
+  headers.set('No-Auth-Challenge', 'true');
 
   const res = await fetch(url, {
     ...init,
