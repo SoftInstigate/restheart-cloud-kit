@@ -1,10 +1,30 @@
 import type { AuthConfig, ApiError } from './types.js';
 
+/** Returns true if `apiBaseUrl` is a well-formed RESTHeart Cloud service URL (*.restheart.com). */
+export function isValidApiBaseUrl(apiBaseUrl: string): boolean {
+  try {
+    return new URL(apiBaseUrl).hostname.toLowerCase().endsWith('.restheart.com');
+  } catch {
+    return false;
+  }
+}
+
+function assertValidApiBaseUrl(apiBaseUrl: string): void {
+  if (!isValidApiBaseUrl(apiBaseUrl)) {
+    throw {
+      status: 0,
+      message: `Invalid URL: apiBaseUrl must be a RESTHeart Cloud service (*.restheart.com), got "${apiBaseUrl}"`,
+    } satisfies ApiError;
+  }
+}
+
 export async function apiFetch(
   config: AuthConfig,
   path: string,
   init?: RequestInit
 ): Promise<Response> {
+  assertValidApiBaseUrl(config.apiBaseUrl);
+
   const url = `${config.apiBaseUrl}${path}`;
   const headers = new Headers(init?.headers);
   if (init?.body && !headers.has('Content-Type')) {
