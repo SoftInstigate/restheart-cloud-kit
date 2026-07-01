@@ -10,6 +10,11 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SoftInstigate/restheart-cloud-kit.git",
+    "directory": "packages/kit"
+  },
   "license": "MIT",
   "scripts": {
     "build": "tsc",

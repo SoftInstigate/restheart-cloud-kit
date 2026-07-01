@@ -1,6 +1,11 @@
 {
   "name": "@restheart-cloud/kit-ng",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SoftInstigate/restheart-cloud-kit.git",
+    "directory": "packages/kit-ng"
+  },
   "license": "MIT",
   "peerDependencies": {
     "@angular/common": ">=21",
