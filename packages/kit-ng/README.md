@@ -2,7 +2,7 @@
 
 Wraps [`@restheart-cloud/kit`](https://www.npmjs.com/package/@restheart-cloud/kit) in an Angular service with signals, route guards, and an HTTP interceptor.
 
-Pairs with [RESTHeart Cloud](https://restheart.org/cloud), which gives you a production-ready backend — MongoDB, REST API, authentication, signup/signin, all managed.
+Pairs with [RESTHeart Cloud](https://cloud.restheart.com), which gives you a production-ready backend — MongoDB, REST API, authentication, signup/signin, all managed.
 
 ## Installation
 
@@ -97,7 +97,7 @@ export const routes: Routes = [
 
 The fastest path to a working app:
 
-1. Create a service on [RESTHeart Cloud](https://restheart.org/cloud)
+1. Create a service on [RESTHeart Cloud](https://cloud.restheart.com)
 2. Fork [`restheart-cloud-starter-ng`](https://github.com/SoftInstigate/restheart-cloud-starter-ng)
 3. Set `apiBaseUrl` in `environment.ts`
 4. `ng serve`

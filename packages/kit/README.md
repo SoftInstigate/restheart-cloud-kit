@@ -4,7 +4,7 @@ Adds signup and login to your frontend — zero dependencies, works with Angular
 
 Covers every [`restheart-accounts`](https://restheart.org/docs/accounts) flow: signup, login, email verification, password reset — plus team management for apps that need it: invitations, member roles, multi-team switching.
 
-Pairs with [RESTHeart Cloud](https://restheart.org/cloud), which gives you a production-ready backend — MongoDB, REST API, authentication, signup/signin, all managed.
+Pairs with [RESTHeart Cloud](https://cloud.restheart.com), which gives you a production-ready backend — MongoDB, REST API, authentication, signup/signin, all managed.
 
 ## Installation
 

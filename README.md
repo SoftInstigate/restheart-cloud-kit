@@ -1,6 +1,6 @@
 # RESTHeart Cloud Kit
 
-[RESTHeart Cloud](https://restheart.org/cloud) gives you a production-ready backend — MongoDB, REST API, authentication, multi-tenancy, all managed.
+[RESTHeart Cloud](https://cloud.restheart.com) gives you a production-ready backend — MongoDB, REST API, authentication, multi-tenancy, all managed.
 
 This kit gives you the same speed on the frontend.
 
@@ -23,7 +23,7 @@ Angular — signals, route guards, HTTP interceptor.
 
 The fastest path to a working Angular app:
 
-1. Create a service on [RESTHeart Cloud](https://restheart.org/cloud)
+1. Create a service on [RESTHeart Cloud](https://cloud.restheart.com)
 2. Fork [`restheart-cloud-starter-ng`](https://github.com/SoftInstigate/restheart-cloud-starter-ng)
 3. Set `apiBaseUrl` in `environment.ts`
 4. `ng serve`
