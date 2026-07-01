@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, from, map, switchMap, tap } from 'rxjs';
+import { Observable, from, map, of, switchMap, tap } from 'rxjs';
 import type { UserInfo, TeamMembership, AuthConfig } from '@restheart-cloud/kit';
 import * as kit from '@restheart-cloud/kit';
 import { RH_AUTH_CONFIG } from './tokens.js';
@@ -19,7 +19,7 @@ export class RhAuthService {
   checkSession(): Observable<UserInfo | null> {
     return from(kit.checkSession(this.config)).pipe(
       tap(u => this._user.set(u)),
-      switchMap(() => from(kit.getTeams(this.config))),
+      switchMap(u => (u === null ? of([]) : from(kit.getTeams(this.config)))),
       tap(ts => this._teams.set(ts)),
       map(() => this._user())
     );
