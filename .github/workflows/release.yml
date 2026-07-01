@@ -10,6 +10,9 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     environment: integration-test
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -17,6 +20,8 @@ jobs:
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
+
+      - run: npm install -g npm@latest
 
       - run: npm ci
 
@@ -43,8 +48,7 @@ jobs:
           path: packages/kit/test-results/
 
       - name: Publish
+        if: success()
         run: |
           npm publish --access public -w packages/kit
           npm publish --access public -w packages/kit-ng
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
