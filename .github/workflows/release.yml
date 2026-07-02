@@ -27,7 +27,7 @@ jobs:
           npm version ${{ github.ref_name }} --no-git-tag-version -w packages/kit
           npm version ${{ github.ref_name }} --no-git-tag-version -w packages/kit-ng
 
-      - run: npm ci --force
+      - run: npm install --legacy-peer-deps
 
       - run: npm run build
 
