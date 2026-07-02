@@ -1,9 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { register, verify, login } from '../../auth';
+import { register, verify, login, clearToken } from '../../index';
 import { forgotPassword, resetPassword } from '../../password';
 import {
   getConfig, testEmail,
-  installCookieJar, clearCookieJar,
   readVerificationToken, readPasswordResetToken, deleteUser,
 } from './helpers';
 
@@ -13,17 +12,13 @@ const password = 'Test-Password-99!';
 const newPassword = 'NewTest-Password-88!';
 
 beforeAll(async () => {
-  installCookieJar();
   await register(config, { email, password, teamName: 'PwdOrg', firstName: 'Test', lastName: 'User' });
   const token = await readVerificationToken(email);
-  await fetch(`${config.apiBaseUrl}/auth/verify?email=${encodeURIComponent(email)}&token=${token}`, {
-    credentials: 'include',
-  });
-  clearCookieJar();
+  await fetch(`${config.apiBaseUrl}/auth/verify?email=${encodeURIComponent(email)}&token=${token}`);
 });
 
 afterAll(async () => {
-  clearCookieJar();
+  clearToken();
   await deleteUser(email);
 });
 

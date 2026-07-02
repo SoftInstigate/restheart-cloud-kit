@@ -107,7 +107,7 @@ Pure TypeScript, zero framework dependencies. Contains all `restheart-accounts` 
 ```
 packages/kit/src/
   types.ts          ← UserInfo, TeamMembership, Invitation, AuthConfig
-  client.ts         ← fetch wrapper (base URL, credentials: 'include')
+  client.ts         ← fetch wrapper, localStorage token store, Bearer auth
   auth.ts           ← register, verify, login, logout, checkSession
   invite.ts         ← invite, getInvitation, activate, acceptInvite, resendInvite
   team.ts         ← getTeams, switchTeam
@@ -152,7 +152,7 @@ export interface Invitation {
 
 ### Conventions
 
-- Native `fetch`, `credentials: 'include'` on all calls (httpOnly JWT cookie).
+- Native `fetch`, Bearer token in `Authorization` header (token stored in `localStorage`, no cookies).
 - All methods return `Promise<T>` — adapters wrap them in framework-specific reactive primitives.
 - Errors: throw `{ status: number; message: string }`.
 

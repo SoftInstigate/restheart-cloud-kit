@@ -24,7 +24,11 @@ await login(config, 'user@example.com', 'secret');
 await logout(config);
 ```
 
-All calls use `credentials: 'include'` — authentication is handled via httpOnly JWT cookie.
+Authentication is handled via a Bearer token stored in `localStorage` — every authenticated request sends `Authorization: Bearer <token>`. No cookies are used.
+
+The token is stored in `localStorage` and expires within 15 minutes. Sessions survive page reloads but don't persist across browser sessions if the token has expired.
+
+Token refresh is fully transparent: the kit schedules a proactive renewal at 80% of the token's TTL (~12 minutes). As long as the tab stays open, the session stays alive without the app or user noticing.
 
 Errors are thrown as `{ status: number; message: string }`.
 
@@ -34,11 +38,21 @@ Errors are thrown as `{ status: number; message: string }`.
 
 | Function | Description |
 |---|---|
-| `checkSession(config)` | Returns `UserInfo` from the active JWT cookie, or `null` |
+| `checkSession(config)` | Returns `UserInfo` if a valid token is held in memory, `null` otherwise |
 | `register(config, payload)` | Sign up — creates user and team |
 | `verify(config, email, token)` | Verify email after signup |
-| `login(config, email, password)` | Email/password login |
-| `logout(config)` | Invalidates the cookie |
+| `login(config, email, password)` | Email/password login — stores token in memory |
+| `logout(config)` | Clears the token and cancels pending refresh |
+
+### Token management
+
+| Function | Description |
+|---|---|
+| `setToken(token)` | Store a token manually (e.g. after OAuth redirect) |
+| `getToken()` | Read the current token, or `null` |
+| `clearToken()` | Clear the token and cancel any pending refresh |
+| `scheduleRefresh(config)` | Schedule proactive token renewal (called automatically by `login`) |
+| `cancelRefresh()` | Cancel a pending refresh timer |
 
 ### Invitations
 
@@ -62,7 +76,7 @@ Errors are thrown as `{ status: number; message: string }`.
 | Function | Description |
 |---|---|
 | `getTeams(config)` | List teams the authenticated user belongs to |
-| `switchTeam(config, teamId)` | Switch active team, re-issues JWT cookie |
+| `switchTeam(config, teamId)` | Switch active team |
 
 ## Types
 

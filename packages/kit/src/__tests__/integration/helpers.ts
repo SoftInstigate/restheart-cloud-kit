@@ -22,56 +22,9 @@ export function testEmail(label: string): string {
   return `test-${runId}-${label}@restheart-test.com`;
 }
 
-// ── Cookie jar (Node.js fetch does not persist cookies automatically) ────────
-
-const cookieJar = new Map<string, string[]>();
-
-function getOrigin(url: string): string {
-  return new URL(url).origin;
-}
-
-function parseCookies(header: string): string[] {
-  return header.split(/,(?=[^ ])/).map(c => c.split(';')[0].trim());
-}
+// ── Admin fetch (Basic Auth, no cookie jar) ──────────────────────────────────
 
 const _originalFetch = globalThis.fetch.bind(globalThis);
-
-export function installCookieJar(): void {
-  globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-    const url    = input.toString();
-    const origin = getOrigin(url);
-
-    const existing = cookieJar.get(origin) ?? [];
-    const headers  = new Headers(init?.headers);
-    if (existing.length) headers.set('Cookie', existing.join('; '));
-    headers.set('X-Skip-Email', 'true');
-
-    const res = await _originalFetch(input, { ...init, headers, redirect: 'manual' });
-
-    const setCookie = res.headers.get('set-cookie');
-    if (setCookie) {
-      const incoming = parseCookies(setCookie);
-      const updated  = [...existing.filter(c => !incoming.some(n => n.split('=')[0] === c.split('=')[0])), ...incoming];
-      cookieJar.set(origin, updated);
-    }
-
-    // follow same-origin redirects only (cross-origin = frontend, ignore)
-    if (res.status >= 300 && res.status < 400) {
-      const location = res.headers.get('location');
-      if (location && getOrigin(location) === origin) {
-        return globalThis.fetch(location, { method: 'GET', credentials: 'include' });
-      }
-    }
-
-    return res;
-  };
-}
-
-export function clearCookieJar(): void {
-  cookieJar.clear();
-}
-
-// ── Admin fetch (Basic Auth, no cookie jar) ──────────────────────────────────
 
 export async function adminFetch(path: string, init?: RequestInit): Promise<Response> {
   const { apiBaseUrl } = getConfig();

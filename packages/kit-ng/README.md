@@ -24,7 +24,16 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
-That one call registers `RhAuthService`, adds `withCredentials` to all HTTP requests, and handles 401 responses automatically.
+That one call registers `RhAuthService`, adds the HTTP interceptor (attaches the Bearer token, clears session on 401), and sets up the DI config.
+
+## How sessions work
+
+The kit uses a **Bearer token stored in `localStorage`** — no cookies.
+
+- `login()` stores the token in `localStorage` and schedules a proactive refresh at 80% of the token's TTL (~12 minutes for a 15-minute token).
+- Every authenticated request sends `Authorization: Bearer <token>` automatically.
+- Sessions survive page reloads as long as the token hasn't expired.
+- If the token expires (laptop asleep, tab backgrounded too long, or the user hasn't interacted for 15+ minutes), the next API call gets a 401 and the session is cleared — the user sees "logged out," not a silent failure.
 
 ## `RhAuthService`
 
@@ -60,7 +69,7 @@ export class AppComponent {
 All methods return `Observable`:
 
 ```typescript
-auth.checkSession()                // Observable<UserInfo | null>
+auth.checkSession()                // Observable<UserInfo | null> — reads localStorage, no HTTP if no token
 auth.login(email, password)        // Observable<UserInfo>
 auth.logout()                      // Observable<void>
 auth.register(payload)             // Observable<void>
@@ -92,6 +101,8 @@ export const routes: Routes = [
   },
 ];
 ```
+
+`authGuard` checks the in-memory token first — no HTTP call if the user is already authenticated in the current session.
 
 ## Quickstart
 
