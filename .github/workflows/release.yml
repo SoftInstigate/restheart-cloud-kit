@@ -22,12 +22,12 @@ jobs:
 
       - run: npm install -g npm@latest
 
-      - run: npm ci
-
       - name: Set version from tag
         run: |
           npm version ${{ github.ref_name }} --no-git-tag-version -w packages/kit
           npm version ${{ github.ref_name }} --no-git-tag-version -w packages/kit-ng
+
+      - run: npm install
 
       - run: npm run build
 
@@ -50,4 +50,4 @@ jobs:
         if: success()
         run: |
           npm publish --access public -w packages/kit
-          npm publish --access public packages/kit-ng/dist
+          npm publish --access public -w packages/kit-ng

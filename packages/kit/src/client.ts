@@ -1,5 +1,81 @@
 import type { AuthConfig, ApiError } from './types.js';
 
+// ── Token store (localStorage) ──────────────────────────────────────────────
+
+const TOKEN_KEY = 'rh_access_token';
+
+/** Decode a JWT payload without signature verification. */
+function decodeJwtPayload(jwt: string): Record<string, unknown> {
+  const base64Url = jwt.split('.')[1];
+  if (!base64Url) throw new Error('Invalid JWT: missing payload segment');
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const json = atob(base64);
+  return JSON.parse(json) as Record<string, unknown>;
+}
+
+/** Returns the token's exp claim in milliseconds, or null if missing/malformed. */
+export function getTokenExpiry(token: string): number | null {
+  try {
+    const payload = decodeJwtPayload(token);
+    const exp = payload['exp'];
+    return typeof exp === 'number' ? exp * 1000 : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Store the token in localStorage.
+ */
+export function setToken(token: string): void {
+  try {
+    localStorage.setItem(TOKEN_KEY, token);
+  } catch {
+    // localStorage unavailable (private browsing, storage full) — fall back to memory-only
+    _memoryToken = token;
+  }
+}
+
+/**
+ * Read the stored token if it exists and has not expired.
+ * Returns null if the token is missing or expired.
+ */
+export function getToken(): string | null {
+  let token: string | null;
+  try {
+    token = localStorage.getItem(TOKEN_KEY);
+  } catch {
+    token = _memoryToken;
+  }
+  if (!token) return null;
+
+  const expMs = getTokenExpiry(token);
+  if (expMs !== null && expMs <= Date.now()) {
+    clearToken();
+    return null;
+  }
+
+  return token;
+}
+
+/**
+ * Clear the stored token and cancel any pending refresh timer.
+ */
+export function clearToken(): void {
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+  } catch {
+    // ignore
+  }
+  _memoryToken = null;
+}
+
+// ── In-memory fallback (when localStorage is unavailable) ───────────────────
+
+let _memoryToken: string | null = null;
+
+// ── URL validation ──────────────────────────────────────────────────────────
+
 /** Returns true if `apiBaseUrl` is a well-formed RESTHeart Cloud service URL (*.restheart.com). */
 export function isValidApiBaseUrl(apiBaseUrl: string): boolean {
   try {
@@ -18,6 +94,8 @@ function assertValidApiBaseUrl(apiBaseUrl: string): void {
   }
 }
 
+// ── Fetch ───────────────────────────────────────────────────────────────────
+
 export async function apiFetch(
   config: AuthConfig,
   path: string,
@@ -35,9 +113,14 @@ export async function apiFetch(
   // an unauthenticated request (e.g. a session check) gets a 401.
   headers.set('No-Auth-Challenge', 'true');
 
+  // Attach Bearer token when held in localStorage
+  const token = getToken();
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
   const res = await fetch(url, {
     ...init,
-    credentials: 'include',
     headers,
   });
 

@@ -7,6 +7,7 @@ import {
 } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
 import { RhAuthService } from './auth.service.js';
+import { clearToken, cancelRefresh } from '@restheart-cloud/kit';
 
 export const rhAuthInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
@@ -14,11 +15,11 @@ export const rhAuthInterceptor: HttpInterceptorFn = (
 ) => {
   const auth = inject(RhAuthService);
 
-  const withCredentials = req.clone({ withCredentials: true });
-
-  return next(withCredentials).pipe(
+  return next(req).pipe(
     catchError((err: unknown) => {
       if (err instanceof HttpErrorResponse && err.status === 401) {
+        clearToken();
+        cancelRefresh();
         auth.clearSession();
       }
       return throwError(() => err);

@@ -1,10 +1,9 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { register, verify, login } from '../../auth';
+import { register, verify, login, clearToken } from '../../index';
 import { invite, acceptInvite } from '../../invite';
 import { getTeams, switchTeam } from '../../team';
 import {
   getConfig, testEmail,
-  installCookieJar, clearCookieJar,
   readVerificationToken, readInvitationToken, deleteUser,
 } from './helpers';
 
@@ -16,28 +15,23 @@ const password    = 'Test-Password-99!';
 async function registerAndVerify(email: string) {
   await register(config, { email, password, teamName: `Org-${email.slice(0, 8)}`, firstName: 'Test', lastName: 'User' });
   const token = await readVerificationToken(email);
-  await fetch(`${config.apiBaseUrl}/auth/verify?email=${encodeURIComponent(email)}&token=${token}`, {
-    credentials: 'include',
-  });
+  await fetch(`${config.apiBaseUrl}/auth/verify?email=${encodeURIComponent(email)}&token=${token}`);
 }
 
 beforeAll(async () => {
-  installCookieJar();
-  // create owner and an additional team for the member
   await registerAndVerify(ownerEmail);
   await registerAndVerify(memberEmail);
   // owner invites member so member has 2 teams
-  clearCookieJar();
   await login(config, ownerEmail, password);
   await invite(config, memberEmail, 'member');
   const inviteToken = await readInvitationToken(memberEmail);
-  clearCookieJar();
+  clearToken();
   await login(config, memberEmail, password);
   await acceptInvite(config, inviteToken);
 });
 
 afterAll(async () => {
-  clearCookieJar();
+  clearToken();
   await Promise.allSettled([deleteUser(ownerEmail), deleteUser(memberEmail)]);
 });
 

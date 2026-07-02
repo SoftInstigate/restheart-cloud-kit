@@ -16,14 +16,27 @@ export class RhAuthService {
   readonly isAuthenticated = computed(() => this._user() !== null);
   readonly hasMultipleTeams = computed(() => this._teams().length > 1);
 
+  /**
+   * Check the current session state.
+   *
+   * Reads the token from localStorage — if present and not expired,
+   * returns user info from the server. Otherwise returns null.
+   */
   checkSession(): Observable<UserInfo | null> {
+    // If no valid token in localStorage, we're logged out — no HTTP call needed
+    if (!kit.getToken()) {
+      this._user.set(null);
+      this._teams.set([]);
+      return of(null);
+    }
+
     return from(kit.checkSession(this.config)).pipe(
-      tap(u => this._user.set(u)),
-      // Team invitations is an optional, toggleable feature — /auth/teams
-      // returns 403 when it's disabled for the service. checkSession() is
-      // a foundational flow (every guarded route depends on it), so it
-      // must not fail just because that feature is off, or the user isn't
-      // logged in yet.
+      tap(u => {
+        this._user.set(u);
+        if (!u) {
+          this._teams.set([]);
+        }
+      }),
       switchMap(u =>
         u === null
           ? of([])
@@ -91,6 +104,8 @@ export class RhAuthService {
   }
 
   clearSession(): void {
+    kit.clearToken();
+    kit.cancelRefresh();
     this._user.set(null);
     this._teams.set([]);
   }
