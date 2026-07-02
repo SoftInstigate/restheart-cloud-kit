@@ -50,4 +50,4 @@ jobs:
         if: success()
         run: |
           npm publish --access public -w packages/kit
-          npm publish --access public packages/kit-ng/dist
+          npm publish --access public -w packages/kit-ng

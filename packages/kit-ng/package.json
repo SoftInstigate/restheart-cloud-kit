@@ -1,6 +1,6 @@
 {
   "name": "@restheart-cloud/kit-ng",
-  "version": "0.1.8",
+  "version": "0.0.0",
   "description": "Angular service, route guards, and HTTP interceptor for RESTHeart Cloud authentication — wraps @restheart-cloud/kit.",
   "repository": {
     "type": "git",
