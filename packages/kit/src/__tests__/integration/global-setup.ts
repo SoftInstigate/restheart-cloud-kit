@@ -10,9 +10,8 @@ async function cleanupAllTestData() {
   const userFilter = encodeURIComponent(JSON.stringify({ _id: { $regex: '@restheart-test\\.com$' } }));
   await adminFetch(`/users/*?filter=${userFilter}`, { method: 'DELETE' });
 
-  // 2. Bulk delete all test teams (name starting with Org-)
-  const teamFilter = encodeURIComponent(JSON.stringify({ '$or': [{ createdBy: { '$regex': '.*@restheart-test.com' } }, { "createdBy": { '$regex': '.*@example\\.com' } }] }));
-  console.log(`/teams/*?filter=${teamFilter}`);
+  // 2. Bulk delete all test teams (createdBy matching test emails)
+  const teamFilter = encodeURIComponent(JSON.stringify({ '$or': [{ createdBy: { '$regex': '.*@restheart-test\\.com' } }, { createdBy: { '$regex': '.*@example\\.com' } }] }));
   await adminFetch(`/teams/*?filter=${teamFilter}`, { method: 'DELETE' });
 
   // 3. Bulk delete all test invitations

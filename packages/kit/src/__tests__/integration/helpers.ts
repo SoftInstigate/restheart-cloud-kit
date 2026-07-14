@@ -29,13 +29,21 @@ const _originalFetch = globalThis.fetch.bind(globalThis);
 export async function adminFetch(path: string, init?: RequestInit): Promise<Response> {
   const { apiBaseUrl } = getConfig();
   const credentials = Buffer.from(`root:${getAdminPassword()}`).toString('base64');
+  const headers = new Headers({ Authorization: `Basic ${credentials}` });
+  const method = init?.method?.toUpperCase() ?? 'GET';
+  // Only set Content-Type on requests that have a body
+  if (init?.body) {
+    headers.set('Content-Type', 'application/json');
+  }
+  // Merge any additional headers from init
+  if (init?.headers) {
+    const h = new Headers(init.headers);
+    h.forEach((v, k) => headers.set(k, v));
+  }
   return _originalFetch(`${apiBaseUrl}${path}`, {
     ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Basic ${credentials}`,
-      ...init?.headers,
-    },
+    method,
+    headers,
   });
 }
 
