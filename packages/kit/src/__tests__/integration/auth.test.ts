@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { register, verify, login, logout, checkSession, clearToken } from '../../index';
+import { register, verify, buildVerifyUrl, login, logout, checkSession, clearToken } from '../../index';
 import {
   getConfig, testEmail,
   readVerificationToken, deleteUser,
@@ -29,12 +29,21 @@ describe('auth flow', () => {
     await expect(checkSession(config)).resolves.toBeNull();
   });
 
-  it('verify activates the account', async () => {
+  it('verify returns the fragment delivery URL by default', async () => {
     const token = await readVerificationToken(email);
-    // GET /auth/verify → 302 to frontend (cross-origin, not followed by fetch)
-    const res = await fetch(`${config.apiBaseUrl}/auth/verify?email=${encodeURIComponent(email)}&token=${token}`);
-    // accept 302 (redirect to frontend) or 2xx (if frontend-app-url is same origin)
-    expect(res.status === 302 || res.ok || res.redirected).toBe(true);
+    const url = await verify(config, email, token);
+    const parsed = new URL(url);
+    expect(parsed.pathname).toBe('/auth/verify');
+    expect(parsed.searchParams.get('delivery')).toBe('fragment');
+    expect(parsed.searchParams.get('email')).toBe(email);
+    expect(parsed.searchParams.get('token')).toBe(token);
+  });
+
+  it('verify returns cookie delivery URL when requested', async () => {
+    const token = await readVerificationToken(email);
+    const url = await verify(config, email, token, 'cookie');
+    const parsed = new URL(url);
+    expect(parsed.searchParams.get('delivery')).toBe('cookie');
   });
 
   it('login returns UserInfo and stores the token', async () => {

@@ -1,3 +1,10 @@
+/**
+ * Login mode.
+ * - 'bearer' (default): token managed client-side (localStorage)
+ * - 'cookie': JWT cookie managed by the backend (HttpOnly)
+ */
+export type LoginMode = 'bearer' | 'cookie';
+
 export interface AuthConfig {
   apiBaseUrl: string;
 }

@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, catchError, from, map, of, switchMap, tap } from 'rxjs';
-import type { UserInfo, TeamMembership, AuthConfig } from '@restheart-cloud/kit';
+import type { UserInfo, TeamMembership, AuthConfig, LoginMode } from '@restheart-cloud/kit';
 import * as kit from '@restheart-cloud/kit';
 import { RH_AUTH_CONFIG } from './tokens.js';
 
@@ -57,12 +57,12 @@ export class RhAuthService {
     return from(kit.register(this.config, payload));
   }
 
-  verify(email: string, token: string): Observable<void> {
-    return from(kit.verify(this.config, email, token));
+  verify(email: string, token: string, delivery: 'cookie' | 'fragment' = 'fragment'): Observable<string> {
+    return from(kit.verify(this.config, email, token, delivery));
   }
 
-  login(email: string, password: string): Observable<UserInfo> {
-    return from(kit.login(this.config, email, password)).pipe(
+  login(email: string, password: string, mode: LoginMode = 'bearer'): Observable<UserInfo> {
+    return from(kit.login(this.config, email, password, mode)).pipe(
       tap(u => this._user.set(u))
     );
   }
@@ -84,8 +84,8 @@ export class RhAuthService {
     return from(kit.getInvitation(this.config, email, token));
   }
 
-  activate(payload: { email: string; token: string; password: string }): Observable<void> {
-    return from(kit.activate(this.config, payload));
+  activate(payload: { email: string; token: string; password: string }, mode: LoginMode = 'bearer'): Observable<void> {
+    return from(kit.activate(this.config, payload, mode));
   }
 
   acceptInvite(token: string): Observable<void> {
@@ -114,7 +114,7 @@ export class RhAuthService {
     return from(kit.forgotPassword(this.config, email));
   }
 
-  resetPassword(payload: { email: string; token: string; password: string }): Observable<void> {
-    return from(kit.resetPassword(this.config, payload));
+  resetPassword(payload: { email: string; token: string; password: string }, mode: LoginMode = 'bearer'): Observable<void> {
+    return from(kit.resetPassword(this.config, payload, mode));
   }
 }

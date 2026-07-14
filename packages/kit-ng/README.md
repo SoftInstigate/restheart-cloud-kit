@@ -28,7 +28,14 @@ That one call registers `RhAuthService`, adds the HTTP interceptor (attaches the
 
 ## How sessions work
 
-The kit uses a **Bearer token stored in `localStorage`** — no cookies.
+The kit supports **two authentication modes**:
+
+- **Bearer token** (default) — stored in `localStorage`, sent as `Authorization: Bearer <token>`
+- **Cookie** — JWT managed by the backend as an HttpOnly cookie
+
+Pass `mode: 'cookie'` to `login()`, `activate()`, or `resetPassword()` for same-origin setups. The default `'bearer'` mode works for cross-origin SPAs.
+
+For email verification, pass `delivery: 'fragment'` (default, cross-origin) or `delivery: 'cookie'` (same-origin) to `verify()`.
 
 - `login()` stores the token in `localStorage` and schedules a proactive refresh at 80% of the token's TTL (~12 minutes for a 15-minute token).
 - Every authenticated request sends `Authorization: Bearer <token>` automatically.
@@ -70,17 +77,17 @@ All methods return `Observable`:
 
 ```typescript
 auth.checkSession()                // Observable<UserInfo | null> — reads localStorage, no HTTP if no token
-auth.login(email, password)        // Observable<UserInfo>
+auth.login(email, password, mode?)     // Observable<UserInfo> — mode: 'bearer' (default) | 'cookie'
 auth.logout()                      // Observable<void>
 auth.register(payload)             // Observable<void>
-auth.verify(email, token)          // Observable<void>
+auth.verify(email, token, delivery?)  // Observable<string> — delivery: 'fragment' (default) | 'cookie'
 auth.invite(email, role)           // Observable<void>
 auth.getInvitation(email, token)   // Observable<Invitation>
-auth.activate(payload)             // Observable<void>
+auth.activate(payload, mode?)        // Observable<void> — mode: 'bearer' (default) | 'cookie'
 auth.acceptInvite(token)           // Observable<void>
 auth.switchTeam(teamId)            // Observable<void> — re-fetches session
 auth.forgotPassword(email)         // Observable<void>
-auth.resetPassword(payload)        // Observable<void>
+auth.resetPassword(payload, mode?)   // Observable<void> — mode: 'bearer' (default) | 'cookie'
 ```
 
 ## Guards

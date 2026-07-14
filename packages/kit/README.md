@@ -24,11 +24,31 @@ await login(config, 'user@example.com', 'secret');
 await logout(config);
 ```
 
-Authentication is handled via a Bearer token stored in `localStorage` — every authenticated request sends `Authorization: Bearer <token>`. No cookies are used.
+Authentication is handled via a Bearer token stored in `localStorage` — every authenticated request sends `Authorization: Bearer <token>`. Cookie authentication is also supported for same-origin setups (via `delivery: 'cookie'` on verify).
 
 The token is stored in `localStorage` and expires within 15 minutes. Sessions survive page reloads but don't persist across browser sessions if the token has expired.
 
 Token refresh is fully transparent: the kit schedules a proactive renewal at 80% of the token's TTL (~12 minutes). As long as the tab stays open, the session stays alive without the app or user noticing.
+
+### Email verification flow
+
+After signup, the user receives a verification email. The `verify()` function returns a URL that the app must navigate to:
+
+```typescript
+// Fragment delivery (default) — cross-origin SPAs
+const url = await verify(config, email, token);
+window.location.href = url; // backend 302 redirects to frontend-app-url#access_token=...
+```
+
+The backend verifies the token, promotes the user, and redirects to your `frontend-app-url` with the JWT as a URL fragment. Your app reads the token from `window.location.hash` and calls `setToken()` to store it.
+
+For same-origin setups where cookies work, pass `'cookie'`:
+
+```typescript
+// Cookie delivery — same-origin setups
+const url = await verify(config, email, token, 'cookie');
+window.location.href = url; // backend sets JWT cookie and redirects
+```
 
 Errors are thrown as `{ status: number; message: string }`.
 
@@ -40,8 +60,8 @@ Errors are thrown as `{ status: number; message: string }`.
 |---|---|
 | `checkSession(config)` | Returns `UserInfo` if a valid token is held in memory, `null` otherwise |
 | `register(config, payload)` | Sign up — creates user and team |
-| `verify(config, email, token)` | Verify email after signup |
-| `login(config, email, password)` | Email/password login — stores token in memory |
+| `verify(config, email, token, delivery?)` | Verify email after signup — returns a URL for browser redirect (`delivery`: `'fragment'` (default) or `'cookie'`) |
+| `login(config, email, password, mode?)` | Email/password login (`mode`: `'bearer'` (default) or `'cookie'`) |
 | `logout(config)` | Clears the token and cancels pending refresh |
 
 ### Token management
@@ -60,7 +80,7 @@ Errors are thrown as `{ status: number; message: string }`.
 |---|---|
 | `invite(config, email, role)` | Invite a user to the current team |
 | `getInvitation(config, email, token)` | Invitation metadata (org name, role, isNewUser) |
-| `activate(config, payload)` | Activate account for a newly invited user |
+| `activate(config, payload, mode?)` | Activate account for a newly invited user (`mode`: `'bearer'` (default) or `'cookie'`) |
 | `acceptInvite(config, token)` | Accept invitation for an already registered user |
 | `resendInvite(config, email)` | Resend an expired invitation |
 

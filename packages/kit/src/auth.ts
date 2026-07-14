@@ -1,4 +1,4 @@
-import type { AuthConfig, UserInfo } from './types.js';
+import type { AuthConfig, UserInfo, LoginMode } from './types.js';
 import { apiFetch, setToken, getToken, clearToken, getTokenExpiry } from './client.js';
 
 // ── Proactive refresh ───────────────────────────────────────────────────────
@@ -69,19 +69,78 @@ export async function register(
   });
 }
 
-export async function verify(config: AuthConfig, email: string, token: string): Promise<void> {
-  await apiFetch(
-    config,
-    `/auth/verify?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`
-  );
+/**
+ * Build the URL for email verification.
+ *
+ * This is a browser-navigation endpoint — the backend responds with a 302
+ * redirect to frontend-app-url. The JWT is delivered according to delivery:
+ * - cookie: sets a JWT cookie (for same-origin setups)
+ * - fragment: appends #access_token=... to the redirect URL (for cross-origin SPAs)
+ */
+export function buildVerifyUrl(
+  config: AuthConfig,
+  email: string,
+  token: string,
+  delivery: 'cookie' | 'fragment' = 'fragment'
+): string {
+  const params = new URLSearchParams({ email, token, delivery });
+  return `${config.apiBaseUrl}/auth/verify?${params.toString()}`;
 }
 
+/**
+ * Verify an email token after signup.
+ *
+ * Returns the URL the browser must navigate to. The backend verifies the
+ * token, promotes the user to roles: ["user"], and 302 redirects to
+ * frontend-app-url with the JWT delivered per the delivery parameter.
+ *
+ * @param delivery  'cookie' sets a JWT cookie (same-origin);
+ *                  'fragment' (default) redirects with #access_token=... in the URL hash
+ *                  (cross-origin SPAs). Read the token from window.location.hash.
+ *
+ * @example
+ * // Fragment delivery (default) — cross-origin SPAs
+ * window.location.href = await verify(config, email, token);
+ * // After redirect, read the token from location.hash
+ *
+ * @example
+ * // Cookie delivery — same-origin setups
+ * await verify(config, email, token, 'cookie');
+ * // Cookie is set by the backend, no further action needed
+ */
+export async function verify(
+  config: AuthConfig,
+  email: string,
+  token: string,
+  delivery: 'cookie' | 'fragment' = 'fragment'
+): Promise<string> {
+  return buildVerifyUrl(config, email, token, delivery);
+}
+
+/**
+ * Login.
+ *
+ * @param mode 'bearer' (default): POST /token, stores token in localStorage.
+ *             'cookie': POST /token/cookie, backend sets HttpOnly JWT cookie.
+ */
 export async function login(
   config: AuthConfig,
   email: string,
-  password: string
+  password: string,
+  mode: LoginMode = 'bearer'
 ): Promise<UserInfo> {
   const credentials = btoa(`${email}:${password}`);
+
+  if (mode === 'cookie') {
+    // Cookie login — backend sets JWT cookie, no token in response
+    await apiFetch(config, '/token/cookie', {
+      method: 'POST',
+      headers: { Authorization: `Basic ${credentials}` },
+    });
+    return fetchUserInfo(config);
+  }
+
+  // Bearer login — token comes back in Auth-Token response header
   const res = await apiFetch(config, '/token', {
     method: 'POST',
     headers: { Authorization: `Basic ${credentials}` },
