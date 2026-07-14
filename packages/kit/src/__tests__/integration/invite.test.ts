@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { register, verify, login, clearToken } from '../../index';
+import { register, login, clearToken } from '../../index';
 import { invite, getInvitation, activate, acceptInvite } from '../../invite';
 import {
   getConfig, testEmail,
@@ -15,7 +15,7 @@ const password     = 'Test-Password-99!';
 async function registerAndVerify(email: string) {
   await register(config, { email, password, teamName: `Org-${email.slice(0, 8)}`, firstName: 'Test', lastName: 'User' });
   const token = await readVerificationToken(email);
-  await fetch(`${config.apiBaseUrl}/auth/verify?email=${encodeURIComponent(email)}&token=${token}`);
+  await fetch(`${config.apiBaseUrl}/auth/verify?email=${encodeURIComponent(email)}&token=${token}&delivery=cookie`);
 }
 
 beforeAll(async () => {
@@ -33,7 +33,9 @@ afterAll(async () => {
 });
 
 describe('invite — new user', () => {
-  beforeAll(() => login(config, ownerEmail, password));
+  beforeAll(async () => {
+    await login(config, ownerEmail, password);
+  });
 
   it('invite sends invitation to a new user', async () => {
     await expect(invite(config, newUserEmail, 'member')).resolves.toBeUndefined();
@@ -55,7 +57,10 @@ describe('invite — new user', () => {
 });
 
 describe('invite — existing user', () => {
-  beforeAll(() => login(config, ownerEmail, password));
+  beforeAll(async () => {
+    clearToken();
+    await login(config, ownerEmail, password);
+  });
 
   it('invite sends invitation to an existing user', async () => {
     await expect(invite(config, existingUserEmail, 'member')).resolves.toBeUndefined();

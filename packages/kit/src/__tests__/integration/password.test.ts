@@ -14,7 +14,7 @@ const newPassword = 'NewTest-Password-88!';
 beforeAll(async () => {
   await register(config, { email, password, teamName: 'PwdOrg', firstName: 'Test', lastName: 'User' });
   const token = await readVerificationToken(email);
-  await fetch(`${config.apiBaseUrl}/auth/verify?email=${encodeURIComponent(email)}&token=${token}`);
+  await fetch(`${config.apiBaseUrl}/auth/verify?email=${encodeURIComponent(email)}&token=${token}&delivery=cookie`);
 });
 
 afterAll(async () => {

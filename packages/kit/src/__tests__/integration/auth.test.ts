@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, afterAll } from 'vitest';
 import { register, verify, buildVerifyUrl, login, logout, checkSession, clearToken } from '../../index';
 import {
   getConfig, testEmail,
-  readVerificationToken, deleteUser,
+  readVerificationToken, deleteUser, adminGet,
 } from './helpers';
 
 const config = getConfig();
@@ -39,10 +39,36 @@ describe('auth flow', () => {
     expect(parsed.searchParams.get('token')).toBe(token);
   });
 
-  it('verify returns cookie delivery URL when requested', async () => {
+  it('verify with fragment delivery activates the account', async () => {
     const token = await readVerificationToken(email);
-    const url = await verify(config, email, token, 'cookie');
-    const parsed = new URL(url);
+    const url = buildVerifyUrl(config, email, token, 'fragment');
+
+    // Follow redirects manually — the backend should 302 to frontend-app-url#access_token=...
+    let current = url;
+    for (let i = 0; i < 5; i++) {
+      const res = await fetch(current, { redirect: 'manual' });
+      const location = res.headers.get('Location');
+      if (!location) break;
+      current = new URL(location, current).toString();
+    }
+
+    // The final URL should contain #access_token=... (the backend verified
+    // the token and redirected to the frontend with the JWT in the fragment).
+    expect(current).toContain('access_token=');
+
+    // Verify the user was activated by the backend (roles changed from
+    // $unauthenticated to user) — read directly from the admin API.
+    const userDoc = await adminGet<Record<string, unknown>>(
+      `/users/${encodeURIComponent(email)}`
+    );
+    const roles = userDoc['roles'] as string[] | undefined;
+    expect(roles).toContain('user');
+  });
+
+  it('verify with cookie delivery builds correct URL', async () => {
+    // User is already activated — just verify the URL construction
+    const url = verify(config, email, 'dummy-token', 'cookie');
+    const parsed = new URL(await url);
     expect(parsed.searchParams.get('delivery')).toBe('cookie');
   });
 

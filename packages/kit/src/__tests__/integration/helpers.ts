@@ -39,7 +39,7 @@ export async function adminFetch(path: string, init?: RequestInit): Promise<Resp
   });
 }
 
-async function adminGet<T>(path: string): Promise<T> {
+export async function adminGet<T>(path: string): Promise<T> {
   const res = await adminFetch(path);
   if (!res.ok) {
     const body = await res.text();
