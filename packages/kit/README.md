@@ -12,6 +12,8 @@ Pairs with [RESTHeart Cloud](https://cloud.restheart.com), which gives you a pro
 npm install @restheart-cloud/kit
 ```
 
+> **v0.3.0+ requires RESTHeart 9.6.0 or later.** Bearer-mode `activate()`, `resetPassword()`, and `switchTeam()` rely on the `delivery=body` query parameter, introduced in RESTHeart 9.6.0. Against an older server the request still succeeds, but the kit won't be able to capture the bearer token from the response (the extra param is silently ignored) — you'll need to log in again to get a token. Cookie mode is unaffected.
+
 ## Usage
 
 ```typescript
