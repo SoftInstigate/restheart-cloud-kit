@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { register, login, clearToken } from '../../index';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import { register, login, clearToken, getToken } from '../../index';
 import { invite, getInvitation, activate, acceptInvite } from '../../invite';
 import {
   getConfig, testEmail,
@@ -49,10 +49,47 @@ describe('invite — new user', () => {
     expect(invitation.email).toBe(newUserEmail);
   });
 
-  it('activate sets password and logs in the new user', async () => {
+  it('activate in bearer mode obtains token with a single request (no POST /token fallback)', async () => {
     const token = await readInvitationToken(newUserEmail);
     clearToken();
-    await expect(activate(config, { email: newUserEmail, token, password })).resolves.toBeUndefined();
+
+    // Spy on fetch to count /token calls
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    const tokenCallsBefore = fetchSpy.mock.calls.filter(
+      ([url]) => typeof url === 'string' && url.includes('/token') && !url.includes('/token/cookie')
+    ).length;
+
+    await activate(config, { email: newUserEmail, token, password });
+
+    const tokenCallsAfter = fetchSpy.mock.calls.filter(
+      ([url]) => typeof url === 'string' && url.includes('/token') && !url.includes('/token/cookie')
+    ).length;
+
+    // No additional /token call should have been made after activate
+    expect(tokenCallsAfter - tokenCallsBefore).toBe(0);
+
+    // A token should now be stored
+    expect(getToken()).toBeTruthy();
+
+    fetchSpy.mockRestore();
+  });
+
+  it('activate in cookie mode does not expose a token', async () => {
+    // Need a fresh invite for the cookie-mode test
+    clearToken();
+    await login(config, ownerEmail, password);
+    const cookieUserEmail = testEmail('invite-cookie');
+    await invite(config, cookieUserEmail, 'member');
+    const inviteToken = await readInvitationToken(cookieUserEmail);
+    clearToken();
+
+    await activate(config, { email: cookieUserEmail, token: inviteToken, password }, 'cookie');
+
+    // Cookie mode should NOT store a bearer token
+    expect(getToken()).toBeNull();
+
+    // Cleanup
+    await deleteUser(cookieUserEmail);
   });
 });
 

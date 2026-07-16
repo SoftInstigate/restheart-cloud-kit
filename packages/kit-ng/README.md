@@ -33,7 +33,7 @@ The kit supports **two authentication modes**:
 - **Bearer token** (default) — stored in `localStorage`, sent as `Authorization: Bearer <token>`
 - **Cookie** — JWT managed by the backend as an HttpOnly cookie
 
-Pass `mode: 'cookie'` to `login()`, `activate()`, or `resetPassword()` for same-origin setups. The default `'bearer'` mode works for cross-origin SPAs.
+Pass `mode: 'cookie'` to `login()`, `activate()`, `resetPassword()`, or `switchTeam()` for same-origin setups; the default `'bearer'` mode works for cross-origin SPAs too (requests are sent with `credentials: 'include'`, so the cookie also works cross-origin as long as the server's CORS config allows credentials for your origin). Each of these calls a matching auto-login endpoint with `delivery=body` (bearer) or `delivery=cookie`, and in bearer mode gets the fresh token back in the same response — no extra login round-trip.
 
 For email verification, pass `delivery: 'fragment'` (default, cross-origin) or `delivery: 'cookie'` (same-origin) to `verify()`.
 
@@ -85,7 +85,7 @@ auth.invite(email, role)           // Observable<void>
 auth.getInvitation(email, token)   // Observable<Invitation>
 auth.activate(payload, mode?)        // Observable<void> — mode: 'bearer' (default) | 'cookie'
 auth.acceptInvite(token)           // Observable<void>
-auth.switchTeam(teamId)            // Observable<void> — re-fetches session
+auth.switchTeam(teamId, mode?)       // Observable<void> — mode: 'bearer' (default) | 'cookie'; re-fetches session
 auth.forgotPassword(email)         // Observable<void>
 auth.resetPassword(payload, mode?)   // Observable<void> — mode: 'bearer' (default) | 'cookie'
 ```

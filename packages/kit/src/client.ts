@@ -122,6 +122,7 @@ export async function apiFetch(
   const res = await fetch(url, {
     ...init,
     headers,
+    credentials: 'include',
   });
 
   if (!res.ok) {

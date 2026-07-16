@@ -24,11 +24,19 @@ await login(config, 'user@example.com', 'secret');
 await logout(config);
 ```
 
-Authentication is handled via a Bearer token stored in `localStorage` — every authenticated request sends `Authorization: Bearer <token>`. Cookie authentication is also supported for same-origin setups (via `delivery: 'cookie'` on verify).
+Authentication is handled via a Bearer token stored in `localStorage` — every authenticated request sends `Authorization: Bearer <token>`. This is the default (`mode: 'bearer'`) and works cross-origin.
+
+Cookie authentication (`mode: 'cookie'`) is also supported, for same-origin setups: the backend manages an HttpOnly JWT cookie and no token ever touches `localStorage` or JavaScript. `apiFetch` always sends `credentials: 'include'`, so the cookie is sent on cross-origin requests too as long as the server's CORS config allows credentials for your origin.
 
 The token is stored in `localStorage` and expires within 15 minutes. Sessions survive page reloads but don't persist across browser sessions if the token has expired.
 
 Token refresh is fully transparent: the kit schedules a proactive renewal at 80% of the token's TTL (~12 minutes). As long as the tab stays open, the session stays alive without the app or user noticing.
+
+### Bearer vs cookie — same functions, one `mode` parameter
+
+`login`, `activate`, and `resetPassword` accept a `mode: 'bearer' | 'cookie'` parameter (default `'bearer'`), and `switchTeam` does too. Under the hood, this sets the `delivery` query parameter the backend understands (`body` for bearer, `cookie` for cookie mode) on every auto-login endpoint — `POST /token` / `POST /token/cookie`, `PATCH /auth/activate`, `PATCH /auth/reset-password`, `POST /auth/switch-team`. In bearer mode, the fresh token always comes back in the same response (no extra round-trip); in cookie mode, the backend sets the cookie and the response body carries no token.
+
+Pick one mode per app — mixing modes for the same user session isn't supported.
 
 ### Email verification flow
 
@@ -89,14 +97,14 @@ Errors are thrown as `{ status: number; message: string }`.
 | Function | Description |
 |---|---|
 | `forgotPassword(config, email)` | Request a reset link (always returns 202) |
-| `resetPassword(config, payload)` | Apply the reset token |
+| `resetPassword(config, payload, mode?)` | Apply the reset token (`mode`: `'bearer'` (default) or `'cookie'`) |
 
 ### Multi-team
 
 | Function | Description |
 |---|---|
 | `getTeams(config)` | List teams the authenticated user belongs to |
-| `switchTeam(config, teamId)` | Switch active team |
+| `switchTeam(config, teamId, mode?)` | Switch active team (`mode`: `'bearer'` (default) or `'cookie'`) — in bearer mode, the stored token is replaced with the freshly issued one carrying the new team claim |
 
 ## Types
 

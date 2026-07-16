@@ -80,6 +80,53 @@ export async function readPasswordResetToken(email: string): Promise<string> {
   return token as string;
 }
 
+// ── Cookie jar (Node's fetch has no automatic cookie store) ──────────────────
+//
+// Browsers manage cookies transparently across requests. Node's global fetch
+// (undici) does not: `credentials: 'include'` only controls whether cookies
+// *would* be sent, but there is no persistent, browser-like cookie store to
+// send them from — each `fetch()` call is independent. To exercise
+// cookie-mode auth end-to-end (e.g. login via /token/cookie followed by an
+// authenticated request) in this Node/vitest environment, install this tiny
+// jar around `globalThis.fetch` for the duration of a test.
+//
+// `adminFetch` above is unaffected: it captured the original `fetch` at
+// module load time, before any jar is installed.
+
+let jar: string[] = [];
+let realFetch: typeof fetch | null = null;
+
+export function installCookieJar(): void {
+  if (realFetch) return; // already installed
+  realFetch = globalThis.fetch;
+  jar = [];
+  const captured = realFetch;
+  globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+    const headers = new Headers(init?.headers);
+    if (jar.length > 0) headers.set('Cookie', jar.join('; '));
+    const res = await captured(input, { ...init, headers });
+    const setCookies = typeof res.headers.getSetCookie === 'function'
+      ? res.headers.getSetCookie()
+      : [];
+    for (const setCookie of setCookies) {
+      const pair = setCookie.split(';')[0]?.trim();
+      if (!pair) continue;
+      const name = pair.split('=')[0];
+      jar = jar.filter(c => !c.startsWith(`${name}=`));
+      jar.push(pair);
+    }
+    return res;
+  }) as typeof fetch;
+}
+
+export function uninstallCookieJar(): void {
+  if (realFetch) {
+    globalThis.fetch = realFetch;
+    realFetch = null;
+  }
+  jar = [];
+}
+
 // ── Cleanup ───────────────────────────────────────────────────────────────────
 
 export async function deleteUser(email: string): Promise<void> {

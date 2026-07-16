@@ -46,6 +46,31 @@ export function cancelRefresh(): void {
   }
 }
 
+// ── Bearer token extraction from auto-login responses ───────────────────────
+
+/**
+ * Extract a bearer token from an auto-login response (activate, resetPassword,
+ * switchTeam) and store it locally. The server returns the token in the JSON
+ * body (`access_token`) when `delivery=body`, or in the `Auth-Token` header
+ * as a fallback.
+ *
+ * After storing the token, schedules a proactive refresh.
+ *
+ * Does nothing if no token is found (e.g. cookie mode, or the server did
+ * not include a token).
+ */
+export async function applyBearerDelivery(
+  config: AuthConfig,
+  res: Response
+): Promise<void> {
+  const body = await res.clone().json().catch(() => null) as Record<string, unknown> | null;
+  const token = (body?.['access_token'] as string | undefined) ?? res.headers.get('Auth-Token');
+  if (token) {
+    setToken(token);
+    scheduleRefresh(config);
+  }
+}
+
 // ── Auth operations ─────────────────────────────────────────────────────────
 
 async function fetchUserInfo(config: AuthConfig): Promise<UserInfo> {

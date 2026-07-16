@@ -96,8 +96,8 @@ export class RhAuthService {
     return from(kit.resendInvite(this.config, email));
   }
 
-  switchTeam(teamId: { $oid: string }): Observable<void> {
-    return from(kit.switchTeam(this.config, teamId)).pipe(
+  switchTeam(teamId: { $oid: string }, mode: LoginMode = 'bearer'): Observable<void> {
+    return from(kit.switchTeam(this.config, teamId, mode)).pipe(
       switchMap(() => this.checkSession()),
       map(() => undefined)
     );
