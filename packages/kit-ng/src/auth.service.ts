@@ -63,7 +63,14 @@ export class RhAuthService {
 
   login(email: string, password: string, mode: LoginMode = 'bearer'): Observable<UserInfo> {
     return from(kit.login(this.config, email, password, mode)).pipe(
-      tap(u => this._user.set(u))
+      tap(u => this._user.set(u)),
+      switchMap(u =>
+        from(kit.getTeams(this.config)).pipe(
+          catchError(() => of([])),
+          tap(ts => this._teams.set(ts)),
+          map(() => u)
+        )
+      )
     );
   }
 
@@ -89,7 +96,15 @@ export class RhAuthService {
   }
 
   acceptInvite(token: string): Observable<void> {
-    return from(kit.acceptInvite(this.config, token));
+    return from(kit.acceptInvite(this.config, token)).pipe(
+      switchMap(() =>
+        from(kit.getTeams(this.config)).pipe(
+          catchError(() => of([])),
+          tap(ts => this._teams.set(ts))
+        )
+      ),
+      map(() => undefined)
+    );
   }
 
   resendInvite(email: string): Observable<void> {
