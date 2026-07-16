@@ -3,5 +3,6 @@
   "lib": {
     "entryFile": "src/index.ts"
   },
-  "dest": "dist"
+  "dest": "dist",
+  "allowedNonPeerDependencies": ["@restheart-cloud/kit"]
 }
