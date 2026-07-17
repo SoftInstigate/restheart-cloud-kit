@@ -36,6 +36,14 @@ export interface TeamMembership {
   active?: boolean;
 }
 
+/** A member of a team, as returned by `listTeamMembers`. */
+export interface TeamMember {
+  email: string;
+  name?: string;
+  role: 'owner' | 'member';
+  joinedAt: string;
+}
+
 export interface Invitation {
   email: string;
   teamName: string;

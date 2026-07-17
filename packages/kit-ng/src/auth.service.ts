@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, catchError, from, map, of, switchMap, tap } from 'rxjs';
-import type { UserInfo, TeamMembership, AuthConfig, LoginMode } from '@restheart-cloud/kit';
+import type { UserInfo, TeamMembership, TeamMember, AuthConfig, LoginMode } from '@restheart-cloud/kit';
 import * as kit from '@restheart-cloud/kit';
 import { RH_AUTH_CONFIG } from './tokens.js';
 
@@ -131,5 +131,51 @@ export class RhAuthService {
 
   resetPassword(payload: { email: string; token: string; password: string }, mode: LoginMode = 'bearer'): Observable<void> {
     return from(kit.resetPassword(this.config, payload, mode));
+  }
+
+  // ── Team members (mock — restheart#642, see @restheart-cloud/kit team.ts) ──
+
+  listTeamMembers(): Observable<TeamMember[]> {
+    return from(kit.listTeamMembers(this.config));
+  }
+
+  removeMember(email: string): Observable<void> {
+    return from(kit.removeMember(this.config, email));
+  }
+
+  updateMemberRole(email: string, role: 'owner' | 'member'): Observable<void> {
+    return from(kit.updateMemberRole(this.config, email, role));
+  }
+
+  // ── Team lifecycle (mock — restheart#643/#644/#645) ─────────────────────────
+
+  createTeam(teamName: string): Observable<TeamMembership> {
+    return from(kit.createTeam(this.config, teamName));
+  }
+
+  updateTeam(teamId: { $oid: string }, updates: { name?: string; description?: string }): Observable<void> {
+    return from(kit.updateTeam(this.config, teamId, updates));
+  }
+
+  deleteTeam(teamId: { $oid: string }): Observable<void> {
+    return from(kit.deleteTeam(this.config, teamId));
+  }
+
+  // ── Profile & password (mock — restheart#646/#647) ──────────────────────────
+
+  updateProfile(updates: { firstName?: string; lastName?: string }): Observable<void> {
+    return from(kit.updateProfile(this.config, updates)).pipe(
+      tap(res => {
+        const current = this._user();
+        if (current) {
+          this._user.set({ ...current, profile: { ...current.profile, ...res.profile } });
+        }
+      }),
+      map(() => undefined)
+    );
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<void> {
+    return from(kit.changePassword(this.config, currentPassword, newPassword));
   }
 }
