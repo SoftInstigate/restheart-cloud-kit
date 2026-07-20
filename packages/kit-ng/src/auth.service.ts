@@ -115,6 +115,12 @@ export class RhAuthService {
     return from(kit.listInvitations(this.config));
   }
 
+  loadTeams(): Observable<TeamMembership[]> {
+    return from(kit.getTeams(this.config)).pipe(
+      tap(ts => this._teams.set(ts))
+    );
+  }
+
   switchTeam(teamId: { $oid: string }, mode: LoginMode = 'bearer'): Observable<void> {
     return from(kit.switchTeam(this.config, teamId, mode)).pipe(
       switchMap(() => this.checkSession()),
