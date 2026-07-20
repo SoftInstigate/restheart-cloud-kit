@@ -14,8 +14,8 @@ export interface UserInfo {
   roles: string[];
   team?: { _id: { $oid: string }; role: string };
   profile?: {
-    firstName?: string;
-    lastName?: string;
+    name?: string;
+    surname?: string;
     avatarUrl?: string;
   };
 }
@@ -32,6 +32,7 @@ export interface TokenInfo {
 export interface TeamMembership {
   id: { $oid: string };
   name?: string;
+  description?: string;
   role: 'owner' | 'member';
   active?: boolean;
 }

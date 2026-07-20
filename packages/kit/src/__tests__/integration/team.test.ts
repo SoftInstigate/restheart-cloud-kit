@@ -84,7 +84,7 @@ describe('team', () => {
     // The `team` claim is `{ _id: { $oid }, role }` — verify the id matches.
     const claim = decodeTeamClaim(tokenAfter!) as Record<string, unknown>;
     expect(claim['_id']).toEqual(other!.id);
-    expect(claim['role']).toBe('member');
+    expect(claim['role']).toBe(other!.role);
 
     fetchSpy.mockRestore();
   });

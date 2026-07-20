@@ -44,12 +44,14 @@ describe('auth flow', () => {
     const url = buildVerifyUrl(config, email, token, 'fragment');
 
     // Follow redirects manually — the backend should 302 to frontend-app-url#access_token=...
+    // Stop as soon as the Location contains the access token (don't fetch the frontend URL).
     let current = url;
     for (let i = 0; i < 5; i++) {
       const res = await fetch(current, { redirect: 'manual' });
       const location = res.headers.get('Location');
       if (!location) break;
       current = new URL(location, current).toString();
+      if (current.includes('access_token=')) break;
     }
 
     // The final URL should contain #access_token=... (the backend verified

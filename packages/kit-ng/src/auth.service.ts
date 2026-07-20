@@ -165,12 +165,7 @@ export class RhAuthService {
 
   updateProfile(updates: { firstName?: string; lastName?: string }): Observable<void> {
     return from(kit.updateProfile(this.config, updates)).pipe(
-      tap(res => {
-        const current = this._user();
-        if (current) {
-          this._user.set({ ...current, profile: { ...current.profile, ...res.profile } });
-        }
-      }),
+      switchMap(() => this.checkSession()),
       map(() => undefined)
     );
   }

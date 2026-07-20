@@ -1,7 +1,10 @@
 import { defineConfig } from 'vitest/config';
 import { config } from 'dotenv';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-config(); // loads .env if present; no-op otherwise (CI uses env vars from secrets)
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(__dirname, '.env') });
 
 export default defineConfig({
   test: {
