@@ -133,7 +133,7 @@ export class RhAuthService {
     return from(kit.resetPassword(this.config, payload, mode));
   }
 
-  // ── Team members (mock — restheart#642, see @restheart-cloud/kit team.ts) ──
+  // ── Team members ─────────────────────────────────────────────────────────
 
   listTeamMembers(): Observable<TeamMember[]> {
     return from(kit.listTeamMembers(this.config));
@@ -147,21 +147,21 @@ export class RhAuthService {
     return from(kit.updateMemberRole(this.config, email, role));
   }
 
-  // ── Team lifecycle (mock — restheart#643/#644/#645) ─────────────────────────
+  // ── Team lifecycle ───────────────────────────────────────────────────────
 
   createTeam(teamName: string): Observable<TeamMembership> {
     return from(kit.createTeam(this.config, teamName));
   }
 
-  updateTeam(teamId: { $oid: string }, updates: { name?: string; description?: string }): Observable<void> {
-    return from(kit.updateTeam(this.config, teamId, updates));
+  updateTeam(updates: { name?: string; description?: string }): Observable<void> {
+    return from(kit.updateTeam(this.config, updates));
   }
 
-  deleteTeam(teamId: { $oid: string }): Observable<void> {
-    return from(kit.deleteTeam(this.config, teamId));
+  deleteTeam(): Observable<void> {
+    return from(kit.deleteTeam(this.config));
   }
 
-  // ── Profile & password (mock — restheart#646/#647) ──────────────────────────
+  // ── Profile & password ──────────────────────────────────────────────────
 
   updateProfile(updates: { firstName?: string; lastName?: string }): Observable<void> {
     return from(kit.updateProfile(this.config, updates)).pipe(

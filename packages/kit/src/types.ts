@@ -12,7 +12,7 @@ export interface AuthConfig {
 export interface UserInfo {
   _id: string;
   roles: string[];
-  team?: string;
+  team?: { _id: { $oid: string }; role: string };
   profile?: {
     firstName?: string;
     lastName?: string;
@@ -23,7 +23,7 @@ export interface UserInfo {
 export interface TokenInfo {
   username: string;
   roles: string[];
-  team?: string;
+  team?: { _id: { $oid: string }; role: string };
   expires_in: number;
   access_token: string;
   token_type: string;

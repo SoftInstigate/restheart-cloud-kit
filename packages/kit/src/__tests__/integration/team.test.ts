@@ -81,8 +81,10 @@ describe('team', () => {
     expect(tokenAfter).toBeTruthy();
     expect(tokenAfter).not.toBe(tokenBefore);
     expect(tokenAfter!.split('.').length).toBe(3);
-    // The `team` claim is the extended-JSON `{ $oid }` form, not a plain string.
-    expect(decodeTeamClaim(tokenAfter!)).toEqual(other!.id);
+    // The `team` claim is `{ _id: { $oid }, role }` — verify the id matches.
+    const claim = decodeTeamClaim(tokenAfter!) as Record<string, unknown>;
+    expect(claim['_id']).toEqual(other!.id);
+    expect(claim['role']).toBe('member');
 
     fetchSpy.mockRestore();
   });
