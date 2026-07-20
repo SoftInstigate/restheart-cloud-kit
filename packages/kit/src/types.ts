@@ -60,6 +60,7 @@ export interface PendingInvitation {
   isNewUser: boolean;
   createdAt?: string;
   expiresAt?: string;
+  expired?: boolean;
 }
 
 export interface ApiError {
