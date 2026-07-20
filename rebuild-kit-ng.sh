@@ -14,7 +14,7 @@ echo "Linking @restheart-cloud/kit..."
 npm link -w packages/kit
 
 echo "Linking @restheart-cloud/kit-ng..."
-npm link -w packages/kit-ng
+(cd packages/kit-ng/dist && npm link)
 
 echo "Linking into starter..."
 cd "$STARTER_DIR" && npm link @restheart-cloud/kit @restheart-cloud/kit-ng
