@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, catchError, from, map, of, switchMap, tap } from 'rxjs';
-import type { UserInfo, TeamMembership, TeamMember, AuthConfig, LoginMode } from '@restheart-cloud/kit';
+import type { UserInfo, TeamMembership, TeamMember, PendingInvitation, AuthConfig, LoginMode } from '@restheart-cloud/kit';
 import * as kit from '@restheart-cloud/kit';
 import { RH_AUTH_CONFIG } from './tokens.js';
 
@@ -109,6 +109,10 @@ export class RhAuthService {
 
   resendInvite(email: string): Observable<void> {
     return from(kit.resendInvite(this.config, email));
+  }
+
+  listInvitations(): Observable<PendingInvitation[]> {
+    return from(kit.listInvitations(this.config));
   }
 
   switchTeam(teamId: { $oid: string }, mode: LoginMode = 'bearer'): Observable<void> {

@@ -1,4 +1,4 @@
-import type { AuthConfig, Invitation, LoginMode } from './types.js';
+import type { AuthConfig, Invitation, LoginMode, PendingInvitation } from './types.js';
 import { apiFetch } from './client.js';
 import { applyBearerDelivery } from './auth.js';
 
@@ -61,4 +61,10 @@ export async function resendInvite(config: AuthConfig, email: string): Promise<v
     method: 'POST',
     body: JSON.stringify({ email }),
   });
+}
+
+/** Lists pending (non-expired) invitations for the caller's active team. Owner/admin only. */
+export async function listInvitations(config: AuthConfig): Promise<PendingInvitation[]> {
+  const res = await apiFetch(config, '/auth/invitations');
+  return res.json() as Promise<PendingInvitation[]>;
 }

@@ -53,6 +53,15 @@ export interface Invitation {
   expiresAt: string;
 }
 
+/** A pending invitation as returned by `listInvitations`. */
+export interface PendingInvitation {
+  email: string;
+  role: 'owner' | 'member';
+  isNewUser: boolean;
+  createdAt?: string;
+  expiresAt?: string;
+}
+
 export interface ApiError {
   status: number;
   message: string;
