@@ -41,6 +41,21 @@ npm install     # install all workspace dependencies
 npm run build   # build kit, then kit-ng
 ```
 
+`kit-ng` depends on `kit` at the exact version `0.0.0` — the version both packages carry in
+git, since releases are tag-driven. That is deliberate: any looser range is also satisfied by
+a published version, so npm resolves `kit` from the registry instead of linking the local
+workspace, and `kit-ng` then compiles against a stale copy. The release workflow rewrites
+this range to the tag before publishing, so `0.0.0` never reaches npm.
+
+If workspace resolution ever looks wrong, reinstall from scratch — note that the nested
+`node_modules` matter, because Node resolution walks up from the importing file and a stale
+copy under `packages/kit-ng/` shadows the workspace symlink at the root:
+
+```bash
+rm -rf node_modules packages/*/node_modules
+npm install
+```
+
 ### Running integration tests locally
 
 Create `packages/kit/.env` (not committed):
