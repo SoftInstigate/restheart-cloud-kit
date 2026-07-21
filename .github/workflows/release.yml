@@ -23,13 +23,17 @@ jobs:
       - run: npm install -g npm@latest
 
       - name: Set version from tag
+        # kit-ng bundles kit as a real dependency pinned to the exact version, so
+        # the two ship in lockstep. All three values have to move together: bump
+        # kit alone and the pin no longer matches the workspace, which sends npm
+        # to the registry for a version that was never published.
+        #
+        # `npm pkg set` only edits package.json — unlike `npm version`, it does
+        # not reify — so the tree is never momentarily inconsistent. The single
+        # `npm install` below resolves it in one shot.
         run: |
-          npm version ${{ github.ref_name }} --no-git-tag-version -w packages/kit
-          npm version ${{ github.ref_name }} --no-git-tag-version -w packages/kit-ng
-          # kit-ng bundles kit as a real dependency, so the two ship in lockstep.
-          # Pin it to the exact tag: a caret range on a 0.x version does not span
-          # minors, so leaving it stale makes npm resolve the previous kit from
-          # the registry instead of linking the local workspace.
+          npm pkg set version=${{ github.ref_name }} -w packages/kit
+          npm pkg set version=${{ github.ref_name }} -w packages/kit-ng
           npm pkg set dependencies.@restheart-cloud/kit=${{ github.ref_name }} -w packages/kit-ng
 
       - run: npm install
