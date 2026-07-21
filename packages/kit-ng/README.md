@@ -33,9 +33,11 @@ That one call registers `RhAuthService`, adds the HTTP interceptor (attaches the
 The kit supports **two authentication modes**:
 
 - **Bearer token** (default) — stored in `localStorage`, sent as `Authorization: Bearer <token>`
-- **Cookie** — JWT managed by the backend as an HttpOnly cookie
+- **Cookie** — JWT managed by the backend as an HttpOnly cookie, **same-origin only**
 
-Pass `mode: 'cookie'` to `login()`, `activate()`, `resetPassword()`, or `switchTeam()` for same-origin setups; the default `'bearer'` mode works for cross-origin SPAs too (requests are sent with `credentials: 'include'`, so the cookie also works cross-origin as long as the server's CORS config allows credentials for your origin). Each of these calls a matching auto-login endpoint with `delivery=body` (bearer) or `delivery=cookie`, and in bearer mode gets the fresh token back in the same response — no extra login round-trip.
+Pass `mode: 'cookie'` to `login()`, `activate()`, `resetPassword()`, or `switchTeam()` only when the app is served from the same origin as the service. Since a RESTHeart Cloud service lives on `*.restheart.com` while your app lives on your own domain, that cookie is third-party and is blocked by default in Safari and Firefox — regardless of the server's CORS configuration. **Cross-origin apps, which is the normal case, should stay on the default `'bearer'` mode.**
+
+Each of these calls a matching auto-login endpoint with `delivery=body` (bearer) or `delivery=cookie`, and in bearer mode gets the fresh token back in the same response — no extra login round-trip.
 
 For email verification, pass `delivery: 'fragment'` (default, cross-origin) or `delivery: 'cookie'` (same-origin) to `verify()`.
 

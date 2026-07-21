@@ -28,7 +28,11 @@ await logout(config);
 
 Authentication is handled via a Bearer token stored in `localStorage` — every authenticated request sends `Authorization: Bearer <token>`. This is the default (`mode: 'bearer'`) and works cross-origin.
 
-Cookie authentication (`mode: 'cookie'`) is also supported, for same-origin setups: the backend manages an HttpOnly JWT cookie and no token ever touches `localStorage` or JavaScript. `apiFetch` always sends `credentials: 'include'`, so the cookie is sent on cross-origin requests too as long as the server's CORS config allows credentials for your origin.
+Cookie authentication (`mode: 'cookie'`) is also supported, but **only for same-origin setups**: the backend manages an HttpOnly JWT cookie and no token ever touches `localStorage` or JavaScript.
+
+Because a RESTHeart Cloud service lives on `*.restheart.com` while your app lives on your own domain, that cookie is *third-party* on every request your page makes — blocked by default in Safari and Firefox, and left to the user in Chrome. A permissive CORS configuration does not change this: the browser drops the cookie before CORS is even consulted. **Use bearer mode unless the app is served from the same origin as the service.**
+
+If you are building on Next.js or Nuxt, note that this is a different cookie from the one those frameworks use — theirs is a first-party cookie set by your own server, holding the same bearer token, and it needs no cookie support from RESTHeart at all. See [docs/ADAPTERS.md](../../docs/ADAPTERS.md#2-token-delivery--the-cookie-story).
 
 The token is stored in `localStorage` and expires within 15 minutes. Sessions survive page reloads but don't persist across browser sessions if the token has expired.
 

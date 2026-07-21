@@ -16,8 +16,14 @@ Pure TypeScript, zero dependencies. All the auth logic: signup, login, email ver
 **[`@restheart-cloud/kit-ng`](./packages/kit-ng/README.md)** [![npm](https://img.shields.io/npm/v/@restheart-cloud/kit-ng)](https://www.npmjs.com/package/@restheart-cloud/kit-ng)  
 Angular — signals, route guards, HTTP interceptor.
 
-`@restheart-cloud/kit-react` — coming soon.  
-`@restheart-cloud/kit-vue` — coming soon.
+`@restheart-cloud/kit-react` — coming soon. React hooks and context, plus a `/next` subpath
+for Next.js: middleware guards, token refresh, and the first-party session cookie.
+
+`@restheart-cloud/kit-vue` — coming soon. Vue composables and navigation guards, plus a
+`/nuxt` subpath.
+
+See **[docs/ADAPTERS.md](./docs/ADAPTERS.md)** for the adapter contract, the roadmap, and how
+the access token is delivered in SPA and server-rendered apps.
 
 ## Quickstart
 
