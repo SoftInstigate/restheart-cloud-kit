@@ -89,3 +89,18 @@ git push origin 1.2.3
 CI runs the integration tests against the RESTHeart Cloud test instance. If they pass, both packages are published to npm at that version. If they fail, nothing is published.
 
 Integration tests can also be triggered manually from the **Actions** tab → **Integration Tests** → **Run workflow**.
+
+## Documentation
+
+Comprehensive documentation is available in the **[openwiki/](./openwiki/)** directory:
+
+- **[Quickstart](./openwiki/quickstart.md)** — Overview and navigation guide
+- **[Architecture Overview](./openwiki/architecture/overview.md)** — Technical architecture and design decisions
+- **[Token Delivery](./openwiki/architecture/token-delivery.md)** — Bearer vs cookie authentication modes
+- **[@restheart-cloud/kit](./openwiki/packages/kit.md)** — Core package API reference
+- **[@restheart-cloud/kit-ng](./openwiki/packages/kit-ng.md)** — Angular adapter documentation
+- **[Testing Guide](./openwiki/testing/guide.md)** — Integration test setup and execution
+- **[Release Process](./openwiki/deployment/release.md)** — Tag-driven release workflow
+- **[Contributing & Development](./openwiki/contributing/development.md)** — Local development setup
+
+For framework adapters and token delivery details, see **[docs/ADAPTERS.md](./docs/ADAPTERS.md)**.
