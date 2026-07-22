@@ -1,9 +1,3 @@
----
-type: Documentation Index
-title: "Architecture"
-description: "Files and subdirectories in Architecture."
----
-
 # Files
 
 - [Architecture Overview](overview.md) - Technical architecture of the RESTHeart Cloud Kit monorepo, including package structure, layering, and design principles.
