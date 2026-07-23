@@ -178,7 +178,11 @@ export async function login(
       method: 'POST',
       headers: { Authorization: `Basic ${credentials}` },
     });
-    return fetchUserInfo(config);
+    const user = await fetchUserInfo(config);
+    if (user.roles.includes('$unauthenticated')) {
+      throw { status: 403, message: 'Account not verified' };
+    }
+    return user;
   }
 
   // Bearer login — token comes back in Auth-Token response header
@@ -195,7 +199,13 @@ export async function login(
 
   persistToken(config, token);
 
-  return fetchUserInfo(config);
+  const user = await fetchUserInfo(config);
+  if (user.roles.includes('$unauthenticated')) {
+    clearToken();
+    cancelRefresh();
+    throw { status: 403, message: 'Account not verified' };
+  }
+  return user;
 }
 
 export async function logout(config: AuthConfig): Promise<void> {
@@ -229,7 +239,13 @@ export async function checkSession(config: AuthConfig): Promise<UserInfo | null>
 
   // Token exists and is not expired — verify with server and get full user info
   try {
-    return await fetchUserInfo(config);
+    const user = await fetchUserInfo(config);
+    if (user.roles.includes('$unauthenticated')) {
+      clearToken();
+      cancelRefresh();
+      return null;
+    }
+    return user;
   } catch (err: unknown) {
     const e = err as { status?: number };
     if (e?.status === 401 || e?.status === 403) {
