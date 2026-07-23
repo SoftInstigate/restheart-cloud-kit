@@ -1,0 +1,56 @@
+{
+  "name": "@restheart-cloud/kit-react",
+  "version": "0.0.0",
+  "description": "React context, hooks, and route guards for RESTHeart Cloud authentication — wraps @restheart-cloud/kit. Includes a /next subpath for Next.js server-side rendering.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./next": {
+      "types": "./dist/next/index.d.ts",
+      "import": "./dist/next/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SoftInstigate/restheart-cloud-kit.git",
+    "directory": "packages/kit-react"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "react-router-dom": ">=6",
+    "next": ">=14"
+  },
+  "peerDependenciesMeta": {
+    "react-router-dom": {
+      "optional": true
+    },
+    "next": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@restheart-cloud/kit": "0.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "next": "^15",
+    "react": "^19",
+    "react-dom": "^19",
+    "react-router-dom": "^7",
+    "typescript": "^5"
+  }
+}
