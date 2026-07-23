@@ -7,8 +7,10 @@ Pairs with [RESTHeart Cloud](https://cloud.restheart.com), which gives you a pro
 ## Installation
 
 ```bash
-npm install @restheart-cloud/kit-react @restheart-cloud/kit
+npm install @restheart-cloud/kit-react
 ```
+
+The core `@restheart-cloud/kit` is a regular dependency, so it is pulled in automatically — you don't install it separately.
 
 `react-router-dom` (for the guards) and `next` (for the `/next` subpath) are **optional peer dependencies** — install them only if you use those parts.
 
