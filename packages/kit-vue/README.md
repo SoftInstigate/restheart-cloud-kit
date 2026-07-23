@@ -10,6 +10,8 @@ Pairs with [RESTHeart Cloud](https://cloud.restheart.com), which gives you a pro
 npm install @restheart-cloud/kit-vue @restheart-cloud/kit
 ```
 
+The core `@restheart-cloud/kit` is a regular dependency, so it is pulled in automatically — you don't install it separately.
+
 `vue-router` (for the guards) and `h3` (for the `/nuxt` subpath) are **optional peer dependencies** — install them only if you use those parts.
 
 ## Setup
