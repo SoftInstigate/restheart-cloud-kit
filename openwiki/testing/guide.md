@@ -7,15 +7,19 @@ tags: [testing, integration, vitest, guide]
 
 # Testing Guide
 
-This guide covers the integration testing setup for RESTHeart Cloud Kit, including environment configuration, running tests, and writing new tests.
+This guide covers testing for RESTHeart Cloud Kit: core integration tests and adapter unit tests.
 
 ## Overview
 
-RESTHeart Cloud Kit uses **integration tests** that run against a real RESTHeart Cloud instance. This ensures tests validate actual API behavior, not mocked responses.
+RESTHeart Cloud Kit has two test tiers:
 
-**Test Framework**: Vitest 3+
-**Test Location**: `packages/kit/src/__tests__/integration/`
-**Configuration**: `packages/kit/vitest.config.ts`
+| Tier | What it tests | Backend needed | Runs on |
+|------|---------------|----------------|---------|
+| **Core integration** (`packages/kit`) | Auth flows, token lifecycle, teams, invites against live API | RESTHeart Cloud instance + secrets | Tags (release), manual trigger |
+| **Adapter unit** (`kit-react`, `kit-vue`, `kit-ng`) | Wiring: reactive state, guards, middleware, cookie bridge | None (mocks `@restheart-cloud/kit`) | Every push and PR |
+
+**Test Framework**: Vitest 4
+**Adapter test contract**: `docs/ADAPTER_CONTRACT.md`
 
 ## Environment Setup
 
@@ -347,15 +351,60 @@ it('works with cookies', async () => {
 });
 ```
 
+## Adapter Unit Tests
+
+Adapter tests mock `@restheart-cloud/kit` and assert only the **wiring**: which core call fires, and how the reactive state (signals / context / refs) and framework glue (guards, middleware, cookies) react.
+
+- Fast, deterministic, **no backend and no secrets**
+- Run on every push and PR (the **Unit Tests** CI workflow)
+- `kit-react` is the reference implementation
+
+### Running Adapter Tests
+
+```bash
+npm run build   # adapters resolve @restheart-cloud/kit from its built dist
+npm test -w packages/kit-react -w packages/kit-vue -w packages/kit-ng
+```
+
+**Note**: `kit-ng` uses Angular's experimental Vitest runner (requires Node ≥ 22.22.3). The others use Vitest directly.
+
+### Adapter Test Contract
+
+All adapters implement the shared checklist in `docs/ADAPTER_CONTRACT.md`. The contract covers:
+
+| Surface | Tests | Status |
+|---------|-------|--------|
+| **A. Reactive contract** (every SPA adapter) | Bootstrap, login, logout, switchTeam, updateProfile, acceptInvite, clearSession, hasMultipleTeams | ✅ all three |
+| **B. Guards** (every SPA adapter) | authGuard unauthenticated/authenticated, publicGuard authenticated/unauthenticated | ✅ all three |
+| **C. Token lifecycle** | 401 clears session (kit-ng interceptor) | ✅ kit-ng |
+| **D. SSR extras** (next/nuxt subpaths) | Middleware refresh, protected paths, session routes, action token sinks, fragment bridge | ✅ D1–D9, D10 pending |
+
+### Test File Locations
+
+| Adapter | SPA tests | SSR tests |
+|---------|-----------|-----------|
+| `kit-react` | `src/__tests__/*.test.tsx` | `src/next/__tests__/*.test.ts` |
+| `kit-vue` | `src/__tests__/*.test.ts` | `src/nuxt/__tests__/*.test.ts` |
+| `kit-ng` | `src/*.spec.ts` | n/a |
+
 ## CI/CD Integration
 
 ### GitHub Actions
 
-Tests run automatically on:
-- Pull requests (via integration-test workflow)
-- Tag pushes (via release workflow before publishing)
+**Unit Tests** (adapter tests, every push/PR):
+- Workflow: `.github/workflows/unit-tests.yml`
+- Runs on every push to `main` and every pull request
+- No secrets needed — adapters mock `@restheart-cloud/kit`
+- Scopes to `kit-react`, `kit-vue`, `kit-ng` (never `--workspaces`, which would also run kit's integration suite)
 
-**Workflow**: `.github/workflows/integration-test.yml`
+```yaml
+# Runs: npm ci → npm run build → npm test -w packages/kit-react -w packages/kit-vue -w packages/kit-ng
+```
+
+**Integration Tests** (core tests, gated):
+- Workflow: `.github/workflows/integration-test.yml`
+- Manual trigger or as part of the release pipeline
+- Requires RESTHeart Cloud instance and secrets
 
 ```yaml
 name: Integration Tests

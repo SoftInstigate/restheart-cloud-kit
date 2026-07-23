@@ -25,24 +25,61 @@ restheart-cloud-kit/
 │   │   │   ├── types.ts        # TypeScript interfaces
 │   │   │   └── index.ts        # Public API exports
 │   │   └── __tests__/
-│   │       └── integration/    # Integration tests
+│   │       └── integration/    # Integration tests (live RESTHeart Cloud)
 │   │
-│   └── kit-ng/                 # @restheart-cloud/kit-ng (Angular)
+│   ├── kit-ng/                 # @restheart-cloud/kit-ng (Angular)
+│   │   ├── src/
+│   │   │   ├── auth.service.ts # Angular service
+│   │   │   ├── auth.guard.ts   # Route guards
+│   │   │   ├── auth.interceptor.ts # HTTP interceptor
+│   │   │   ├── provide-rh-auth.ts  # DI setup
+│   │   │   ├── tokens.ts       # Injection tokens
+│   │   │   ├── __tests__/      # Unit tests (Vitest + Angular runner)
+│   │   │   └── index.ts        # Public API
+│   │   └── ng-package.json     # Angular packaging config
+│   │
+│   ├── kit-react/              # @restheart-cloud/kit-react (React)
+│   │   ├── src/
+│   │   │   ├── context.tsx     # React context + provider
+│   │   │   ├── guards.tsx      # Auth/public guard components
+│   │   │   ├── __tests__/      # SPA unit tests
+│   │   │   ├── next/           # /next subpath (Next.js SSR)
+│   │   │   │   ├── middleware.ts
+│   │   │   │   ├── route.ts
+│   │   │   │   ├── actions.ts
+│   │   │   │   ├── session.ts
+│   │   │   │   ├── cookies.ts
+│   │   │   │   └── __tests__/  # SSR unit tests
+│   │   │   └── index.ts
+│   │   ├── vitest.config.ts
+│   │   └── package.json
+│   │
+│   └── kit-vue/                # @restheart-cloud/kit-vue (Vue)
 │       ├── src/
-│       │   ├── auth.service.ts # Angular service
-│       │   ├── auth.guard.ts   # Route guards
-│       │   ├── auth.interceptor.ts # HTTP interceptor
-│       │   ├── provide-rh-auth.ts  # DI setup
-│       │   ├── tokens.ts       # Injection tokens
-│       │   └── index.ts        # Public API
-│       └── ng-package.json     # Angular packaging config
+│       │   ├── create.ts       # Vue plugin creation
+│       │   ├── store.ts        # Reactive state (refs)
+│       │   ├── use-auth.ts     # useAuth composable
+│       │   ├── guards.ts       # Navigation guards
+│       │   ├── __tests__/      # SPA unit tests
+│       │   ├── nuxt/           # /nuxt subpath (Nuxt SSR)
+│       │   │   ├── middleware.ts
+│       │   │   ├── handler.ts
+│       │   │   ├── actions.ts
+│       │   │   ├── session.ts
+│       │   │   ├── cookies.ts
+│       │   │   └── __tests__/  # SSR unit tests
+│       │   └── index.ts
+│       ├── vitest.config.ts
+│       └── package.json
 │
 ├── docs/
-│   └── ADAPTERS.md             # Framework adapter contract
+│   ├── ADAPTERS.md             # Framework adapter contract & roadmap
+│   └── ADAPTER_CONTRACT.md     # Shared test checklist for all adapters
 │
 ├── .github/workflows/
 │   ├── release.yml             # Tag-driven release pipeline
-│   ├── integration-test.yml    # Manual test trigger
+│   ├── unit-tests.yml          # Adapter unit tests (every push/PR)
+│   ├── integration-test.yml    # Core integration tests (gated, needs secrets)
 │   └── openwiki-update.yml     # Documentation updates
 │
 └── rebuild-kit-ng.sh           # Local development helper
@@ -74,17 +111,22 @@ The monorepo follows a strict layered architecture:
 
 **Purpose**: Reactive wrappers for specific frameworks
 
-**Current Adapter**: `@restheart-cloud/kit-ng` (Angular)
+**Current Adapters**:
+- `@restheart-cloud/kit-ng` (Angular) — signals, guards, interceptor
+- `@restheart-cloud/kit-react` (React) — hooks, context, guard components
+- `@restheart-cloud/kit-vue` (Vue) — composables, navigation guards
+
+**SSR Subpaths**:
+- `@restheart-cloud/kit-react/next` — Next.js middleware, route handlers, server actions
+- `@restheart-cloud/kit-vue/nuxt` — Nuxt server middleware, route rules
 
 **Characteristics**:
 - Depends on Layer 1 (kit)
-- Adds framework-specific patterns (signals, guards, interceptors)
+- Adds framework-specific patterns (signals, hooks, composables, guards)
 - Manages reactive state
 - Never reimplements API calls or token logic
 
-**Future Adapters**:
-- `@restheart-cloud/kit-react` — React hooks and context
-- `@restheart-cloud/kit-vue` — Vue composables
+**Test contract**: All adapters implement the shared checklist in `docs/ADAPTER_CONTRACT.md`. Tests mock `@restheart-cloud/kit` and assert only the wiring.
 
 ## Design Principles
 
@@ -113,7 +155,27 @@ Both authentication modes (bearer and cookie) must be supported consistently:
 
 Every auto-login endpoint (`login`, `activate`, `resetPassword`, `switchTeam`) accepts a `mode` parameter that controls token delivery via the `delivery` query parameter (`body` for bearer, `cookie` for cookie mode).
 
-### 3. Proactive Token Refresh
+### 3. Pluggable Token Source/Sink
+
+The core `AuthConfig` accepts optional `getToken` and `setToken` callbacks:
+
+```typescript
+interface AuthConfig {
+  apiBaseUrl: string;
+  getToken?: () => string | null | Promise<string | null>;  // custom token source
+  setToken?: (token: string) => void;                        // custom token sink
+}
+```
+
+**Defaults** (SPA adapters): localStorage read/write plus proactive refresh timer.
+
+**SSR runtimes** (Next.js middleware, Nuxt server) pass custom source/sink:
+- `getToken` reads from the request cookie
+- `setToken` captures the token so the server action can write it into a response cookie
+
+When `setToken` is provided, localStorage and the refresh timer are both bypassed. This lets SSR frameworks manage first-party session cookies without leaking into shared module globals or scheduling `setTimeout` on the server.
+
+### 4. Proactive Token Refresh
 
 Tokens are refreshed transparently:
 - 15-minute TTL
@@ -121,7 +183,7 @@ Tokens are refreshed transparently:
 - Automatic rescheduling after successful refresh
 - Graceful degradation on refresh failure (token expires naturally)
 
-### 4. Error Handling
+### 5. Error Handling
 
 All API errors are thrown as `{ status: number; message: string }` (ApiError type).
 
@@ -133,19 +195,17 @@ Special handling:
 ## Dependency Graph
 
 ```
-@restheart-cloud/kit-ng
-        │
-        ▼
-@restheart-cloud/kit
-        │
-        ▼
-    (none)
+@restheart-cloud/kit-ng        @restheart-cloud/kit-react      @restheart-cloud/kit-vue
+  (Angular adapter)              (React adapter)                 (Vue adapter)
+        │                              │                               │
+        └──────────────────────────────┼───────────────────────────────┘
+                                       │
+                                       ▼
+                         @restheart-cloud/kit
+                              (core, zero deps)
 ```
 
-**Workspace Configuration**:
-- `kit-ng` depends on `kit` at exact version `0.0.0` in development
-- This prevents npm from resolving `kit` from the registry instead of the workspace
-- Release workflow rewrites this to the tag version before publishing
+All adapters depend on `kit` at exact version `0.0.0` in development to prevent npm from resolving from the registry. The release workflow rewrites this to the tag version before publishing.
 
 ## Authentication Flow Architecture
 

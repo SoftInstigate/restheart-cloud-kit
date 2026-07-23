@@ -15,39 +15,45 @@ RESTHeart Cloud Kit provides the same speed on the frontend that RESTHeart Cloud
 
 - **`@restheart-cloud/kit`** — Framework-agnostic core with zero dependencies. Handles all authentication logic: signup, login, email verification, password reset, team management, and multi-team switching.
 - **`@restheart-cloud/kit-ng`** — Angular adapter with signals, route guards, and HTTP interceptor. Wraps the core kit.
+- **`@restheart-cloud/kit-react`** — React adapter with context, hooks, and route guards. Includes a `/next` subpath for Next.js SSR support (middleware, route handlers, server actions).
+- **`@restheart-cloud/kit-vue`** — Vue adapter with composables and navigation guards. Includes a `/nuxt` subpath for Nuxt SSR support.
 
 ## Architecture Overview
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Your Frontend App                         │
-├─────────────────────────────────────────────────────────────┤
-│  @restheart-cloud/kit-ng (Angular)                          │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │  RhAuthService                                        │  │
-│  │  • Signals (user, teams, isAuthenticated)             │  │
-│  │  • Route Guards (authGuard, publicGuard)              │  │
-│  │  • HTTP Interceptor (Bearer token, 401 handling)      │  │
-│  └───────────────────────────────────────────────────────┘  │
-│                           │                                 │
-│                           ▼                                 │
-│  @restheart-cloud/kit (Core)                                │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │  • Auth flows (register, login, verify, logout)       │  │
-│  │  • Token management (localStorage, proactive refresh) │  │
-│  │  • Team operations (switch, create, manage members)   │  │
-│  │  • Password reset & profile updates                   │  │
-│  └───────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                      Your Frontend App                               │
+├─────────────────────────────────────────────────────────────────────┤
+│  Framework Adapters (reactive wrappers)                             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
+│  │  kit-ng      │  │  kit-react   │  │  kit-vue     │              │
+│  │  (Angular)   │  │  (React)     │  │  (Vue)       │              │
+│  │  signals,    │  │  hooks,      │  │  composables,│              │
+│  │  guards,     │  │  context,    │  │  navigation  │              │
+│  │  interceptor │  │  guards      │  │  guards      │              │
+│  │              │  │  + /next     │  │  + /nuxt     │              │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘              │
+│         │                 │                 │                       │
+│         └─────────────────┼─────────────────┘                       │
+│                           ▼                                         │
+│  @restheart-cloud/kit (Core)                                        │
+│  ┌───────────────────────────────────────────────────────────────┐  │
+│  │  • Auth flows (register, login, verify, logout)               │  │
+│  │  • Token management (localStorage, proactive refresh)         │  │
+│  │  • Team operations (switch, create, manage members)           │  │
+│  │  • Password reset & profile updates                           │  │
+│  │  • Pluggable token source/sink (for SSR runtimes)             │  │
+│  └───────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────┘
                                │
                                ▼
-┌─────────────────────────────────────────────────────────────┐
-│              RESTHeart Cloud Backend                         │
-│  • MongoDB database                                         │
-│  • REST API                                                 │
-│  • Authentication & multi-tenancy                           │
-│  • Managed infrastructure                                   │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│              RESTHeart Cloud Backend                                 │
+│  • MongoDB database                                                  │
+│  • REST API                                                          │
+│  • Authentication & multi-tenancy                                    │
+│  • Managed infrastructure                                            │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Quick Navigation
@@ -59,9 +65,11 @@ RESTHeart Cloud Kit provides the same speed on the frontend that RESTHeart Cloud
 ### Packages
 - **[Core Kit](packages/kit.md)** — API reference, configuration, authentication flows
 - **[Angular Adapter](packages/kit-ng.md)** — RhAuthService, signals, guards, interceptor
+- **[React Adapter](packages/kit-react.md)** — Hooks, context, guards, Next.js `/next` subpath
+- **[Vue Adapter](packages/kit-vue.md)** — Composables, navigation guards, Nuxt `/nuxt` subpath
 
 ### Development
-- **[Testing Guide](testing/guide.md)** — Integration tests, environment setup, running tests
+- **[Testing Guide](testing/guide.md)** — Core integration tests and adapter unit tests
 - **[Release Process](deployment/release.md)** — Tag-driven releases, CI/CD pipeline
 - **[Contributing](contributing/development.md)** — Local setup, workspace configuration, debugging
 
@@ -92,7 +100,7 @@ npm install
 ### 3. Build
 
 ```bash
-# Build both packages (kit first, then kit-ng)
+# Build all packages (kit first, then adapters)
 npm run build
 ```
 
@@ -109,6 +117,13 @@ EOF
 
 # Run integration tests
 npm test -w packages/kit
+```
+
+Adapter unit tests need no backend:
+
+```bash
+npm run build   # adapters resolve @restheart-cloud/kit from its built dist
+npm test -w packages/kit-react -w packages/kit-vue -w packages/kit-ng
 ```
 
 ### 5. Local Development with Starter App
@@ -153,8 +168,11 @@ Users can belong to multiple teams:
 
 The architecture follows a layered pattern:
 - **Core** (`kit`): All network calls, token operations, business rules
-- **Adapters** (`kit-ng`): Reactive wrappers, framework-specific integration
+- **Adapters** (`kit-ng`, `kit-react`, `kit-vue`): Reactive wrappers, framework-specific integration
+- **SSR subpaths** (`kit-react/next`, `kit-vue/nuxt`): Server-side token management via pluggable token source/sink
 - **Principle**: An adapter that reimplements an API call or token computation is a bug
+
+See **[docs/ADAPTERS.md](../docs/ADAPTERS.md)** for the full adapter contract and **[docs/ADAPTER_CONTRACT.md](../docs/ADAPTER_CONTRACT.md)** for the shared test checklist.
 
 ## Common Workflows
 
@@ -199,19 +217,48 @@ export class AppComponent {
 }
 ```
 
+### React Integration
+
+```tsx
+import { RhAuthProvider, useAuth } from '@restheart-cloud/kit-react';
+
+// Near app root
+createRoot(document.getElementById('root')!).render(
+  <RhAuthProvider config={{ apiBaseUrl: import.meta.env.VITE_API_URL }}>
+    <App />
+  </RhAuthProvider>
+);
+
+// In component
+function Header() {
+  const auth = useAuth();
+  if (!auth.isAuthenticated) return null;
+  return <span>{auth.user?.profile?.name}</span>;
+}
+```
+
+### Vue Integration
+
+```ts
+import { createRhAuth, useAuth } from '@restheart-cloud/kit-vue';
+
+// main.ts
+const rhAuth = createRhAuth({ apiBaseUrl: import.meta.env.VITE_API_URL });
+app.use(rhAuth);
+
+// Component
+const auth = useAuth();
+// auth.isAuthenticated.value, auth.user.value, auth.teams.value
+```
+
 ## Version Information
 
-- **Current version**: 0.0.0 (development)
+- **Current version**: 0.0.0 (development, tag-driven releases)
 - **Required RESTHeart**: 9.6.0+ (for `delivery=body` support)
-- **Angular**: 21+ (peer dependency for kit-ng)
-- **TypeScript**: 5+ (kit), 6+ (kit-ng)
-
-## Backlog
-
-- **React Adapter** (`@restheart-cloud/kit-react`) — Hooks, context, guard component
-- **Vue Adapter** (`@restheart-cloud/kit-vue`) — Composables, navigation guards
-- **Next.js Integration** — Middleware, route handlers, token refresh
-- **Nuxt Integration** — Server middleware, route rules
+- **Node**: 22.22.3+ (required by Angular 22 CLI for `kit-ng` tests)
+- **Angular**: 22+ (peer dependency for kit-ng)
+- **TypeScript**: 5+ (kit), 6+ (adapters)
+- **Vitest**: 4 (all adapter unit tests)
 
 ## Support
 

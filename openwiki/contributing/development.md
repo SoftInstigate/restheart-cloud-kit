@@ -39,9 +39,20 @@ This installs all dependencies for both packages using npm workspaces.
 npm run build
 ```
 
-Builds `kit` first, then `kit-ng` (order matters due to dependency).
+Builds `kit` first, then all adapters (order matters due to dependency).
+
+> **Node ≥ 22.22.3** is required — the Angular 22 CLI that runs `kit-ng`'s tests enforces it. The rest of the workspace is fine on any Node 22.
 
 ### 4. Run Tests
+
+**Adapter unit tests** (no backend needed):
+
+```bash
+npm run build   # adapters resolve @restheart-cloud/kit from its built dist
+npm test -w packages/kit-react -w packages/kit-vue -w packages/kit-ng
+```
+
+**Integration tests** (requires RESTHeart Cloud instance):
 
 ```bash
 # Create test environment file
@@ -66,14 +77,31 @@ restheart-cloud-kit/
 │   │   ├── package.json
 │   │   └── tsconfig.json
 │   │
-│   └── kit-ng/                 # Angular adapter
-│       ├── src/                # Source code
-│       ├── dist/               # Compiled output (gitignored)
+│   ├── kit-ng/                 # Angular adapter
+│   │   ├── src/                # Source + unit tests (*.spec.ts)
+│   │   ├── dist/               # Compiled output (gitignored)
+│   │   ├── angular.json        # Angular workspace config (Vitest runner)
+│   │   ├── package.json
+│   │   ├── ng-package.json     # Angular packaging config
+│   │   └── tsconfig.json
+│   │
+│   ├── kit-react/              # React adapter
+│   │   ├── src/                # Source + unit tests
+│   │   ├── src/next/           # /next subpath (Next.js SSR)
+│   │   ├── vitest.config.ts
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
+│   └── kit-vue/                # Vue adapter
+│       ├── src/                # Source + unit tests
+│       ├── src/nuxt/           # /nuxt subpath (Nuxt SSR)
+│       ├── vitest.config.ts
 │       ├── package.json
-│       ├── ng-package.json     # Angular packaging config
 │       └── tsconfig.json
 │
 ├── docs/                       # Documentation
+│   ├── ADAPTERS.md             # Adapter contract & roadmap
+│   └── ADAPTER_CONTRACT.md     # Shared test checklist
 ├── .github/workflows/          # CI/CD workflows
 ├── package.json                # Workspace root
 ├── tsconfig.base.json          # Shared TypeScript config
@@ -101,7 +129,7 @@ The monorepo uses npm workspaces:
 
 ### Dependency Resolution
 
-`kit-ng` depends on `kit` at exact version `0.0.0`:
+All adapters depend on `kit` at exact version `0.0.0`:
 
 ```json
 {
@@ -113,7 +141,7 @@ The monorepo uses npm workspaces:
 
 **Why `0.0.0`?**
 - Prevents npm from resolving `kit` from the registry
-- Ensures `kit-ng` always uses local workspace `kit`
+- Ensures adapters always use local workspace `kit`
 - Release workflow rewrites to tag version before publishing
 
 **If resolution looks wrong**:
@@ -144,6 +172,8 @@ npm install
 **Package configs** extend base:
 - `packages/kit/tsconfig.json` — Standard TypeScript
 - `packages/kit-ng/tsconfig.json` — Angular-specific settings
+- `packages/kit-react/tsconfig.json` — React JSX settings
+- `packages/kit-vue/tsconfig.json` — Vue settings
 
 ## Building
 
@@ -153,7 +183,7 @@ npm install
 npm run build
 ```
 
-**Order**: kit → kit-ng (kit-ng depends on kit)
+**Order**: kit → kit-ng, kit-react, kit-vue (adapters depend on kit)
 
 ### Build Individual Packages
 
@@ -176,6 +206,16 @@ npm run build -w packages/kit-ng
 - `packages/kit-ng/dist/` — Angular package format
 - Entry point: `packages/kit-ng/dist/index.js`
 - Types: `packages/kit-ng/dist/index.d.ts`
+
+**kit-react**:
+- `packages/kit-react/dist/` — ES modules
+- Entry point: `packages/kit-react/dist/index.js`
+- `/next` subpath: `packages/kit-react/dist/next/`
+
+**kit-vue**:
+- `packages/kit-vue/dist/` — ES modules
+- Entry point: `packages/kit-vue/dist/index.js`
+- `/nuxt` subpath: `packages/kit-vue/dist/nuxt/`
 
 ### Watch Mode
 
@@ -238,6 +278,17 @@ cd packages/kit-ng/dist && npm unlink
 ```
 
 ## Testing
+
+### Adapter Unit Tests
+
+No backend needed — run on every push:
+
+```bash
+npm run build
+npm test -w packages/kit-react -w packages/kit-vue -w packages/kit-ng
+```
+
+See [Testing Guide](../testing/guide.md) and `docs/ADAPTER_CONTRACT.md` for the shared test checklist.
 
 ### Integration Tests
 
