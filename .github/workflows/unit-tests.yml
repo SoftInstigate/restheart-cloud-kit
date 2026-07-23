@@ -1,0 +1,31 @@
+name: Unit Tests
+
+# Adapter unit tests mock @restheart-cloud/kit, so they need no backend and no
+# secrets — unlike the core's live integration tests (integration-test.yml).
+# They run on every push and pull request as the fast feedback gate.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  unit:
+    name: Adapter unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Angular 22's CLI (kit-ng's Vitest runner) requires >= 22.22.3.
+          node-version: 22
+
+      - run: npm ci
+
+      # Adapters resolve @restheart-cloud/kit from its built dist.
+      - run: npm run build
+
+      # Scope to the adapters explicitly — never --workspaces, which would also
+      # run kit's integration test suite (that one needs the live instance).
+      - run: npm test -w packages/kit-react -w packages/kit-vue -w packages/kit-ng
