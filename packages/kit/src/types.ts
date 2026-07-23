@@ -7,6 +7,28 @@ export type LoginMode = 'bearer' | 'cookie';
 
 export interface AuthConfig {
   apiBaseUrl: string;
+  /**
+   * Where the bearer token comes from.
+   *
+   * Defaults to the browser `localStorage` store used by SPA adapters. Server
+   * runtimes (Next.js middleware/route handlers, Nuxt server middleware) have no
+   * `localStorage`; they pass a source that reads the token from the request
+   * cookie instead. May be async so the source can await a cookie store.
+   */
+  getToken?: () => string | null | Promise<string | null>;
+  /**
+   * Where a freshly obtained bearer token is persisted, after `login` and the
+   * auto-login endpoints (`activate`, `resetPassword`, `switchTeam`).
+   *
+   * Defaults to the browser `localStorage` store plus a proactive refresh timer.
+   * Server runtimes pass a sink that simply captures the token — so a server
+   * action can write it into a response cookie — instead of touching
+   * `localStorage` (which on a server would leak into a shared module global) or
+   * scheduling a `setTimeout` refresh (which a server has nothing to refresh).
+   *
+   * When set, the localStorage store and the refresh timer are both bypassed.
+   */
+  setToken?: (token: string) => void;
 }
 
 export interface UserInfo {

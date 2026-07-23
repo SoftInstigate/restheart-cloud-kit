@@ -51,12 +51,15 @@ export async function deleteTeam(config: AuthConfig): Promise<void> {
  *
  * In bearer mode the stored token is replaced with the fresh one so that
  * subsequent requests carry the correct team context.
+ *
+ * Returns the fresh bearer token (bearer mode), or `null` (cookie mode), so a
+ * server action can write it into a response cookie.
  */
 export async function switchTeam(
   config: AuthConfig,
   teamId: { $oid: string },
   mode: LoginMode = 'bearer'
-): Promise<void> {
+): Promise<string | null> {
   const delivery = mode === 'bearer' ? 'body' : 'cookie';
   const res = await apiFetch(config, `/auth/switch-team?delivery=${delivery}`, {
     method: 'POST',
@@ -64,7 +67,8 @@ export async function switchTeam(
   });
 
   if (mode === 'bearer') {
-    await applyBearerDelivery(config, res);
+    return applyBearerDelivery(config, res);
   }
   // Cookie mode: backend already set the JWT cookie, nothing to do
+  return null;
 }

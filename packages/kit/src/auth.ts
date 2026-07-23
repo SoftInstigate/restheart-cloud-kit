@@ -54,18 +54,34 @@ export function cancelRefresh(): void {
  * body (`access_token`) when `delivery=body`, or in the `Auth-Token` header
  * as a fallback.
  *
- * After storing the token, schedules a proactive refresh.
+ * By default the token is stored in localStorage and a proactive refresh is
+ * scheduled. When `config.setToken` is provided (server runtimes), the token is
+ * handed to that sink instead and no refresh timer is scheduled.
  *
- * Does nothing if no token is found (e.g. cookie mode, or the server did
- * not include a token).
+ * Returns the token so a server action can write it into a response cookie, or
+ * `null` if none was found (cookie mode, or the server did not include one).
  */
 export async function applyBearerDelivery(
   config: AuthConfig,
   res: Response
-): Promise<void> {
+): Promise<string | null> {
   const body = await res.clone().json().catch(() => null) as Record<string, unknown> | null;
-  const token = (body?.['access_token'] as string | undefined) ?? res.headers.get('Auth-Token');
+  const token = (body?.['access_token'] as string | undefined) ?? res.headers.get('Auth-Token') ?? null;
   if (token) {
+    persistToken(config, token);
+  }
+  return token;
+}
+
+/**
+ * Store a freshly obtained token. Uses the pluggable sink when configured
+ * (server: capture only), otherwise the localStorage store plus a proactive
+ * refresh timer (browser).
+ */
+function persistToken(config: AuthConfig, token: string): void {
+  if (config.setToken) {
+    config.setToken(token);
+  } else {
     setToken(token);
     scheduleRefresh(config);
   }
@@ -177,8 +193,7 @@ export async function login(
     throw { status: 0, message: 'Login succeeded but no Auth-Token in response' };
   }
 
-  setToken(token);
-  scheduleRefresh(config);
+  persistToken(config, token);
 
   return fetchUserInfo(config);
 }
@@ -199,7 +214,9 @@ export async function logout(config: AuthConfig): Promise<void> {
  * returns user info from the server. Otherwise returns null.
  */
 export async function checkSession(config: AuthConfig): Promise<UserInfo | null> {
-  const token = getToken();
+  // Resolve through the pluggable source: SPA adapters read localStorage, server
+  // runtimes read the request cookie. Falls back to the localStorage default.
+  const token = config.getToken ? await config.getToken() : getToken();
   if (!token) return null;
 
   // Client-side expiry check — no need to call the server if the JWT is expired

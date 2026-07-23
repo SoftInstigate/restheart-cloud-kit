@@ -113,8 +113,10 @@ export async function apiFetch(
   // an unauthenticated request (e.g. a session check) gets a 401.
   headers.set('No-Auth-Challenge', 'true');
 
-  // Attach Bearer token when held in localStorage
-  const token = getToken();
+  // Attach the Bearer token. The source is pluggable: SPA adapters use the
+  // default localStorage store; server runtimes pass a source that reads the
+  // token from the request cookie (there is no localStorage on a server).
+  const token = config.getToken ? await config.getToken() : getToken();
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
   }

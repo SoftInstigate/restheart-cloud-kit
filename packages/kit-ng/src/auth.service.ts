@@ -92,7 +92,7 @@ export class RhAuthService {
   }
 
   activate(payload: { email: string; token: string; password: string }, mode: LoginMode = 'bearer'): Observable<void> {
-    return from(kit.activate(this.config, payload, mode));
+    return from(kit.activate(this.config, payload, mode)).pipe(map(() => undefined));
   }
 
   acceptInvite(token: string): Observable<void> {
@@ -140,7 +140,7 @@ export class RhAuthService {
   }
 
   resetPassword(payload: { email: string; token: string; password: string }, mode: LoginMode = 'bearer'): Observable<void> {
-    return from(kit.resetPassword(this.config, payload, mode));
+    return from(kit.resetPassword(this.config, payload, mode)).pipe(map(() => undefined));
   }
 
   // ── Team members ─────────────────────────────────────────────────────────

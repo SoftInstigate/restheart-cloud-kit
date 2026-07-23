@@ -31,12 +31,15 @@ export async function getInvitation(
  * Uses the `delivery` query parameter to control token delivery:
  * - bearer (default): delivery=body — token returned in the response JSON body
  * - cookie: delivery=cookie — backend sets HttpOnly JWT cookie, no token in body
+ *
+ * Returns the fresh bearer token (bearer mode), or `null` (cookie mode), so a
+ * server action can write it into a response cookie.
  */
 export async function activate(
   config: AuthConfig,
   payload: { email: string; token: string; password: string },
   mode: LoginMode = 'bearer'
-): Promise<void> {
+): Promise<string | null> {
   const delivery = mode === 'bearer' ? 'body' : 'cookie';
   const res = await apiFetch(config, `/auth/activate?delivery=${delivery}`, {
     method: 'PATCH',
@@ -44,9 +47,10 @@ export async function activate(
   });
 
   if (mode === 'bearer') {
-    await applyBearerDelivery(config, res);
+    return applyBearerDelivery(config, res);
   }
   // Cookie mode: backend already set the JWT cookie, nothing to do
+  return null;
 }
 
 export async function acceptInvite(config: AuthConfig, token: string): Promise<void> {
