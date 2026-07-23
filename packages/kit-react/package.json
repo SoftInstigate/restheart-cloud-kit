@@ -25,7 +25,8 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "vitest run"
   },
   "peerDependencies": {
     "react": ">=18",
@@ -45,12 +46,16 @@
     "@restheart-cloud/kit": "0.0.0"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10",
+    "@testing-library/react": "^16",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "jsdom": "^26",
     "next": "^15",
     "react": "^19",
     "react-dom": "^19",
     "react-router-dom": "^7",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3"
   }
 }
