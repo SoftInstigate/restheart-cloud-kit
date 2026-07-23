@@ -118,6 +118,8 @@ Comprehensive documentation is available in the **[openwiki/](./openwiki/)** dir
 - **[Token Delivery](./openwiki/architecture/token-delivery.md)** — Bearer vs cookie authentication modes
 - **[@restheart-cloud/kit](./openwiki/packages/kit.md)** — Core package API reference
 - **[@restheart-cloud/kit-ng](./openwiki/packages/kit-ng.md)** — Angular adapter documentation
+- **[@restheart-cloud/kit-react](./openwiki/packages/kit-react.md)** — React adapter with hooks, context, and Next.js SSR support
+- **[@restheart-cloud/kit-vue](./openwiki/packages/kit-vue.md)** — Vue adapter with composables and Nuxt SSR support
 - **[Testing Guide](./openwiki/testing/guide.md)** — Integration test setup and execution
 - **[Release Process](./openwiki/deployment/release.md)** — Tag-driven release workflow
 - **[Contributing & Development](./openwiki/contributing/development.md)** — Local development setup
