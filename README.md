@@ -16,11 +16,12 @@ Pure TypeScript, zero dependencies. All the auth logic: signup, login, email ver
 **[`@restheart-cloud/kit-ng`](./packages/kit-ng/README.md)** [![npm](https://img.shields.io/npm/v/@restheart-cloud/kit-ng)](https://www.npmjs.com/package/@restheart-cloud/kit-ng)  
 Angular — signals, route guards, HTTP interceptor.
 
-`@restheart-cloud/kit-react` — coming soon. React hooks and context, plus a `/next` subpath
-for Next.js: middleware guards, token refresh, and the first-party session cookie.
+**[`@restheart-cloud/kit-react`](./packages/kit-react/README.md)** [![npm](https://img.shields.io/npm/v/@restheart-cloud/kit-react)](https://www.npmjs.com/package/@restheart-cloud/kit-react)  
+React — context, hooks, and route guards, plus a `/next` subpath for Next.js: middleware
+refresh and guards, first-party session cookie, fragment→cookie bridge, and server actions.
 
-`@restheart-cloud/kit-vue` — coming soon. Vue composables and navigation guards, plus a
-`/nuxt` subpath.
+**[`@restheart-cloud/kit-vue`](./packages/kit-vue/README.md)** [![npm](https://img.shields.io/npm/v/@restheart-cloud/kit-vue)](https://www.npmjs.com/package/@restheart-cloud/kit-vue)  
+Vue — composables and navigation guards, plus a `/nuxt` subpath for Nuxt on the same pattern.
 
 See **[docs/ADAPTERS.md](./docs/ADAPTERS.md)** for the adapter contract, the roadmap, and how
 the access token is delivered in SPA and server-rendered apps.
@@ -38,13 +39,16 @@ The fastest path to a working Angular app:
 
 ```bash
 npm install     # install all workspace dependencies
-npm run build   # build kit, then kit-ng
+npm run build   # build kit, then the adapters (kit-ng, kit-react, kit-vue)
 ```
 
-`kit-ng` depends on `kit` at the exact version `0.0.0` — the version both packages carry in
-git, since releases are tag-driven. That is deliberate: any looser range is also satisfied by
-a published version, so npm resolves `kit` from the registry instead of linking the local
-workspace, and `kit-ng` then compiles against a stale copy. The release workflow rewrites
+> **Node ≥ 22.22.3** is required — the Angular 22 CLI that runs `kit-ng`'s tests enforces it.
+> The rest of the workspace is fine on any Node 22.
+
+Each adapter depends on `kit` at the exact version `0.0.0` — the version every package carries
+in git, since releases are tag-driven. That is deliberate: any looser range is also satisfied
+by a published version, so npm resolves `kit` from the registry instead of linking the local
+workspace, and the adapter then compiles against a stale copy. The release workflow rewrites
 this range to the tag before publishing, so `0.0.0` never reaches npm.
 
 If workspace resolution ever looks wrong, reinstall from scratch — note that the nested
@@ -56,9 +60,24 @@ rm -rf node_modules packages/*/node_modules
 npm install
 ```
 
+### Running adapter unit tests
+
+The adapter suites mock `@restheart-cloud/kit`, so they need no backend and no secrets — they
+run on every push and pull request (the **Unit Tests** workflow), and locally with:
+
+```bash
+npm run build   # adapters resolve @restheart-cloud/kit from its built dist
+npm test -w packages/kit-react -w packages/kit-vue -w packages/kit-ng
+```
+
+`kit-ng` uses Angular's experimental Vitest runner (hence the Node requirement above); the
+others use Vitest directly. See **[docs/ADAPTER_CONTRACT.md](./docs/ADAPTER_CONTRACT.md)** for
+the shared behaviour checklist every adapter's tests implement.
+
 ### Running integration tests locally
 
-Create `packages/kit/.env` (not committed):
+The core's integration tests hit a live RESTHeart Cloud instance. Create `packages/kit/.env`
+(not committed):
 
 ```
 RH_TEST_API_URL=https://<your-instance>.restheart.com
@@ -86,7 +105,7 @@ git tag 1.2.3
 git push origin 1.2.3
 ```
 
-CI runs the integration tests against the RESTHeart Cloud test instance. If they pass, both packages are published to npm at that version. If they fail, nothing is published.
+CI runs the integration tests against the RESTHeart Cloud test instance. If they pass, all four packages (`kit`, `kit-ng`, `kit-react`, `kit-vue`) are published to npm at that version. If they fail, nothing is published.
 
 Integration tests can also be triggered manually from the **Actions** tab → **Integration Tests** → **Run workflow**.
 

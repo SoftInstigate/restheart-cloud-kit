@@ -3,7 +3,9 @@
 How the kit is layered across frameworks, and how the access token reaches the API in
 each of them. Read this before starting a new adapter or a new starter app.
 
-**Status:** `kit` and `kit-ng` are shipped. Everything else on this page is the plan.
+**Status:** `kit`, `kit-ng`, `kit-react` (+ `/next`) and `kit-vue` (+ `/nuxt`) are implemented
+and unit-tested against the [adapter contract](./ADAPTER_CONTRACT.md). The starters and the
+roadmap ordering in §5 are still the plan.
 
 ---
 
