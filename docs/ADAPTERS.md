@@ -120,19 +120,32 @@ server-only environment variable.
 
 ## 3. What the core kit needs
 
-One change, and it unblocks every SSR adapter at once.
+Two symmetric changes, and every SSR adapter is unblocked. **Both are implemented.**
 
-**Pluggable token source.** `apiFetch` reads the token through `getToken()`, which is wired
-to `localStorage`. On a server there is no `localStorage` — the token is in the request
-cookie. `AuthConfig` should accept an optional token source, defaulting to the current
-behaviour:
+**Pluggable token source.** `apiFetch` (and `checkSession`) read the token through
+`getToken()`, which is wired to `localStorage`. On a server there is no `localStorage` — the
+token is in the request cookie. `AuthConfig` accepts an optional source, defaulting to the
+current behaviour.
+
+**Pluggable token sink, and token-returning auto-login.** The mirror image: `login` and the
+auto-login endpoints (`activate`, `resetPassword`, `switchTeam`) *store* the fresh token via
+the localStorage `setToken` plus a `setTimeout` refresh. On a server that write leaks into a
+shared module global and the timer refreshes nothing. So those functions now **return** the
+fresh bearer token, and `AuthConfig` accepts an optional `setToken` sink. When the sink is
+set, the localStorage store and the refresh timer are both bypassed — a server action passes
+a sink that merely captures the token, then writes it into a response cookie.
 
 ```ts
 export interface AuthConfig {
   apiBaseUrl: string;
   /** Where the bearer token comes from. Defaults to the localStorage store. */
   getToken?: () => string | null | Promise<string | null>;
+  /** Where a freshly obtained token is persisted. Defaults to localStorage + refresh timer. */
+  setToken?: (token: string) => void;
 }
+
+// login / activate / resetPassword / switchTeam now resolve to the fresh token
+// (or null in cookie mode), so a server action can rewrite the session cookie.
 ```
 
 Worth reviewing at the same time: `apiFetch` sends `credentials: 'include'`, which achieves
@@ -173,7 +186,7 @@ These have no equivalent in the SPA adapters and are the bulk of the work.
 | **Refresh in middleware** | Cookies cannot be written while a server component renders — only in middleware, route handlers and server actions. The browser `setTimeout` refresh has nothing to refresh, since it holds no token. Middleware decodes `exp`, calls `/token?renew` past 80%, rewrites `Set-Cookie`. |
 | **Fragment → cookie bridge** | Verification and OAuth redirect back with `#access_token=…`, and fragments are never sent to the server. A small client component reads `location.hash` and POSTs to a route handler that writes the cookie. One extra round trip. |
 | **Guards as middleware** | Redirect before render, so no flash of unauthenticated content. |
-| **Auto-login via server action** | `switchTeam`, `activate` and `resetPassword` return a fresh token with `delivery=body`; it must be intercepted server-side to rewrite the cookie, then revalidate. |
+| **Auto-login via server action** | `switchTeam`, `activate` and `resetPassword` return a fresh token with `delivery=body`; a server action runs the core call with a capturing `setToken` sink, rewrites the cookie from the returned token, then revalidates. Exposed as `rhSwitchTeam` / `rhActivate` / `rhResetPassword` (plus `rhLogin` / `rhLogout`) on the subpath. |
 
 A rejected alternative for the fragment bridge: a `delivery=query` mode landing directly on
 a route handler. It is cleaner but needs a backend change, and query parameters leak into

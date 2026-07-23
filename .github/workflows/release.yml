@@ -23,10 +23,11 @@ jobs:
       - run: npm install -g npm@latest
 
       - name: Set version from tag
-        # kit-ng bundles kit as a real dependency pinned to the exact version, so
-        # the two ship in lockstep. All three values have to move together: bump
-        # kit alone and the pin no longer matches the workspace, which sends npm
-        # to the registry for a version that was never published.
+        # Every adapter bundles kit as a real dependency pinned to the exact
+        # version, so they all ship in lockstep. Each package's version and its
+        # kit pin have to move together: bump kit alone and a pin no longer
+        # matches the workspace, which sends npm to the registry for a version
+        # that was never published.
         #
         # `npm pkg set` only edits package.json — unlike `npm version`, it does
         # not reify — so the tree is never momentarily inconsistent. The single
@@ -34,7 +35,11 @@ jobs:
         run: |
           npm pkg set version=${{ github.ref_name }} -w packages/kit
           npm pkg set version=${{ github.ref_name }} -w packages/kit-ng
+          npm pkg set version=${{ github.ref_name }} -w packages/kit-react
+          npm pkg set version=${{ github.ref_name }} -w packages/kit-vue
           npm pkg set dependencies.@restheart-cloud/kit=${{ github.ref_name }} -w packages/kit-ng
+          npm pkg set dependencies.@restheart-cloud/kit=${{ github.ref_name }} -w packages/kit-react
+          npm pkg set dependencies.@restheart-cloud/kit=${{ github.ref_name }} -w packages/kit-vue
 
       - run: npm install
 
@@ -60,3 +65,5 @@ jobs:
         run: |
           npm publish --access public -w packages/kit
           npm publish --access public packages/kit-ng/dist
+          npm publish --access public -w packages/kit-react
+          npm publish --access public -w packages/kit-vue

@@ -1,0 +1,52 @@
+{
+  "name": "@restheart-cloud/kit-vue",
+  "version": "0.0.0",
+  "description": "Vue composables and navigation guards for RESTHeart Cloud authentication — wraps @restheart-cloud/kit. Includes a /nuxt subpath for Nuxt server-side rendering.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./nuxt": {
+      "types": "./dist/nuxt/index.d.ts",
+      "import": "./dist/nuxt/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SoftInstigate/restheart-cloud-kit.git",
+    "directory": "packages/kit-vue"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
+  "peerDependencies": {
+    "vue": ">=3.4",
+    "vue-router": ">=4",
+    "h3": ">=1"
+  },
+  "peerDependenciesMeta": {
+    "vue-router": {
+      "optional": true
+    },
+    "h3": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@restheart-cloud/kit": "0.0.0"
+  },
+  "devDependencies": {
+    "h3": "^1",
+    "typescript": "^5",
+    "vue": "^3.5.0",
+    "vue-router": "^4.4.0"
+  }
+}
