@@ -48,7 +48,7 @@
     "h3": "^1",
     "jsdom": "^26",
     "typescript": "^5",
-    "vitest": "^3",
+    "vitest": "^4",
     "vue": "^3.5.0",
     "vue-router": "^4.4.0"
   }

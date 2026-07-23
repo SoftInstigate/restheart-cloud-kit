@@ -22,9 +22,9 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@vitest/ui": "^3",
+    "@vitest/ui": "^4",
     "dotenv": "^17.4.2",
     "typescript": "^5",
-    "vitest": "^3"
+    "vitest": "^4"
   }
 }
