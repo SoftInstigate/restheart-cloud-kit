@@ -71,7 +71,7 @@ state (signals / context / refs) and the framework glue (guards, middleware, coo
 | `kit-react/next` | — | — | — | D1–D9 ✅, D10 pending |
 | `kit-vue` | ✅ | ✅ | n/a | — |
 | `kit-vue/nuxt` | — | — | — | D1–D9 ✅, D10 pending |
-| `kit-ng` | ☐ | ☐ | ☐ | n/a |
+| `kit-ng` | ✅ | ✅ | C1 ✅ | n/a |
 
 ## CI
 

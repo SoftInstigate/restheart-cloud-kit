@@ -18,16 +18,22 @@
     "@restheart-cloud/kit": "0.0.0"
   },
   "devDependencies": {
+    "@angular/build": "^22.0.0",
+    "@angular/cli": "^22.0.0",
     "@angular/common": "^22.0.0",
     "@angular/compiler": "^22.0.0",
     "@angular/compiler-cli": "^22.0.0",
     "@angular/core": "^22.0.0",
+    "@angular/platform-browser": "^22.0.0",
     "@angular/router": "^22.0.0",
+    "jsdom": "^26",
     "ng-packagr": "^22.0.0",
     "rxjs": "^7.8.0",
-    "typescript": "^6"
+    "typescript": "^6",
+    "vitest": "^4"
   },
   "scripts": {
-    "build": "ng-packagr -p ng-package.json"
+    "build": "ng-packagr -p ng-package.json",
+    "test": "ng test kit-ng"
   }
 }
