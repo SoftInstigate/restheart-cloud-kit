@@ -189,6 +189,7 @@ All API errors are thrown as `{ status: number; message: string }` (ApiError typ
 
 Special handling:
 - 401 responses clear session automatically
+- 403 "Account not verified" thrown by `login()` when user has `$unauthenticated` role (registered but not email-verified); `checkSession()` returns `null` for the same case
 - Browser Basic Auth popup suppressed via `No-Auth-Challenge` header
 - localStorage failures fall back to in-memory token storage
 
