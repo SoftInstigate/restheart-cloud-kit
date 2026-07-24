@@ -156,6 +156,7 @@ The kit supports two authentication modes:
 - Proactive refresh at 80% of TTL (~12 minutes)
 - Sessions survive page reloads but not browser sessions if token expires
 - Automatic cleanup on 401 responses
+- **Unverified accounts**: Users with the `$unauthenticated` role (registered but not email-verified) are rejected by `login()` (throws 403) and `checkSession()` (returns null). See [Core Kit — Login](packages/kit.md#login).
 
 ### Team Multi-tenancy
 
@@ -256,7 +257,7 @@ const auth = useAuth();
 - **Current version**: 0.0.0 (development, tag-driven releases)
 - **Required RESTHeart**: 9.6.0+ (for `delivery=body` support)
 - **Node**: 22.22.3+ (required by Angular 22 CLI for `kit-ng` tests)
-- **Angular**: 22+ (peer dependency for kit-ng)
+- **Angular**: 21+ (peer dependency for kit-ng)
 - **TypeScript**: 5+ (kit), 6+ (adapters)
 - **Vitest**: 4 (all adapter unit tests)
 

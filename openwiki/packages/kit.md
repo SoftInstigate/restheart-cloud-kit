@@ -104,6 +104,8 @@ const user = await login(config, email, password, 'cookie');
 // Backend sets HttpOnly JWT cookie
 ```
 
+**Unverified account rejection**: After a successful login, the kit fetches user info and checks for the `$unauthenticated` role. If the account has not yet been email-verified, `login()` clears the stored token and throws `{ status: 403, message: 'Account not verified' }`. This applies to both bearer and cookie modes. Catch this error to prompt the user to verify their email before retrying.
+
 ### Session Check
 
 ```typescript
@@ -115,6 +117,8 @@ if (user) {
   console.log(user._id, user.roles, user.team);
 }
 ```
+
+**Unverified accounts**: If the server returns a user whose roles include `$unauthenticated` (i.e., the account was registered but never email-verified), `checkSession()` clears the token and returns `null` rather than returning an unusable user object.
 
 ### Logout
 
@@ -352,6 +356,8 @@ try {
 } catch (error) {
   if (error.status === 401) {
     console.error('Invalid credentials');
+  } else if (error.status === 403) {
+    console.error('Account not verified — check email');
   } else if (error.status === 400) {
     console.error('Validation error:', error.message);
   } else {
