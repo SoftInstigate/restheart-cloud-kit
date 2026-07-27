@@ -40,9 +40,13 @@ All functions accept an `AuthConfig` object:
 
 ```typescript
 interface AuthConfig {
-  apiBaseUrl: string;  // Must be *.restheart.com
+  apiBaseUrl: string;                              // Must be *.restheart.com
+  getToken?: () => string | null | Promise<string | null>;  // SSR token source
+  setToken?: (token: string) => void;              // SSR token sink
 }
 ```
+
+The optional `getToken`/`setToken` callbacks support SSR runtimes (Next.js, Nuxt) where `localStorage` is unavailable. See [Architecture — Pluggable Token Source/Sink](../architecture/overview.md#3-pluggable-token-source-sink) for details.
 
 **Validation**: `apiBaseUrl` must be a RESTHeart Cloud service URL (`*.restheart.com`). Invalid URLs throw an `ApiError`.
 
