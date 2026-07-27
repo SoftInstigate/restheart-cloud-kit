@@ -100,12 +100,13 @@ The monorepo follows a strict layered architecture:
 - Works with any framework or vanilla JavaScript
 
 **Exports**:
-- Auth flows: `register`, `login`, `logout`, `verify`, `checkSession`
-- Token management: `setToken`, `getToken`, `clearToken`, `scheduleRefresh`
-- Team operations: `getTeams`, `switchTeam`, `listTeamMembers`, `createTeam`
-- Invitation flows: `invite`, `activate`, `acceptInvite`, `listInvitations`
+- Auth flows: `register`, `login`, `logout`, `verify`, `checkSession`, `buildVerifyUrl`, `applyBearerDelivery`
+- Token management: `setToken`, `getToken`, `clearToken`, `getTokenExpiry`, `scheduleRefresh`, `cancelRefresh`
+- Team operations: `getTeams`, `switchTeam`, `listTeamMembers`, `createTeam`, `updateTeam`, `deleteTeam`, `removeMember`, `updateMemberRole`
+- Invitation flows: `invite`, `getInvitation`, `activate`, `acceptInvite`, `resendInvite`, `listInvitations`
 - Password management: `forgotPassword`, `resetPassword`
 - Profile updates: `updateProfile`, `changePassword`
+- Utilities: `isValidApiBaseUrl`
 
 ### Layer 2: Framework Adapters
 
@@ -417,17 +418,19 @@ git push origin 1.2.3
 
 ### Additional Framework Adapters
 
-The adapter pattern is designed for extension:
+The adapter pattern is designed for extension. All current adapters are implemented and unit-tested:
 
 ```
 @restheart-cloud/kit
         │
         ├── @restheart-cloud/kit-ng     (Angular - shipped)
-        ├── @restheart-cloud/kit-react  (React - planned)
-        │       └── /next               (Next.js - planned)
-        └── @restheart-cloud/kit-vue    (Vue - planned)
-                └── /nuxt               (Nuxt - planned)
+        ├── @restheart-cloud/kit-react  (React - shipped)
+        │       └── /next               (Next.js - shipped)
+        └── @restheart-cloud/kit-vue    (Vue - shipped)
+                └── /nuxt               (Nuxt - shipped)
 ```
+
+Svelte does not justify an adapter until the current adapters and starters are stable.
 
 ### Subpath Strategy
 

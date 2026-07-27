@@ -11,7 +11,7 @@ This guide covers local development setup, workspace configuration, building pac
 
 ## Prerequisites
 
-- **Node.js**: 18+ (recommended: 22)
+- **Node.js**: 22.22.3+ (required by Angular 22 CLI for `kit-ng` tests; the rest of the workspace is fine on any Node 22)
 - **npm**: 9+ (workspaces support)
 - **Git**: 2.30+
 - **RESTHeart Cloud**: Account for integration tests ([sign up](https://cloud.restheart.com))

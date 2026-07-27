@@ -82,7 +82,7 @@ RESTHeart Cloud Kit provides the same speed on the frontend that RESTHeart Cloud
 
 ### 1. Prerequisites
 
-- Node.js 18+ (recommended: 22)
+- Node.js 22.22.3+ (required by Angular 22 CLI for `kit-ng` tests)
 - npm 9+ (workspaces support)
 - A RESTHeart Cloud service ([sign up](https://cloud.restheart.com))
 
@@ -258,7 +258,7 @@ const auth = useAuth();
 - **Required RESTHeart**: 9.6.0+ (for `delivery=body` support)
 - **Node**: 22.22.3+ (required by Angular 22 CLI for `kit-ng` tests)
 - **Angular**: 21+ (peer dependency for kit-ng)
-- **TypeScript**: 5+ (kit), 6+ (adapters)
+- **TypeScript**: 5+ (kit, kit-react, kit-vue), 6+ (kit-ng, Angular 22 CLI requirement)
 - **Vitest**: 4 (all adapter unit tests)
 
 ## Support
