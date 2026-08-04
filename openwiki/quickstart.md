@@ -75,6 +75,7 @@ RESTHeart Cloud Kit provides the same speed on the frontend that RESTHeart Cloud
 
 ### External Resources
 - **[RESTHeart Cloud Documentation](https://cloud.restheart.com)**
+<!-- openwiki: broken internal link [../docs/ADAPTERS.md] link "../docs/ADAPTERS.md" is outside the wiki root. Fix the href or restore the target, then delete this comment. -->
 - **[Adapter Contract & Roadmap](../docs/ADAPTERS.md)** — Framework adapter specifications
 - **[Starter App](https://github.com/SoftInstigate/restheart-cloud-starter-ng)** — Angular starter template
 
@@ -173,6 +174,8 @@ The architecture follows a layered pattern:
 - **SSR subpaths** (`kit-react/next`, `kit-vue/nuxt`): Server-side token management via pluggable token source/sink
 - **Principle**: An adapter that reimplements an API call or token computation is a bug
 
+<!-- openwiki: broken internal link [../docs/ADAPTERS.md] link "../docs/ADAPTERS.md" is outside the wiki root. Fix the href or restore the target, then delete this comment. -->
+<!-- openwiki: broken internal link [../docs/ADAPTER_CONTRACT.md] link "../docs/ADAPTER_CONTRACT.md" is outside the wiki root. Fix the href or restore the target, then delete this comment. -->
 See **[docs/ADAPTERS.md](../docs/ADAPTERS.md)** for the full adapter contract and **[docs/ADAPTER_CONTRACT.md](../docs/ADAPTER_CONTRACT.md)** for the shared test checklist.
 
 ## Common Workflows

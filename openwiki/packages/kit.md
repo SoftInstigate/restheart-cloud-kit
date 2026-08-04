@@ -46,6 +46,7 @@ interface AuthConfig {
 }
 ```
 
+<!-- openwiki: broken internal link [../architecture/overview.md#3-pluggable-token-source-sink] heading anchor "3-pluggable-token-source-sink" does not exist in "../architecture/overview.md". Fix the href or restore the target, then delete this comment. -->
 The optional `getToken`/`setToken` callbacks support SSR runtimes (Next.js, Nuxt) where `localStorage` is unavailable. See [Architecture — Pluggable Token Source/Sink](../architecture/overview.md#3-pluggable-token-source-sink) for details.
 
 **Validation**: `apiBaseUrl` must be a RESTHeart Cloud service URL (`*.restheart.com`). Invalid URLs throw an `ApiError`.
