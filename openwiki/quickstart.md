@@ -75,9 +75,29 @@ RESTHeart Cloud Kit provides the same speed on the frontend that RESTHeart Cloud
 
 ### External Resources
 - **[RESTHeart Cloud Documentation](https://cloud.restheart.com)**
-<!-- openwiki: broken internal link [../docs/ADAPTERS.md] link "../docs/ADAPTERS.md" is outside the wiki root. Fix the href or restore the target, then delete this comment. -->
-- **[Adapter Contract & Roadmap](../docs/ADAPTERS.md)** — Framework adapter specifications
+- **[Adapter Contract & Roadmap](https://github.com/SoftInstigate/restheart-cloud-kit/blob/main/docs/ADAPTERS.md)** — Framework adapter specifications
 - **[Starter App](https://github.com/SoftInstigate/restheart-cloud-starter-ng)** — Angular starter template
+
+## Task Routing
+
+Use this table to find the right starting point for common change types:
+
+| Change area | Wiki page | Source entry points | Important symbols | Focused tests | Validation |
+|------------|-----------|--------------------|--------------------|--------------|------------|
+| Auth flow (register, login, verify, logout) | [Core Kit](packages/kit.md#authentication-flows) | `packages/kit/src/auth.ts` | `register`, `login`, `verify`, `checkSession`, `applyBearerDelivery` | `packages/kit/src/__tests__/integration/auth.test.ts` | `npm test -w packages/kit` |
+| Token management & refresh | [Core Kit](packages/kit.md#token-management) | `packages/kit/src/client.ts`, `packages/kit/src/auth.ts` | `setToken`, `getToken`, `clearToken`, `scheduleRefresh`, `cancelRefresh` | `packages/kit/src/__tests__/integration/auth.test.ts` | `npm test -w packages/kit` |
+| Team operations | [Core Kit](packages/kit.md#team-operations) | `packages/kit/src/team.ts` | `getTeams`, `switchTeam`, `createTeam`, `listTeamMembers` | `packages/kit/src/__tests__/integration/team.test.ts`, `team-management.test.ts` | `npm test -w packages/kit` |
+| Invitations | [Core Kit](packages/kit.md#invitation-flows) | `packages/kit/src/invite.ts` | `invite`, `activate`, `acceptInvite`, `listInvitations` | `packages/kit/src/__tests__/integration/invite.test.ts` | `npm test -w packages/kit` |
+| Password reset | [Core Kit](packages/kit.md#password-management) | `packages/kit/src/password.ts` | `forgotPassword`, `resetPassword` | `packages/kit/src/__tests__/integration/password.test.ts` | `npm test -w packages/kit` |
+| Profile updates | [Core Kit](packages/kit.md#profile-management) | `packages/kit/src/profile.ts` | `updateProfile`, `changePassword` | `packages/kit/src/__tests__/integration/profile.test.ts` | `npm test -w packages/kit` |
+| Angular adapter (signals, guards, interceptor) | [Angular Adapter](packages/kit-ng.md) | `packages/kit-ng/src/auth.service.ts`, `auth.guard.ts`, `auth.interceptor.ts` | `RhAuthService`, `authGuard`, `provideRhAuth` | `packages/kit-ng/src/__tests__/` | `npm test -w packages/kit-ng` |
+| React adapter (hooks, context, guards) | [React Adapter](packages/kit-react.md) | `packages/kit-react/src/context.tsx`, `guards.tsx` | `useAuth`, `RhAuthProvider`, `AuthGuard` | `packages/kit-react/src/__tests__/` | `npm test -w packages/kit-react` |
+| Next.js SSR (middleware, route handlers, server actions) | [React Adapter — /next](packages/kit-react.md#nextjs-subpath-next) | `packages/kit-react/src/next/` | `rhAuthMiddleware`, `createSessionRoute`, `rhLogin`, `SessionSync` | `packages/kit-react/src/next/__tests__/` | `npm test -w packages/kit-react` |
+| Vue adapter (composables, guards) | [Vue Adapter](packages/kit-vue.md) | `packages/kit-vue/src/store.ts`, `create.ts`, `guards.ts` | `createRhAuth`, `useAuth`, `buildGuards` | `packages/kit-vue/src/__tests__/` | `npm test -w packages/kit-vue` |
+| Nuxt SSR (middleware, handler, bridge) | [Vue Adapter — /nuxt](packages/kit-vue.md#nuxt-subpath-nuxt) | `packages/kit-vue/src/nuxt/` | `rhAuthServerMiddleware`, `createSessionHandler`, `bridgeFragmentToCookie` | `packages/kit-vue/src/nuxt/__tests__/` | `npm test -w packages/kit-vue` |
+| Token delivery (bearer vs cookie) | [Token Delivery](architecture/token-delivery.md) | `packages/kit/src/auth.ts`, `packages/kit/src/client.ts` | `applyBearerDelivery`, `persistToken`, `LoginMode` | `packages/kit/src/__tests__/integration/auth.test.ts` | `npm test -w packages/kit` |
+| Package publishing / release | [Release Process](deployment/release.md) | `.github/workflows/release.yml` | tag-driven versioning | Integration tests (gated) | `git tag X.Y.Z && git push origin X.Y.Z` |
+| Types & interfaces | [Core Kit](packages/kit.md#type-definitions) | `packages/kit/src/types.ts` | `UserInfo`, `TeamMembership`, `AuthConfig`, `ApiError`, `LoginMode` | All integration tests | `npm run build` |
 
 ## Getting Started
 
@@ -174,9 +194,7 @@ The architecture follows a layered pattern:
 - **SSR subpaths** (`kit-react/next`, `kit-vue/nuxt`): Server-side token management via pluggable token source/sink
 - **Principle**: An adapter that reimplements an API call or token computation is a bug
 
-<!-- openwiki: broken internal link [../docs/ADAPTERS.md] link "../docs/ADAPTERS.md" is outside the wiki root. Fix the href or restore the target, then delete this comment. -->
-<!-- openwiki: broken internal link [../docs/ADAPTER_CONTRACT.md] link "../docs/ADAPTER_CONTRACT.md" is outside the wiki root. Fix the href or restore the target, then delete this comment. -->
-See **[docs/ADAPTERS.md](../docs/ADAPTERS.md)** for the full adapter contract and **[docs/ADAPTER_CONTRACT.md](../docs/ADAPTER_CONTRACT.md)** for the shared test checklist.
+See **[docs/ADAPTERS.md](https://github.com/SoftInstigate/restheart-cloud-kit/blob/main/docs/ADAPTERS.md)** for the full adapter contract and **[docs/ADAPTER_CONTRACT.md](https://github.com/SoftInstigate/restheart-cloud-kit/blob/main/docs/ADAPTER_CONTRACT.md)** for the shared test checklist.
 
 ## Common Workflows
 

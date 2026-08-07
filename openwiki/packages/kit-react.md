@@ -65,39 +65,124 @@ import { AuthGuard, PublicGuard } from '@restheart-cloud/kit-react';
 
 | Export | Type | Description |
 |--------|------|-------------|
-| `useAuth()` | Hook | Access auth state: `user`, `teams`, `isAuthenticated`, `initializing`, `hasMultipleTeams` |
+| `useAuth()` | Hook | Access all auth state and methods (see below) |
 | `RhAuthProvider` | Component | Context provider, runs `checkSession` on mount |
 | `AuthGuard` | Component | Redirects unauthenticated users to `/auth/login` |
 | `PublicGuard` | Component | Redirects authenticated users into the app |
 
 ## Auth Methods
 
-All methods are available on the `useAuth()` return value:
+All methods are available on the `useAuth()` return value. These wrap `@restheart-cloud/kit` functions and update reactive state (`user`, `teams`) where applicable:
 
 ```ts
 const auth = useAuth();
-await auth.login(email, password);
-await auth.register({ email, password, teamName });
+
+// Session
+await auth.checkSession();              // → UserInfo | null
+auth.clearSession();                    // clear token, cancel refresh, reset state
+
+// Registration & verification
+await auth.register({ email, password, teamName, firstName?, lastName? });
+await auth.verify(email, token, delivery?);
+
+// Login / logout
+await auth.login(email, password, mode?);   // mode: 'bearer' (default) | 'cookie'
 await auth.logout();
-await auth.switchTeam(teamId);
-await auth.updateProfile(fields);
+
+// Password
+await auth.forgotPassword(email);
+await auth.resetPassword({ email, token, password }, mode?);
+await auth.changePassword(currentPassword, newPassword);
+
+// Profile
+await auth.updateProfile({ firstName?, lastName? });
+
+// Teams
+await auth.loadTeams();                 // → TeamMembership[]
+await auth.switchTeam({ $oid }, mode?);
+await auth.createTeam(teamName);        // → TeamMembership
+await auth.updateTeam({ name?, description? });
+await auth.deleteTeam();
+await auth.listTeamMembers();           // → TeamMember[]
+await auth.removeMember(email);
+await auth.updateMemberRole(email, role);
+
+// Invitations
+await auth.invite(email, role);         // role: 'owner' | 'member'
+await auth.getInvitation(email, token); // → Invitation
+await auth.activate({ email, token, password }, mode?);
 await auth.acceptInvite(token);
-auth.clearSession();
+await auth.resendInvite(email);
+await auth.listInvitations();           // → PendingInvitation[]
 ```
+
+Methods that perform auto-login (`login`, `activate`, `resetPassword`, `switchTeam`) accept an optional `mode` parameter (`'bearer'` | `'cookie'`) that maps to the backend's `delivery` query parameter.
 
 ## Next.js Subpath (`/next`)
 
 ```ts
-import { rhAuthMiddleware } from '@restheart-cloud/kit-react/next';
+import {
+  // Middleware
+  rhAuthMiddleware,              // Next.js middleware: refresh at 80% TTL, protected/public redirects
+  type RhMiddlewareOptions,
+
+  // Route handler
+  createSessionRoute,            // POST/DELETE session cookie management
+  type SessionRouteOptions,
+
+  // Server actions
+  rhLogin,                       // server-side login (sets cookie)
+  rhSwitchTeam,                  // server-side team switch
+  rhActivate,                    // activate invitation account
+  rhResetPassword,               // reset password with token
+  rhLogout,                      // server-side logout (clears cookie)
+
+  // Fragment→cookie bridge (client component)
+  SessionSync,                   // React component: reads #access_token, POSTs to session route
+  syncServerSession,             // programmatic: POST token to session endpoint
+  clearServerSession,            // programmatic: DELETE session endpoint
+  DEFAULT_SESSION_ENDPOINT,      // '/api/rh/session'
+
+  // Session reading (server)
+  getServerSession,              // read session from request cookie → UserInfo | null
+  getServerSessionWithTeams,     // read session + load teams
+
+  // Cookie utilities
+  RH_SESSION_COOKIE,
+  DEFAULT_COOKIE_OPTIONS,
+  rhServerConfig,
+  cookieMaxAge,
+  resolveCookieOptions,
+  type SessionCookieOptions,
+  type ServerActionOptions,
+} from '@restheart-cloud/kit-react/next';
 ```
 
 The `/next` subpath provides:
-- **Middleware**: token refresh at 80% TTL, protected/public path redirects
-- **Route handlers**: session cookie management (POST/DELETE)
-- **Server actions**: `rhLogin`, `rhSwitchTeam`, `rhActivate`, `rhResetPassword`
-- **Fragment bridge**: reads `#access_token` from URL and writes to first-party cookie
+- **Middleware** (`rhAuthMiddleware`): token refresh at 80% TTL, protected/public path redirects
+- **Route handler** (`createSessionRoute`): session cookie management (POST writes cookie, DELETE clears)
+- **Server actions** (`rhLogin`, `rhSwitchTeam`, `rhActivate`, `rhResetPassword`, `rhLogout`): server-side auth operations that set or clear the session cookie
+- **Fragment→cookie bridge** (`SessionSync` client component): reads `#access_token` from URL and POSTs to the session route so the server can set a first-party cookie
+- **Session readers** (`getServerSession`, `getServerSessionWithTeams`): read the current user from the request cookie in server components or middleware
+- **Cookie utilities**: `RH_SESSION_COOKIE`, `DEFAULT_COOKIE_OPTIONS`, `rhServerConfig`, `cookieMaxAge`, `resolveCookieOptions`
 
-Uses the core's [pluggable token source/sink](../architecture/overview.md) to read tokens from request cookies and capture tokens for cookie writes — no `localStorage` on the server.
+<!-- openwiki: broken internal link [../architecture/overview.md#pluggable-token-source-sink] heading anchor "pluggable-token-source-sink" does not exist in "../architecture/overview.md". Fix the href or restore the target, then delete this comment. -->
+Uses the core's [pluggable token source/sink](../architecture/overview.md#pluggable-token-source-sink) to read tokens from request cookies and capture tokens for cookie writes — no `localStorage` on the server.
+
+### Source Map
+
+| Source file | Responsibility |
+|-------------|---------------|
+| `src/context.tsx` | `RhAuthProvider`, `useAuth`, full `RhAuth` interface |
+| `src/guards.tsx` | `AuthGuard`, `PublicGuard` components |
+| `src/index.ts` | SPA barrel export |
+| `src/next/middleware.ts` | `rhAuthMiddleware` |
+| `src/next/route.ts` | `createSessionRoute` |
+| `src/next/actions.ts` | `rhLogin`, `rhSwitchTeam`, `rhActivate`, `rhResetPassword`, `rhLogout` |
+| `src/next/session.ts` | `getServerSession`, `getServerSessionWithTeams` |
+| `src/next/sync.tsx` | `SessionSync`, `syncServerSession`, `clearServerSession` |
+| `src/next/cookies.ts` | Cookie constants and resolution |
+| `src/next/index.ts` | `/next` subpath barrel export |
 
 ## See Also
 
