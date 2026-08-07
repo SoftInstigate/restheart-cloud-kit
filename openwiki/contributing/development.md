@@ -31,7 +31,7 @@ cd restheart-cloud-kit
 npm install
 ```
 
-This installs all dependencies for both packages using npm workspaces.
+This installs all dependencies for all workspace packages using npm workspaces.
 
 ### 3. Build Packages
 
@@ -258,7 +258,7 @@ The `rebuild-kit-ng.sh` script automates linking:
 ```
 
 **What it does**:
-1. Builds both packages
+1. Builds all packages
 2. Links `kit` globally
 3. Links `kit-ng` from dist directory
 4. Links both into starter app

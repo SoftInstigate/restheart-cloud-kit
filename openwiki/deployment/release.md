@@ -16,7 +16,7 @@ RESTHeart Cloud Kit uses a **tag-driven release process**:
 1. Create a version tag
 2. Push tag to GitHub
 3. CI runs integration tests
-4. If tests pass, both packages published to npm
+4. If tests pass, all four packages published to npm
 5. If tests fail, nothing is published
 
 **No manual versioning step needed** — the tag determines the version.
@@ -406,7 +406,7 @@ npm install
 # Run full test suite
 npm test -w packages/kit
 
-# Build both packages
+# Build all packages
 npm run build
 
 # Test in starter app (optional)

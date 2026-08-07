@@ -49,6 +49,7 @@ restheart-cloud-kit/
 │   │   │   │   ├── actions.ts
 │   │   │   │   ├── session.ts
 │   │   │   │   ├── cookies.ts
+│   │   │   │   ├── sync.tsx     # Fragment→cookie bridge (SessionSync)
 │   │   │   │   └── __tests__/  # SSR unit tests
 │   │   │   └── index.ts
 │   │   ├── vitest.config.ts
@@ -67,6 +68,7 @@ restheart-cloud-kit/
 │       │   │   ├── actions.ts
 │       │   │   ├── session.ts
 │       │   │   ├── cookies.ts
+│       │   │   ├── client.ts    # Fragment→cookie bridge
 │       │   │   └── __tests__/  # SSR unit tests
 │       │   └── index.ts
 │       ├── vitest.config.ts
@@ -156,7 +158,7 @@ Both authentication modes (bearer and cookie) must be supported consistently:
 
 Every auto-login endpoint (`login`, `activate`, `resetPassword`, `switchTeam`) accepts a `mode` parameter that controls token delivery via the `delivery` query parameter (`body` for bearer, `cookie` for cookie mode).
 
-### 3. Pluggable Token Source/Sink
+### Pluggable Token Source/Sink
 
 The core `AuthConfig` accepts optional `getToken` and `setToken` callbacks:
 
@@ -217,7 +219,7 @@ All adapters depend on `kit` at exact version `0.0.0` in development to prevent 
 User ─── register() ───▶ POST /auth/register
                                │
                                ▼
-                    User created with roles: ["user"]
+                    User created with roles: ["$unauthenticated"]
                                │
                                ▼
                     Verification email sent
@@ -226,11 +228,13 @@ User ─── register() ───▶ POST /auth/register
 User ─── verify() ───▶ GET /auth/verify?email=...&token=...&delivery=...
                                │
                                ▼
-                    Backend promotes user, 302 redirects
+                    Backend promotes user to roles: ["user"], 302 redirects
                                │
                                ▼
                     Token delivered via fragment or cookie
 ```
+
+**Important**: New users start with the `$unauthenticated` role. `login()` checks for this role after authenticating and throws `{ status: 403, message: 'Account not verified' }` if found. `checkSession()` returns `null` for `$unauthenticated` users.
 
 ### Login Flow
 
@@ -238,7 +242,8 @@ User ─── verify() ───▶ GET /auth/verify?email=...&token=...&delive
 User ─── login() ───▶ POST /token (bearer) or POST /token/cookie (cookie)
                               │
                               ▼
-                    Token returned in body (bearer) or Set-Cookie (cookie)
+                    Bearer: token in Auth-Token response header
+                    Cookie: backend sets HttpOnly JWT cookie
                               │
                               ▼
                     Token stored in localStorage (bearer) or memory (cookie)
@@ -246,6 +251,8 @@ User ─── login() ───▶ POST /token (bearer) or POST /token/cookie (
                               ▼
                     Schedule proactive refresh at 80% TTL
 ```
+
+**Note**: In bearer mode the token arrives in the `Auth-Token` response header (not the JSON body). The kit reads it with `res.headers.get('Auth-Token')`.
 
 ### Team Switching Flow
 
@@ -398,37 +405,46 @@ git push origin 1.2.3
 │  2. Set version from tag                                │
 │     • kit: version=1.2.3                                │
 │     • kit-ng: version=1.2.3                             │
-│     • kit-ng dependencies: kit=1.2.3                    │
+│     • kit-react: version=1.2.3                          │
+│     • kit-vue: version=1.2.3                            │
+│     • each adapter dependency: kit=1.2.3                │
 │  3. npm install (reify workspace)                       │
-│  4. Build both packages                                 │
+│  4. Build all packages                                  │
 │  5. Run integration tests                               │
-│  6. Publish to npm (both packages)                      │
+│  6. Publish to npm (all four packages)                  │
 └─────────────────────────────────────────────────────────┘
 ```
 
 ### Version Management
 
-- Both packages share the same version
-- `kit-ng` depends on `kit` at exact version
+- All packages (`kit`, `kit-ng`, `kit-react`, `kit-vue`) share the same version
+- Each adapter depends on `kit` at exact version
 - Workspace uses `0.0.0` in development
 - Release workflow rewrites versions before publishing
-- Single changelog for both packages
+- Single changelog for all packages
 
-## Future Architecture Considerations
+## Adapter Ecosystem
 
-### Additional Framework Adapters
+### Current Adapters
 
-The adapter pattern is designed for extension. All current adapters are implemented and unit-tested:
+All framework adapters are implemented and unit-tested:
 
 ```
 @restheart-cloud/kit
         │
-        ├── @restheart-cloud/kit-ng     (Angular - shipped)
-        ├── @restheart-cloud/kit-react  (React - shipped)
-        │       └── /next               (Next.js - shipped)
-        └── @restheart-cloud/kit-vue    (Vue - shipped)
-                └── /nuxt               (Nuxt - shipped)
+        ├── @restheart-cloud/kit-ng     (Angular — signals, guards, interceptor)
+        ├── @restheart-cloud/kit-react  (React — hooks, context, guards)
+        │       └── /next               (Next.js — middleware, route handlers, server actions)
+        └── @restheart-cloud/kit-vue    (Vue — composables, navigation guards)
+                └── /nuxt               (Nuxt — server middleware, handler, bridge)
 ```
+
+### Adding New Adapters
+
+The adapter pattern is designed for extension. A new adapter needs:
+1. A reactive state wrapper (signals, hooks, or composables)
+2. Route guards (framework-specific)
+3. Tests implementing the shared checklist in `docs/ADAPTER_CONTRACT.md`
 
 Svelte does not justify an adapter until the current adapters and starters are stable.
 
