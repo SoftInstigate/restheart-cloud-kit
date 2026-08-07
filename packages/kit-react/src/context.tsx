@@ -50,8 +50,9 @@ export interface RhAuth {
     email: string;
     password: string;
     teamName: string;
-    firstName?: string;
-    lastName?: string;
+    firstName: string;
+    lastName: string;
+    [key: string]: unknown;
   }): Promise<void>;
   verify(email: string, token: string, delivery?: 'cookie' | 'fragment'): Promise<string>;
   login(email: string, password: string, mode?: LoginMode): Promise<UserInfo>;
@@ -62,6 +63,14 @@ export interface RhAuth {
     mode?: LoginMode
   ): Promise<void>;
   updateProfile(updates: { firstName?: string; lastName?: string }): Promise<void>;
+  updateUser(email: string, updates: Record<string, unknown>): Promise<void>;
+  /**
+   * Record the signed-in user's acceptance of the application's consents,
+   * renew the token so the guard sees it, and update `user` with the result.
+   */
+  acceptConsents(body?: Record<string, unknown>, mode?: LoginMode): Promise<UserInfo>;
+  /** Force a new token, carrying the user document as it is now. */
+  renewToken(mode?: LoginMode): Promise<string | null>;
   changePassword(currentPassword: string, newPassword: string): Promise<void>;
   invite(email: string, role: 'owner' | 'member'): Promise<void>;
   getInvitation(email: string, token: string): Promise<Invitation>;
@@ -111,6 +120,12 @@ export function RhAuthProvider({ config, children }: RhAuthProviderProps): React
   // the caller passes a fresh config object on every render.
   const configRef = useRef(config);
   configRef.current = config;
+
+  // Same reason, for the methods that need the signed-in user's id: reading it
+  // from a ref keeps them out of the dependency arrays, so their identity does
+  // not change on every sign-in.
+  const userRef = useRef<UserInfo | null>(null);
+  userRef.current = user;
 
   const loadTeams = useCallback(async (): Promise<TeamMembership[]> => {
     const ts = await kit.getTeams(configRef.current);
@@ -212,6 +227,25 @@ export function RhAuthProvider({ config, children }: RhAuthProviderProps): React
       kit.changePassword(configRef.current, currentPassword, newPassword),
     []
   );
+  const updateUser = useCallback(
+    (email: string, updates: Record<string, unknown>) =>
+      kit.updateUser(configRef.current, email, updates),
+    []
+  );
+  const acceptConsents = useCallback(
+    async (body?: Record<string, unknown>, mode: LoginMode = 'bearer'): Promise<UserInfo> => {
+      const current = userRef.current;
+      if (!current) throw { status: 0, message: 'acceptConsents requires a signed-in user' };
+      const u = await kit.acceptConsents(configRef.current, current._id, body, mode);
+      setUser(u);
+      return u;
+    },
+    []
+  );
+  const renewToken = useCallback(
+    (mode: LoginMode = 'bearer') => kit.renewToken(configRef.current, mode),
+    []
+  );
   const invite = useCallback(
     (email: string, role: 'owner' | 'member') => kit.invite(configRef.current, email, role),
     []
@@ -279,6 +313,9 @@ export function RhAuthProvider({ config, children }: RhAuthProviderProps): React
       forgotPassword,
       resetPassword,
       updateProfile,
+      updateUser,
+      acceptConsents,
+      renewToken,
       changePassword,
       invite,
       getInvitation,
@@ -308,6 +345,9 @@ export function RhAuthProvider({ config, children }: RhAuthProviderProps): React
       forgotPassword,
       resetPassword,
       updateProfile,
+      updateUser,
+      acceptConsents,
+      renewToken,
       changePassword,
       invite,
       getInvitation,

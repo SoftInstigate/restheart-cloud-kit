@@ -26,6 +26,24 @@ await login(config, 'user@example.com', 'secret');
 await logout(config);
 ```
 
+If the users collection has a JSON Schema with additional fields, pass them in the register payload:
+
+```typescript
+import { register } from '@restheart-cloud/kit';
+
+await register(config, {
+  email: 'user@example.com',
+  password: 'secret',
+  teamName: 'acme',
+  latestConsents: { tos: '2026-07-01', pp: '2026-07-01' },
+  consents: [{ tos: '2026-07-01', pp: '2026-07-01' }]
+});
+```
+
+> **Note:** When no JSON Schema is configured on the users collection the server silently drops any extra properties — the request still succeeds with `201`.
+
+See [Consents](#consents) for the whole pattern, including the users who cannot accept at sign-up.
+
 Authentication is handled via a Bearer token stored in `localStorage` — every authenticated request sends `Authorization: Bearer <token>`. This is the default (`mode: 'bearer'`) and works cross-origin.
 
 Cookie authentication (`mode: 'cookie'`) is also supported, but **only for same-origin setups**: the backend manages an HttpOnly JWT cookie and no token ever touches `localStorage` or JavaScript.
@@ -73,10 +91,13 @@ Errors are thrown as `{ status: number; message: string }`.
 | Function | Description |
 |---|---|
 | `checkSession(config)` | Returns `UserInfo` if a valid token is held in memory, `null` otherwise |
-| `register(config, payload)` | Sign up — creates user and team |
+| `register(config, payload)` | Sign up — creates user and team. Accepts additional properties for app-specific JSON Schema fields (e.g. consents) |
 | `verify(config, email, token, delivery?)` | Verify email after signup — returns a URL for browser redirect (`delivery`: `'fragment'` (default) or `'cookie'`) |
 | `login(config, email, password, mode?)` | Email/password login (`mode`: `'bearer'` (default) or `'cookie'`) |
 | `logout(config)` | Clears the token and cancels pending refresh |
+| `getUserInfo(config)` | Read the stored user document (`GET /users/me`) without the session bookkeeping of `checkSession` |
+| `updateUser(config, email, updates)` | Update a user document via `PATCH /users/{email}` — ACL-scoped, distinct from `updateProfile` |
+| `acceptConsents(config, userId, body?, mode?)` | Record the acceptance, renew the token, return the updated user |
 
 ### Token management
 
@@ -85,6 +106,7 @@ Errors are thrown as `{ status: number; message: string }`.
 | `setToken(token)` | Store a token manually (e.g. after OAuth redirect) |
 | `getToken()` | Read the current token, or `null` |
 | `clearToken()` | Clear the token and cancel any pending refresh |
+| `renewToken(config, mode?)` | Force a new token, rebuilt from the user document as it is now |
 | `scheduleRefresh(config)` | Schedule proactive token renewal (called automatically by `login`) |
 | `cancelRefresh()` | Cancel a pending refresh timer |
 
@@ -112,6 +134,43 @@ Errors are thrown as `{ status: number; message: string }`.
 | `getTeams(config)` | List teams the authenticated user belongs to |
 | `switchTeam(config, teamId, mode?)` | Switch active team (`mode`: `'bearer'` (default) or `'cookie'`) — in bearer mode, the stored token is replaced with the freshly issued one carrying the new team claim |
 
+## Consents
+
+Blocking users who have not accepted the current terms is a server-side rule — a [Guards](https://restheart.org/docs/cloud/guards#_example_gating_on_consents) condition that refuses every request from a user whose document does not carry the current versions, plus an ACL permission that exempts the one request recording the acceptance. What the client contributes is small, and easy to get wrong in exactly one way.
+
+**At sign-up**, when your form shows the terms, send them with the credentials. The user is then never in the blocked state:
+
+```typescript
+await register(config, {
+  email, password, teamName,
+  latestConsents: { tos: TOS_VERSION, pp: PP_VERSION },
+  consents: [{ tos: TOS_VERSION, pp: PP_VERSION }]
+});
+```
+
+This works only when a JSON Schema is configured on the users collection — otherwise the server drops the extra properties and the user is registered without them.
+
+**Afterwards** — someone who signed in with OAuth, where there was no form of yours to tick, or anyone who already had an account when the terms changed:
+
+```typescript
+const user = await acceptConsents(config, session.user._id);
+```
+
+That one call does three things: `PATCH /users/{_id}`, which the permission's `mergeRequest` turns into the versions and the timestamp *the server* chose; a token renewal; and a re-read of the user document, returned to you.
+
+**The renewal is the part that is easy to miss.** The guard reads the token, and the token the user is holding was issued before they accepted. Write the acceptance without renewing and the rule keeps blocking them until that token expires — with the acceptance sitting in the database the whole time. `renewToken(config)` is exported separately for the same reason: whenever something the token carries changes underneath it.
+
+**Reading the state.** `checkSession` and `getUserInfo` return the stored document, not the token's claims, so the extra fields are there whether or not you expose them as JWT claims:
+
+```typescript
+type AppUser = { latestConsents?: { tos: string; pp: string } };
+
+const user = await checkSession<AppUser>(config);
+const mustAccept = user !== null && user.latestConsents?.tos !== TOS_VERSION;
+```
+
+The guard, on the other hand, reads the claims — so the fields it tests must be in the service's JWT claim list.
+
 ## Types
 
 ```typescript
@@ -119,13 +178,12 @@ interface AuthConfig {
   apiBaseUrl: string;
 }
 
-interface UserInfo {
+type UserInfo<E extends object = Record<never, never>> = {
   _id: string;
   roles: string[];
-  team: string;
-  teams?: TeamMembership[];
-  profile?: { firstName?: string; lastName?: string; avatarUrl?: string };
-}
+  team?: { _id: { $oid: string }; role: string };
+  profile?: { name?: string; surname?: string; avatarUrl?: string };
+} & E
 
 interface TeamMembership {
   id: { $oid: string };

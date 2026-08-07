@@ -65,6 +65,26 @@ export async function readVerificationToken(email: string): Promise<string> {
   return token as string;
 }
 
+/**
+ * Complete the email verification of a freshly registered user.
+ *
+ * `GET /auth/verify` verifies the token, promotes the account, and then 302s to
+ * the service's `frontend-app-url` — an address that belongs to the application,
+ * not to this suite, and that nothing is listening on while the tests run.
+ * Node's fetch follows redirects by default, so without `redirect: 'manual'` a
+ * verification that succeeded server-side still fails the hook with
+ * `ECONNREFUSED` against whatever that URL points at.
+ */
+export async function verifyEmail(email: string): Promise<void> {
+  const token = await readVerificationToken(email);
+  const { apiBaseUrl } = getConfig();
+  const url = `${apiBaseUrl}/auth/verify?email=${encodeURIComponent(email)}&token=${token}&delivery=cookie`;
+  const res = await fetch(url, { redirect: 'manual' });
+  if (res.status >= 400) {
+    throw new Error(`verification failed for ${email} → ${res.status}: ${await res.text()}`);
+  }
+}
+
 export async function readInvitationToken(email: string): Promise<string> {
   const filter = encodeURIComponent(JSON.stringify({ email }));
   const docs   = await adminGet<Array<Record<string, unknown>>>(`/auth_invitations?filter=${filter}&pagesize=1`);

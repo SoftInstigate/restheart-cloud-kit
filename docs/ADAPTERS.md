@@ -164,13 +164,31 @@ Every adapter exposes the same surface, so one starter specification serves all 
 
 **Methods** — thin wrappers over the core, each updating that state: `checkSession`,
 `register`, `verify`, `login`, `logout`, `forgotPassword`, `resetPassword`, `updateProfile`,
-`changePassword`, `invite`, `getInvitation`, `activate`, `acceptInvite`, `resendInvite`,
+`changePassword`, `updateUser`, `acceptConsents`, `renewToken`, `invite`, `getInvitation`,
+`activate`, `acceptInvite`, `resendInvite`,
 `listInvitations`, `loadTeams`, `switchTeam`, `listTeamMembers`, `removeMember`,
 `updateMemberRole`, `createTeam`, `updateTeam`, `deleteTeam`, `clearSession`.
 
 **Two behaviours that are easy to miss:** `checkSession()` also loads teams (short-circuiting
 to `null` with no HTTP call when there is no stored token), and `login()` also loads teams in
 the same round trip. Get these wrong and team-dependent UI is intermittently empty.
+
+**Extensible user document.** `UserInfo` and `register()` accept a generic type parameter for
+application-specific fields declared in the users collection JSON Schema (e.g. `consents`).
+When no schema is configured the server silently drops extra properties — the request still
+succeeds with `201`. Adapters expose the same extensibility via an index signature on the
+register payload.
+
+**User document updates.** `updateUser(config, email, updates)` targets `PATCH /users/{email}`,
+where the application's ACL permission decides what fields are writable. This is distinct from
+`updateProfile` (which goes through `/auth/profile` and is limited to `firstName` / `lastName`).
+
+**Consents.** `acceptConsents(body?, mode?)` is the adapter form of the acceptance: it takes the
+user id from the reactive state, sends the whitelisted `PATCH`, renews the token, and writes the
+returned document back into `user`. The renewal is not an optimisation — a Guards rule reads the
+token, and the token predates the acceptance, so skipping it leaves the user blocked with their
+consent already recorded. Adapters that add their own acceptance flow must keep that order:
+write, renew, then refresh the state.
 
 **Guards** — `authGuard` (no user → `/auth/login`) and `publicGuard` (user → into the app).
 `/invitations/accept` stays unguarded: it must work for signed-out invitees, signed-in

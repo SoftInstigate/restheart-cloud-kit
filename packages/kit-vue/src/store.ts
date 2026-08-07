@@ -34,8 +34,9 @@ export interface RhAuthStore {
     email: string;
     password: string;
     teamName: string;
-    firstName?: string;
-    lastName?: string;
+    firstName: string;
+    lastName: string;
+    [key: string]: unknown;
   }): Promise<void>;
   verify(email: string, token: string, delivery?: 'cookie' | 'fragment'): Promise<string>;
   login(email: string, password: string, mode?: LoginMode): Promise<UserInfo>;
@@ -46,6 +47,14 @@ export interface RhAuthStore {
     mode?: LoginMode
   ): Promise<void>;
   updateProfile(updates: { firstName?: string; lastName?: string }): Promise<void>;
+  updateUser(email: string, updates: Record<string, unknown>): Promise<void>;
+  /**
+   * Record the signed-in user's acceptance of the application's consents,
+   * renew the token so the guard sees it, and update `user` with the result.
+   */
+  acceptConsents(body?: Record<string, unknown>, mode?: LoginMode): Promise<UserInfo>;
+  /** Force a new token, carrying the user document as it is now. */
+  renewToken(mode?: LoginMode): Promise<string | null>;
   changePassword(currentPassword: string, newPassword: string): Promise<void>;
   invite(email: string, role: 'owner' | 'member'): Promise<void>;
   getInvitation(email: string, token: string): Promise<Invitation>;
@@ -140,6 +149,17 @@ export function createRhAuthStore(config: AuthConfig): RhAuthStore {
     await checkSession();
   }
 
+  async function acceptConsents(
+    body?: Record<string, unknown>,
+    mode: LoginMode = 'bearer'
+  ): Promise<UserInfo> {
+    const current = user.value;
+    if (!current) throw { status: 0, message: 'acceptConsents requires a signed-in user' };
+    const u = await kit.acceptConsents(config, current._id, body, mode);
+    user.value = u;
+    return u;
+  }
+
   const store: RhAuthStore = {
     user,
     teams,
@@ -158,6 +178,9 @@ export function createRhAuthStore(config: AuthConfig): RhAuthStore {
     },
     updateProfile,
     changePassword: (current, next) => kit.changePassword(config, current, next),
+    updateUser: (email, updates) => kit.updateUser(config, email, updates),
+    acceptConsents,
+    renewToken: (mode = 'bearer') => kit.renewToken(config, mode),
     invite: (email, role) => kit.invite(config, email, role),
     getInvitation: (email, token) => kit.getInvitation(config, email, token),
     activate: async (payload, mode = 'bearer') => {

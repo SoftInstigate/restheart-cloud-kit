@@ -25,17 +25,48 @@ export function scheduleRefresh(config: AuthConfig): void {
   const refreshAt = ttlMs * 0.8; // 80% of TTL
   _refreshTimerId = setTimeout(async () => {
     try {
-      const res = await apiFetch(config, '/token?renew');
-      const newToken = res.headers.get('Auth-Token');
-      if (newToken) {
-        setToken(newToken);
-        scheduleRefresh(config); // reschedule from new expiry
-      }
+      await renewToken(config);
+      scheduleRefresh(config); // reschedule from new expiry
     } catch {
       // refresh failed — token will expire naturally, next API call
       // will get a 401 and the session will be cleared
     }
   }, refreshAt);
+}
+
+/**
+ * Force the server to issue a new token, replacing the one currently held.
+ *
+ * A JWT is a snapshot taken at issuance: a change to the user document — the
+ * roles, or an application-level field such as consents — does not reach the
+ * token the client is already holding. The renewed token is rebuilt from the
+ * user document as it is read at that moment, so it carries the change.
+ *
+ * This is what {@link scheduleRefresh} calls on its timer, and what an
+ * application calls right after writing something the token is expected to
+ * reflect (see `acceptConsents`).
+ *
+ * @param mode 'bearer' (default): `GET /token?renew=true`, the new token is
+ *             stored and returned. 'cookie': `POST /token/cookie?renew=true`,
+ *             the backend replaces the JWT cookie and `null` is returned.
+ */
+export async function renewToken(
+  config: AuthConfig,
+  mode: LoginMode = 'bearer'
+): Promise<string | null> {
+  if (mode === 'cookie') {
+    await apiFetch(config, '/token/cookie?renew=true', { method: 'POST' });
+    return null;
+  }
+
+  const res = await apiFetch(config, '/token?renew=true');
+  const token = res.headers.get('Auth-Token');
+  if (!token) {
+    throw { status: 0, message: 'Token renewal succeeded but no Auth-Token in response' };
+  }
+
+  persistToken(config, token);
+  return token;
 }
 
 /** Cancel any pending refresh timer. */
@@ -89,20 +120,38 @@ function persistToken(config: AuthConfig, token: string): void {
 
 // ── Auth operations ─────────────────────────────────────────────────────────
 
-async function fetchUserInfo(config: AuthConfig): Promise<UserInfo> {
+/**
+ * Read the authenticated user from `GET /users/me`.
+ *
+ * The response is the stored user document, not the token's claims — so it
+ * carries application-level fields (e.g. consents) even when they are not
+ * exposed as JWT claims. Unlike {@link checkSession} it makes no local expiry
+ * check and does not clear the session on failure.
+ */
+export async function getUserInfo<E extends object = Record<never, never>>(config: AuthConfig): Promise<UserInfo<E>> {
   const res = await apiFetch(config, '/users/me');
-  return res.json() as Promise<UserInfo>;
+  return res.json() as Promise<UserInfo<E>>;
 }
 
-export async function register(
+/**
+ * Register a new user.
+ *
+ * The generic parameter `E` lets callers pass additional properties that the
+ * application's JSON Schema declares on the users collection (e.g. `consents`).
+ *
+ * **Important:** when no JSON Schema is configured on the users collection the
+ * server silently drops any properties beyond the base set (`email`, `password`,
+ * `teamName`, `firstName`, `lastName`). The request still succeeds with `201`.
+ */
+export async function register<E extends object = Record<never, never>>(
   config: AuthConfig,
   payload: {
     email: string;
     password: string;
     teamName: string;
-    firstName?: string;
-    lastName?: string;
-  }
+    firstName: string;
+    lastName: string;
+  } & E
 ): Promise<void> {
   await apiFetch(config, '/auth/register', {
     method: 'POST',
@@ -164,12 +213,12 @@ export async function verify(
  * @param mode 'bearer' (default): POST /token, stores token in localStorage.
  *             'cookie': POST /token/cookie, backend sets HttpOnly JWT cookie.
  */
-export async function login(
+export async function login<E extends object = Record<never, never>>(
   config: AuthConfig,
   email: string,
   password: string,
   mode: LoginMode = 'bearer'
-): Promise<UserInfo> {
+): Promise<UserInfo<E>> {
   const credentials = btoa(`${email}:${password}`);
 
   if (mode === 'cookie') {
@@ -178,7 +227,7 @@ export async function login(
       method: 'POST',
       headers: { Authorization: `Basic ${credentials}` },
     });
-    const user = await fetchUserInfo(config);
+    const user = await getUserInfo<E>(config);
     if (user.roles.includes('$unauthenticated')) {
       throw { status: 403, message: 'Account not verified' };
     }
@@ -199,7 +248,7 @@ export async function login(
 
   persistToken(config, token);
 
-  const user = await fetchUserInfo(config);
+  const user = await getUserInfo<E>(config);
   if (user.roles.includes('$unauthenticated')) {
     clearToken();
     cancelRefresh();
@@ -223,7 +272,7 @@ export async function logout(config: AuthConfig): Promise<void> {
  * Reads the token from localStorage — if present and not expired,
  * returns user info from the server. Otherwise returns null.
  */
-export async function checkSession(config: AuthConfig): Promise<UserInfo | null> {
+export async function checkSession<E extends object = Record<never, never>>(config: AuthConfig): Promise<UserInfo<E> | null> {
   // Resolve through the pluggable source: SPA adapters read localStorage, server
   // runtimes read the request cookie. Falls back to the localStorage default.
   const token = config.getToken ? await config.getToken() : getToken();
@@ -239,7 +288,7 @@ export async function checkSession(config: AuthConfig): Promise<UserInfo | null>
 
   // Token exists and is not expired — verify with server and get full user info
   try {
-    const user = await fetchUserInfo(config);
+    const user = await getUserInfo<E>(config);
     if (user.roles.includes('$unauthenticated')) {
       clearToken();
       cancelRefresh();

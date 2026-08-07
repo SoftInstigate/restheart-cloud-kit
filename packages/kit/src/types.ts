@@ -31,7 +31,30 @@ export interface AuthConfig {
   setToken?: (token: string) => void;
 }
 
-export interface UserInfo {
+/**
+ * Base user document returned by `/users/me`.
+ *
+ * Applications whose users collection has a JSON Schema can extend this
+ * with their own fields via the generic parameter:
+ *
+ * ```ts
+ * type MyUser = UserInfo<{
+ *   latestConsents?: { tos: string; pp: string; acceptedAt?: { $date: number } };
+ * }>;
+ *
+ * const user = await checkSession<{ latestConsents?: … }>(config);
+ * const accepted = user?.latestConsents?.tos === CURRENT_TOS_VERSION;
+ * ```
+ *
+ * The fields are optional because the user document does not carry them until
+ * the user accepts — which is the state a Guards rule blocks on.
+ *
+ * The extra properties are populated only when the server's JSON Schema
+ * declares them. When no schema is configured the server silently drops
+ * any properties beyond the base set — the request still succeeds with
+ * `201` on registration.
+ */
+export type UserInfo<E extends object = Record<never, never>> = {
   _id: string;
   roles: string[];
   team?: { _id: { $oid: string }; role: string };
@@ -40,7 +63,7 @@ export interface UserInfo {
     surname?: string;
     avatarUrl?: string;
   };
-}
+} & E;
 
 export interface TokenInfo {
   username: string;

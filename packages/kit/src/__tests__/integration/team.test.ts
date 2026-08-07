@@ -4,7 +4,7 @@ import { invite, acceptInvite } from '../../invite';
 import { getTeams, switchTeam } from '../../team';
 import {
   getConfig, testEmail,
-  readVerificationToken, readInvitationToken, deleteUser,
+  verifyEmail, readInvitationToken, deleteUser,
   installCookieJar, uninstallCookieJar,
 } from './helpers';
 
@@ -23,8 +23,7 @@ function decodeTeamClaim(token: string): unknown {
 
 async function registerAndVerify(email: string) {
   await register(config, { email, password, teamName: `Org-${email.slice(0, 8)}`, firstName: 'Test', lastName: 'User' });
-  const token = await readVerificationToken(email);
-  await fetch(`${config.apiBaseUrl}/auth/verify?email=${encodeURIComponent(email)}&token=${token}&delivery=cookie`);
+  await verifyEmail(email);
 }
 
 beforeAll(async () => {

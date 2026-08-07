@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, catchError, from, map, of, switchMap, tap } from 'rxjs';
+import { Observable, catchError, from, map, of, switchMap, tap, throwError } from 'rxjs';
 import type { UserInfo, TeamMembership, TeamMember, PendingInvitation, AuthConfig, LoginMode } from '@restheart-cloud/kit';
 import * as kit from '@restheart-cloud/kit';
 import { RH_AUTH_CONFIG } from './tokens.js';
@@ -51,8 +51,9 @@ export class RhAuthService {
     email: string;
     password: string;
     teamName: string;
-    firstName?: string;
-    lastName?: string;
+    firstName: string;
+    lastName: string;
+    [key: string]: unknown;
   }): Observable<void> {
     return from(kit.register(this.config, payload));
   }
@@ -182,5 +183,30 @@ export class RhAuthService {
 
   changePassword(currentPassword: string, newPassword: string): Observable<void> {
     return from(kit.changePassword(this.config, currentPassword, newPassword));
+  }
+
+  updateUser(email: string, updates: Record<string, unknown>): Observable<void> {
+    return from(kit.updateUser(this.config, email, updates));
+  }
+
+  // ── Consents ────────────────────────────────────────────────────────────
+
+  /**
+   * Record the signed-in user's acceptance of the application's consents,
+   * renew the token so the guard sees it, and update the `user` signal.
+   */
+  acceptConsents(body?: Record<string, unknown>, mode: LoginMode = 'bearer'): Observable<UserInfo> {
+    const current = this._user();
+    if (!current) {
+      return throwError(() => ({ status: 0, message: 'acceptConsents requires a signed-in user' }));
+    }
+    return from(kit.acceptConsents(this.config, current._id, body, mode)).pipe(
+      tap(u => this._user.set(u))
+    );
+  }
+
+  /** Force a new token, carrying the user document as it is now. */
+  renewToken(mode: LoginMode = 'bearer'): Observable<string | null> {
+    return from(kit.renewToken(this.config, mode));
   }
 }

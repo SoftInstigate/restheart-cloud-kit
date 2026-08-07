@@ -3,7 +3,7 @@ import { register, verify, login, clearToken, getToken } from '../../index';
 import { forgotPassword, resetPassword } from '../../password';
 import {
   getConfig, testEmail,
-  readVerificationToken, readPasswordResetToken, deleteUser,
+  verifyEmail, readPasswordResetToken, deleteUser,
 } from './helpers';
 
 const config   = getConfig();
@@ -13,8 +13,7 @@ const newPassword = 'NewTest-Password-88!';
 
 beforeAll(async () => {
   await register(config, { email, password, teamName: 'PwdOrg', firstName: 'Test', lastName: 'User' });
-  const token = await readVerificationToken(email);
-  await fetch(`${config.apiBaseUrl}/auth/verify?email=${encodeURIComponent(email)}&token=${token}&delivery=cookie`);
+  await verifyEmail(email);
 });
 
 afterAll(async () => {
