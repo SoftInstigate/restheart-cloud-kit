@@ -96,6 +96,26 @@ function assertValidApiBaseUrl(apiBaseUrl: string): void {
 
 // ── Fetch ───────────────────────────────────────────────────────────────────
 
+/**
+ * A `fetch` against the service, with the session already applied: the bearer
+ * token, the challenge suppression and the cookie credentials.
+ *
+ * Every call the kit makes goes through this. It is exported because an
+ * application querying its own collections needs exactly the same thing, and
+ * re-deriving it at each call site is how a request ends up unauthenticated —
+ * which the service answers with a `401`, not with the response the caller was
+ * reasoning about.
+ *
+ * ```ts
+ * const res = await apiFetch(config, '/my-collection?pagesize=10');
+ * const docs = await res.json();
+ * ```
+ *
+ * Rejects with an `ApiError` (`{ status, message }`) on any non-2xx response,
+ * so callers can branch on `status` without unpacking the body.
+ *
+ * @param path A path on the service, leading slash included — not a full URL.
+ */
 export async function apiFetch(
   config: AuthConfig,
   path: string,

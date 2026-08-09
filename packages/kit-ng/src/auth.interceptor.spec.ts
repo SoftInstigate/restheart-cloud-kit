@@ -62,4 +62,63 @@ describe('rhAuthInterceptor', () => {
 
     expect(clearSpy).not.toHaveBeenCalled();
   });
+
+  it('C2 attaches the bearer token to requests to the service', async () => {
+    vi.mocked(kit.getToken).mockReturnValue('tok');
+    const done = fire(`${config.apiBaseUrl}/my-collection`);
+    const req = TestBed.inject(HttpTestingController).expectOne(
+      `${config.apiBaseUrl}/my-collection`
+    );
+
+    expect(req.request.headers.get('Authorization')).toBe('Bearer tok');
+    expect(req.request.headers.get('No-Auth-Challenge')).toBe('true');
+    expect(req.request.withCredentials).toBe(true);
+
+    req.flush({});
+    await done;
+  });
+
+  it('C2 never sends the token to a third-party host', async () => {
+    vi.mocked(kit.getToken).mockReturnValue('tok');
+    const done = fire('https://evil.example.com/collect');
+    const req = TestBed.inject(HttpTestingController).expectOne(
+      'https://evil.example.com/collect'
+    );
+
+    expect(req.request.headers.has('Authorization')).toBe(false);
+    expect(req.request.headers.has('No-Auth-Challenge')).toBe(false);
+    expect(req.request.withCredentials).toBe(false);
+
+    req.flush({});
+    await done;
+  });
+
+  it('C2 leaves an Authorization header the caller already set', async () => {
+    vi.mocked(kit.getToken).mockReturnValue('tok');
+    const http = TestBed.inject(HttpClient);
+    const done = new Promise<void>(resolve => {
+      http
+        .get(`${config.apiBaseUrl}/x`, { headers: { Authorization: 'Basic abc' } })
+        .subscribe({ next: () => resolve(), error: () => resolve() });
+    });
+    const req = TestBed.inject(HttpTestingController).expectOne(`${config.apiBaseUrl}/x`);
+
+    expect(req.request.headers.get('Authorization')).toBe('Basic abc');
+
+    req.flush({});
+    await done;
+  });
+
+  it('C2 sends no Authorization header when there is no token', async () => {
+    vi.mocked(kit.getToken).mockReturnValue(null);
+    const done = fire(`${config.apiBaseUrl}/x`);
+    const req = TestBed.inject(HttpTestingController).expectOne(`${config.apiBaseUrl}/x`);
+
+    expect(req.request.headers.has('Authorization')).toBe(false);
+    // Still marked, so a 401 does not raise the browser's Basic Auth popup.
+    expect(req.request.headers.get('No-Auth-Challenge')).toBe('true');
+
+    req.flush({});
+    await done;
+  });
 });

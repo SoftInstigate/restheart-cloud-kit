@@ -65,6 +65,20 @@ export interface RhAuth {
   updateProfile(updates: { firstName?: string; lastName?: string }): Promise<void>;
   updateUser(email: string, updates: Record<string, unknown>): Promise<void>;
   /**
+   * A `fetch` against the service with the session already applied — the
+   * React counterpart of Angular's `rhAuthInterceptor`.
+   *
+   * React has no interceptor slot, so an app querying its own collections
+   * would otherwise attach the bearer token by hand at every call site. Pass a
+   * path, not a URL; rejects with an `ApiError` on any non-2xx response.
+   *
+   * ```tsx
+   * const res = await auth.api('/my-collection?pagesize=10');
+   * const docs = await res.json();
+   * ```
+   */
+  api(path: string, init?: RequestInit): Promise<Response>;
+  /**
    * Record the signed-in user's acceptance of the application's consents,
    * renew the token so the guard sees it, and update `user` with the result.
    */
@@ -232,6 +246,10 @@ export function RhAuthProvider({ config, children }: RhAuthProviderProps): React
       kit.updateUser(configRef.current, email, updates),
     []
   );
+  const api = useCallback(
+    (path: string, init?: RequestInit) => kit.apiFetch(configRef.current, path, init),
+    []
+  );
   const acceptConsents = useCallback(
     async (body?: Record<string, unknown>, mode: LoginMode = 'bearer'): Promise<UserInfo> => {
       const current = userRef.current;
@@ -314,6 +332,7 @@ export function RhAuthProvider({ config, children }: RhAuthProviderProps): React
       resetPassword,
       updateProfile,
       updateUser,
+      api,
       acceptConsents,
       renewToken,
       changePassword,
@@ -346,6 +365,7 @@ export function RhAuthProvider({ config, children }: RhAuthProviderProps): React
       resetPassword,
       updateProfile,
       updateUser,
+      api,
       acceptConsents,
       renewToken,
       changePassword,
