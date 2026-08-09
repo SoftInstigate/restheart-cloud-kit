@@ -49,6 +49,20 @@ export interface RhAuthStore {
   updateProfile(updates: { firstName?: string; lastName?: string }): Promise<void>;
   updateUser(email: string, updates: Record<string, unknown>): Promise<void>;
   /**
+   * A `fetch` against the service with the session already applied — the Vue
+   * counterpart of Angular's `rhAuthInterceptor`.
+   *
+   * Vue has no interceptor slot, so an app querying its own collections would
+   * otherwise attach the bearer token by hand at every call site. Pass a path,
+   * not a URL; rejects with an `ApiError` on any non-2xx response.
+   *
+   * ```ts
+   * const res = await auth.api('/my-collection?pagesize=10');
+   * const docs = await res.json();
+   * ```
+   */
+  api(path: string, init?: RequestInit): Promise<Response>;
+  /**
    * Record the signed-in user's acceptance of the application's consents,
    * renew the token so the guard sees it, and update `user` with the result.
    */
@@ -179,6 +193,7 @@ export function createRhAuthStore(config: AuthConfig): RhAuthStore {
     updateProfile,
     changePassword: (current, next) => kit.changePassword(config, current, next),
     updateUser: (email, updates) => kit.updateUser(config, email, updates),
+    api: (path, init) => kit.apiFetch(config, path, init),
     acceptConsents,
     renewToken: (mode = 'bearer') => kit.renewToken(config, mode),
     invite: (email, role) => kit.invite(config, email, role),
