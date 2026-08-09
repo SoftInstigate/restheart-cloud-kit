@@ -94,6 +94,31 @@ auth.forgotPassword(email)         // Observable<void>
 auth.resetPassword(payload, mode?)   // Observable<void> — mode: 'bearer' (default) | 'cookie'
 ```
 
+## Your own collections
+
+`provideRhAuth()` registers `rhAuthInterceptor`, which applies the session to every
+`HttpClient` request bound for `apiBaseUrl`: the bearer token, the challenge suppression that
+keeps the browser's Basic Auth popup away on a `401`, and the cookie credentials. So your own
+data requests need no header of their own:
+
+```typescript
+private readonly http = inject(HttpClient);
+
+load() {
+  return this.http.get(`${environment.apiUrl}/my-collection?pagesize=10`);
+}
+```
+
+Requests to any other host pass through untouched — the token is a credential, and attaching
+it everywhere would hand it to whatever third party the app happens to call. An
+`Authorization` header you set yourself is left alone. The `401` handling applies to every
+request either way, because that is about the session and not the target.
+
+Adding your own interceptor alongside it takes a second `provideHttpClient` call, *after*
+`provideRhAuth`; `withInterceptors` registers each function as a `multi` provider, so the two
+add up rather than replacing one another. Do not name `rhAuthInterceptor` again there — it is
+already registered, and repeating it just runs it twice.
+
 ## Guards
 
 ```typescript

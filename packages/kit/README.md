@@ -98,6 +98,7 @@ Errors are thrown as `{ status: number; message: string }`.
 | `getUserInfo(config)` | Read the stored user document (`GET /users/me`) without the session bookkeeping of `checkSession` |
 | `updateUser(config, email, updates)` | Update a user document via `PATCH /users/{email}` — ACL-scoped, distinct from `updateProfile` |
 | `acceptConsents(config, userId, body?, mode?)` | Record the acceptance, renew the token, return the updated user |
+| `apiFetch(config, path, init?)` | A `fetch` against the service with the session applied — for the app's own collections. Rejects with an `ApiError` on any non-2xx |
 
 ### Token management
 

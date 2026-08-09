@@ -77,7 +77,22 @@ auth.acceptInvite(token)  auth.resendInvite(email)  auth.listInvitations()
 auth.loadTeams()  auth.switchTeam(teamId, mode?)
 auth.listTeamMembers()  auth.removeMember(email)  auth.updateMemberRole(email, role)
 auth.createTeam(teamName)  auth.updateTeam(updates)  auth.deleteTeam()  auth.clearSession()
+auth.api(path, init?)
 ```
+
+### Your own collections
+
+Everything above talks to `/auth/*`, `/token` and `/users/me`. For your application's own
+data, use `auth.api` — it applies the session on the way out, so you never attach the bearer
+token by hand:
+
+```ts
+const res = await auth.api('/my-collection?pagesize=10');
+const docs = await res.json();
+```
+
+Pass a path, not a URL. Any non-2xx rejects with an `ApiError` (`{ status, message }`), so a
+`451` from a Guards rule or a `403` from an ACL is something you branch on rather than parse.
 
 ## Guards
 

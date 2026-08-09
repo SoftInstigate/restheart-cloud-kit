@@ -164,7 +164,7 @@ Every adapter exposes the same surface, so one starter specification serves all 
 
 **Methods** — thin wrappers over the core, each updating that state: `checkSession`,
 `register`, `verify`, `login`, `logout`, `forgotPassword`, `resetPassword`, `updateProfile`,
-`changePassword`, `updateUser`, `acceptConsents`, `renewToken`, `invite`, `getInvitation`,
+`changePassword`, `updateUser`, `api`, `acceptConsents`, `renewToken`, `invite`, `getInvitation`,
 `activate`, `acceptInvite`, `resendInvite`,
 `listInvitations`, `loadTeams`, `switchTeam`, `listTeamMembers`, `removeMember`,
 `updateMemberRole`, `createTeam`, `updateTeam`, `deleteTeam`, `clearSession`.
@@ -182,6 +182,19 @@ register payload.
 **User document updates.** `updateUser(config, email, updates)` targets `PATCH /users/{email}`,
 where the application's ACL permission decides what fields are writable. This is distinct from
 `updateProfile` (which goes through `/auth/profile` and is limited to `firstName` / `lastName`).
+
+**The application's own requests.** Everything above talks to `/auth/*`, `/token` and
+`/users/me`. An application also reads its own collections, and those requests need the same
+session applied — the bearer token, the challenge suppression, the cookie credentials.
+Getting it wrong is quiet: the service answers `401`, which reads as "logged out" rather than
+"you forgot the header".
+
+Adapters expose this in whatever shape the framework already has. Angular has an interceptor
+slot, so `rhAuthInterceptor` applies the session to every `HttpClient` request bound for
+`apiBaseUrl` — and to no other host, because the token is a credential and must not leak to
+third parties. React and Vue have no such slot, so both expose `api(path, init?)` on the
+store, a thin binding of the core's `apiFetch(config, path, init)`. An adapter for a
+framework with interceptors should prefer the interceptor; one without should expose `api`.
 
 **Consents.** `acceptConsents(body?, mode?)` is the adapter form of the acceptance: it takes the
 user id from the reactive state, sends the whitelisted `PATCH`, renews the token, and writes the
