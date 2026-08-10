@@ -89,7 +89,8 @@ Use this table to find the right starting point for common change types:
 | Team operations | [Core Kit](packages/kit.md#team-operations) | `packages/kit/src/team.ts` | `getTeams`, `switchTeam`, `createTeam`, `listTeamMembers` | `packages/kit/src/__tests__/integration/team.test.ts`, `team-management.test.ts` | `npm test -w packages/kit` |
 | Invitations | [Core Kit](packages/kit.md#invitation-flows) | `packages/kit/src/invite.ts` | `invite`, `activate`, `acceptInvite`, `listInvitations` | `packages/kit/src/__tests__/integration/invite.test.ts` | `npm test -w packages/kit` |
 | Password reset | [Core Kit](packages/kit.md#password-management) | `packages/kit/src/password.ts` | `forgotPassword`, `resetPassword` | `packages/kit/src/__tests__/integration/password.test.ts` | `npm test -w packages/kit` |
-| Profile updates | [Core Kit](packages/kit.md#profile-management) | `packages/kit/src/profile.ts` | `updateProfile`, `changePassword` | `packages/kit/src/__tests__/integration/profile.test.ts` | `npm test -w packages/kit` |
+| Profile updates | [Core Kit](packages/kit.md#profile-management) | `packages/kit/src/profile.ts` | `updateProfile`, `updateUser`, `changePassword` | `packages/kit/src/__tests__/integration/profile.test.ts` | `npm test -w packages/kit` |
+| Consents gating | [Core Kit — Consents](packages/kit.md#consents-gating) | `packages/kit/src/consents.ts` | `acceptConsents` | `packages/kit/src/__tests__/integration/consents.test.ts` | `npm test -w packages/kit` |
 | Angular adapter (signals, guards, interceptor) | [Angular Adapter](packages/kit-ng.md) | `packages/kit-ng/src/auth.service.ts`, `auth.guard.ts`, `auth.interceptor.ts` | `RhAuthService`, `authGuard`, `provideRhAuth` | `packages/kit-ng/src/__tests__/` | `npm test -w packages/kit-ng` |
 | React adapter (hooks, context, guards) | [React Adapter](packages/kit-react.md) | `packages/kit-react/src/context.tsx`, `guards.tsx` | `useAuth`, `RhAuthProvider`, `AuthGuard` | `packages/kit-react/src/__tests__/` | `npm test -w packages/kit-react` |
 | Next.js SSR (middleware, route handlers, server actions) | [React Adapter — /next](packages/kit-react.md#nextjs-subpath-next) | `packages/kit-react/src/next/` | `rhAuthMiddleware`, `createSessionRoute`, `rhLogin`, `SessionSync` | `packages/kit-react/src/next/__tests__/` | `npm test -w packages/kit-react` |
@@ -97,7 +98,7 @@ Use this table to find the right starting point for common change types:
 | Nuxt SSR (middleware, handler, bridge) | [Vue Adapter — /nuxt](packages/kit-vue.md#nuxt-subpath-nuxt) | `packages/kit-vue/src/nuxt/` | `rhAuthServerMiddleware`, `createSessionHandler`, `bridgeFragmentToCookie` | `packages/kit-vue/src/nuxt/__tests__/` | `npm test -w packages/kit-vue` |
 | Token delivery (bearer vs cookie) | [Token Delivery](architecture/token-delivery.md) | `packages/kit/src/auth.ts`, `packages/kit/src/client.ts` | `applyBearerDelivery`, `persistToken`, `LoginMode` | `packages/kit/src/__tests__/integration/auth.test.ts` | `npm test -w packages/kit` |
 | Package publishing / release | [Release Process](deployment/release.md) | `.github/workflows/release.yml` | tag-driven versioning | Integration tests (gated) | `git tag X.Y.Z && git push origin X.Y.Z` |
-| Types & interfaces | [Core Kit](packages/kit.md#type-definitions) | `packages/kit/src/types.ts` | `UserInfo`, `TeamMembership`, `AuthConfig`, `ApiError`, `LoginMode` | All integration tests | `npm run build` |
+| Types & interfaces | [Core Kit](packages/kit.md#type-definitions) | `packages/kit/src/types.ts` | `UserInfo<E>`, `TeamMembership`, `AuthConfig`, `ApiError`, `LoginMode` | All integration tests | `npm run build` |
 
 ## Getting Started
 
@@ -185,6 +186,16 @@ Users can belong to multiple teams:
 - Switch active team with `switchTeam()`
 - Team context included in JWT claims
 - Team-scoped operations (members, invitations)
+
+### Consents Gating
+
+Applications can gate access behind a user's acceptance of terms of service, privacy policy, or any other consent. The pattern:
+
+1. A guard rule blocks requests from users who have not accepted the current consent versions.
+2. An ACL permission on `PATCH /users/{userId}` — scoped with `bson-request-whitelist` — exempts the one call that records the acceptance.
+3. `acceptConsents()` calls `updateUser()` then `renewToken()` so the guard sees the updated claims.
+
+**Key invariant**: the server decides which versions are stamped and when — the client body carries only the whitelisted key. See [Core Kit — Consents Gating](packages/kit.md#consents-gating) for the full API.
 
 ### Framework Adapter Pattern
 
