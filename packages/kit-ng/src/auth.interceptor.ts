@@ -7,7 +7,7 @@ import {
 } from '@angular/common/http';
 import { Observable, catchError, from, switchMap, throwError } from 'rxjs';
 import { RhAuthService } from './auth.service.js';
-import { RH_AUTH_CONFIG } from './tokens.js';
+import { RH_AUTH_CONFIG, RH_KIT_REQUEST } from './tokens.js';
 import { clearToken, cancelRefresh, getToken } from '@restheart-cloud/kit';
 import type { AuthConfig } from '@restheart-cloud/kit';
 
@@ -43,10 +43,16 @@ export const rhAuthInterceptor: HttpInterceptorFn = (
   const auth = inject(RhAuthService);
   const config = inject(RH_AUTH_CONFIG);
 
+  // A 401 on the kit's own endpoints does not always mean the session is dead
+  // — change-password and token answer 401 for wrong *supplied* credentials —
+  // and the kit already handles those. Clearing here would sign a user out for
+  // mistyping their old password.
+  const ownsIts401s = req.context.get(RH_KIT_REQUEST);
+
   const onError = (source: Observable<unknown>) =>
     source.pipe(
       catchError((err: unknown) => {
-        if (err instanceof HttpErrorResponse && err.status === 401) {
+        if (!ownsIts401s && err instanceof HttpErrorResponse && err.status === 401) {
           clearToken();
           cancelRefresh();
           auth.clearSession();

@@ -1,11 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
-import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpContext,
+  provideHttpClient,
+  withInterceptors,
+} from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import * as kit from '@restheart-cloud/kit';
 import { RhAuthService } from './auth.service';
 import { rhAuthInterceptor } from './auth.interceptor';
-import { RH_AUTH_CONFIG } from './tokens';
+import { RH_AUTH_CONFIG, RH_KIT_REQUEST } from './tokens';
 
 vi.mock('@restheart-cloud/kit');
 
@@ -107,6 +112,30 @@ describe('rhAuthInterceptor', () => {
 
     req.flush({});
     await done;
+  });
+
+  it('C3 leaves the session alone on a 401 to a kit request', async () => {
+    // Wrong current password answers 401; signing the user out for that would
+    // be a regression introduced by routing the kit through HttpClient.
+    const auth = TestBed.inject(RhAuthService);
+    const clearSpy = vi.spyOn(auth, 'clearSession');
+    const http = TestBed.inject(HttpClient);
+    const done = new Promise<void>(resolve => {
+      http
+        .patch(
+          `${config.apiBaseUrl}/auth/change-password`,
+          {},
+          { context: new HttpContext().set(RH_KIT_REQUEST, true) }
+        )
+        .subscribe({ next: () => resolve(), error: () => resolve() });
+    });
+    TestBed.inject(HttpTestingController)
+      .expectOne(`${config.apiBaseUrl}/auth/change-password`)
+      .flush('nope', { status: 401, statusText: 'Unauthorized' });
+    await done;
+
+    expect(clearSpy).not.toHaveBeenCalled();
+    expect(kit.clearToken).not.toHaveBeenCalled();
   });
 
   it('C2 sends no Authorization header when there is no token', async () => {

@@ -141,7 +141,11 @@ export async function apiFetch(
     headers.set('Authorization', `Bearer ${token}`);
   }
 
-  const res = await fetch(url, {
+  // Called through, not captured at module load, so a caller that replaces the
+  // global `fetch` after import is still honoured.
+  const send = config.transport ?? ((u: string, i?: RequestInit) => fetch(u, i));
+
+  const res = await send(url, {
     ...init,
     headers,
     credentials: 'include',

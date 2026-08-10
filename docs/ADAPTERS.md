@@ -196,6 +196,19 @@ third parties. React and Vue have no such slot, so both expose `api(path, init?)
 store, a thin binding of the core's `apiFetch(config, path, init)`. An adapter for a
 framework with interceptors should prefer the interceptor; one without should expose `api`.
 
+**The transport runs the other way too.** The core speaks `fetch`, so by default *its* calls
+bypass the host framework's HTTP stack — and every cross-cutting concern wired into it. An
+adapter closes that by passing `AuthConfig.transport`, a `fetch`-shaped callback the core
+sends everything through. `kit-ng` supplies one backed by `HttpClient` (`httpClientTransport`),
+so a login or a session check goes through the interceptor chain like any other request.
+
+An implementation owes the core two things `fetch` guarantees and framework clients often do
+not: **resolve** on a non-2xx rather than rejecting, since the core reads the status itself;
+and reject only when no response existed at all. It must also mark its requests so
+`rhAuthInterceptor` skips its 401 handling (`RH_KIT_REQUEST`) — the kit owns the meaning of a
+401 on its own endpoints, where it can mean "wrong current password" rather than "session
+over".
+
 **Consents.** `acceptConsents(body?, mode?)` is the adapter form of the acceptance: it takes the
 user id from the reactive state, sends the whitelisted `PATCH`, renews the token, and writes the
 returned document back into `user`. The renewal is not an optimisation — a Guards rule reads the

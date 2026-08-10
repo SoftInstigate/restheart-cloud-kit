@@ -29,6 +29,28 @@ export interface AuthConfig {
    * When set, the localStorage store and the refresh timer are both bypassed.
    */
   setToken?: (token: string) => void;
+  /**
+   * How a request actually goes out. Defaults to the global `fetch`.
+   *
+   * The core is framework-agnostic and speaks `fetch`, which means its calls
+   * bypass whatever HTTP stack the host framework has — and with it every
+   * cross-cutting concern wired into that stack. In Angular that is literal:
+   * an interceptor sees `HttpClient` traffic and nothing else, so a tracing
+   * header, a retry policy or a global error handler would silently cover the
+   * application's own requests and not the kit's.
+   *
+   * An adapter can close that gap by passing its framework's client here.
+   * `kit-ng` does exactly this, routing every call through `HttpClient` so the
+   * interceptor chain applies to all of it.
+   *
+   * The contract is `fetch`'s, and deliberately so — the core uses only `ok`,
+   * `status`, `statusText`, `json()`, `clone()` and `headers.get()`. Two things
+   * an implementation must get right: **resolve** on a non-2xx response rather
+   * than rejecting (clients like `HttpClient` throw, and the core reads the
+   * status itself), and reject only when the request never produced a response
+   * at all.
+   */
+  transport?: (url: string, init?: RequestInit) => Promise<Response>;
 }
 
 /**

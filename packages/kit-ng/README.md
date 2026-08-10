@@ -119,6 +119,25 @@ Adding your own interceptor alongside it takes a second `provideHttpClient` call
 add up rather than replacing one another. Do not name `rhAuthInterceptor` again there — it is
 already registered, and repeating it just runs it twice.
 
+### The kit's own calls go through `HttpClient` too
+
+`provideRhAuth()` also hands the kit an `HttpClient`-backed transport, so a login, a session
+check or a token renewal travels the same interceptor chain as everything else. Your tracing
+header, retry policy or error handler covers all of it, not just the requests you wrote.
+
+One asymmetry is deliberate: `rhAuthInterceptor` does **not** clear the session on a 401 to a
+kit endpoint. A 401 there does not always mean the session is over —
+`PATCH /auth/change-password` answers 401 for a wrong *current* password, `GET /token` for
+wrong credentials — and signing a user out for mistyping their old password would be a poor
+trade. The kit handles those itself; the interceptor's 401 handling is for your requests.
+
+To route the kit somewhere else entirely, pass your own `transport` in the config: an explicit
+one is left alone.
+
+```typescript
+provideRhAuth({ apiBaseUrl: environment.apiUrl, transport: myTransport }),
+```
+
 ## Guards
 
 ```typescript
