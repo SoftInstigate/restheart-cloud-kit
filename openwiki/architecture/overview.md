@@ -20,9 +20,10 @@ restheart-cloud-kit/
 │   │   │   ├── client.ts       # Token management, API fetch
 │   │   │   ├── invite.ts       # Invitation operations
 │   │   │   ├── password.ts     # Password reset flows
-│   │   │   ├── profile.ts      # User profile updates
+│   │   │   ├── consents.ts     # Consents gating (acceptConsents)
+│   │   │   ├── profile.ts      # User profile and document updates
 │   │   │   ├── team.ts         # Team management
-│   │   │   ├── types.ts        # TypeScript interfaces
+│   │   │   ├── types.ts        # TypeScript interfaces (generic UserInfo<E>)
 │   │   │   └── index.ts        # Public API exports
 │   │   └── __tests__/
 │   │       └── integration/    # Integration tests (live RESTHeart Cloud)
@@ -107,7 +108,8 @@ The monorepo follows a strict layered architecture:
 - Team operations: `getTeams`, `switchTeam`, `listTeamMembers`, `createTeam`, `updateTeam`, `deleteTeam`, `removeMember`, `updateMemberRole`
 - Invitation flows: `invite`, `getInvitation`, `activate`, `acceptInvite`, `resendInvite`, `listInvitations`
 - Password management: `forgotPassword`, `resetPassword`
-- Profile updates: `updateProfile`, `changePassword`
+- Profile updates: `updateProfile`, `updateUser`, `changePassword`
+- Consents: `acceptConsents`
 - Utilities: `isValidApiBaseUrl`
 
 ### Layer 2: Framework Adapters
@@ -158,7 +160,7 @@ Both authentication modes (bearer and cookie) must be supported consistently:
 
 Every auto-login endpoint (`login`, `activate`, `resetPassword`, `switchTeam`) accepts a `mode` parameter that controls token delivery via the `delivery` query parameter (`body` for bearer, `cookie` for cookie mode).
 
-### Pluggable Token Source/Sink
+### Pluggable Token Source and Sink
 
 The core `AuthConfig` accepts optional `getToken` and `setToken` callbacks:
 
@@ -385,6 +387,7 @@ packages/kit/src/__tests__/integration/
 ├── team.test.ts           # Team switching, multi-team
 ├── team-management.test.ts # Team CRUD, member management
 ├── invite.test.ts         # Invitation flows
+├── consents.test.ts       # Consents gating (acceptConsents, ACL permission)
 ├── password.test.ts       # Password reset
 └── profile.test.ts        # Profile updates
 ```
@@ -470,4 +473,6 @@ Future considerations:
 - HTTP-only cookie with CSRF protection
 - Refresh token rotation
 - Device-specific tokens
+- OAuth2/OIDC integration
+ens
 - OAuth2/OIDC integration

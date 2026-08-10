@@ -243,6 +243,19 @@ uninstallCookieJar(): void
 - ForgotPassword sends reset email
 - ResetPassword changes password and logs in
 
+### consents.test.ts
+
+**Purpose**: Consents gating (`acceptConsents`, ACL permission scoping)
+
+**Tests**:
+- Register with application fields succeeds (drops extras when no JSON Schema)
+- `acceptConsents` records the server-stamped versions, not the ones the client sent
+- `acceptConsents` renews the token (guard sees the updated claims)
+- Consent history appends entries rather than overwriting
+- Writing outside the `bson-request-whitelist` is rejected with 403
+
+**Note**: This suite creates an ACL permission in `beforeAll` and waits 22 seconds for the server's ACL cache to refresh. The permission uses `bson-request-whitelist(consents)` and `mergeRequest` to stamp the accepted versions server-side.
+
 ### profile.test.ts
 
 **Purpose**: Profile updates

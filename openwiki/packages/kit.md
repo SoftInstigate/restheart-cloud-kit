@@ -1,7 +1,7 @@
 ---
 type: Package
 title: "@restheart-cloud/kit"
-description: Core authentication package with zero dependencies. Provides all auth flows, token management, team operations, and password reset functionality.
+description: Core authentication package with zero dependencies. Provides all auth flows, token management, team operations, consents gating, and password reset functionality.
 tags: [package, core, authentication, typescript]
 ---
 
@@ -46,8 +46,7 @@ interface AuthConfig {
 }
 ```
 
-<!-- openwiki: broken internal link [../architecture/overview.md#pluggable-token-source-sink] heading anchor "pluggable-token-source-sink" does not exist in "../architecture/overview.md". Fix the href or restore the target, then delete this comment. -->
-The optional `getToken`/`setToken` callbacks support SSR runtimes (Next.js, Nuxt) where `localStorage` is unavailable. See [Architecture — Pluggable Token Source/Sink](../architecture/overview.md#pluggable-token-source-sink) for details.
+The optional `getToken`/`setToken` callbacks support SSR runtimes (Next.js, Nuxt) where `localStorage` is unavailable. See [Architecture — Pluggable Token Source and Sink](../architecture/overview.md#pluggable-token-source-and-sink) for details.
 
 **Validation**: `apiBaseUrl` must be a RESTHeart Cloud service URL (`*.restheart.com`). Invalid URLs throw an `ApiError`.
 
@@ -334,17 +333,52 @@ await resetPassword(config, {
 ## Profile Management
 
 ```typescript
-import { updateProfile, changePassword } from '@restheart-cloud/kit';
+import { updateProfile, updateUser, changePassword } from '@restheart-cloud/kit';
 
-// Update profile fields
+// Update profile fields (firstName, lastName only — goes through /auth/profile)
 await updateProfile(config, {
   firstName: 'John',
   lastName: 'Doe'
 });
 
+// Update any user document field (goes through PATCH /users/{email})
+// Requires an ACL permission granting write access to the target fields.
+await updateUser(config, 'user@example.com', { preferences: { theme: 'dark' } });
+
 // Change password (requires current password)
 await changePassword(config, 'current-password', 'new-password');
 ```
+
+## Consents Gating
+
+The consents pattern lets you gate access behind the user's acceptance of terms of service, privacy policy, or any other consent.
+
+**How it works**: A [Guards rule](../architecture/overview.md) blocks requests from users who have not accepted the current consents. An ACL permission on `PATCH /users/{userId}` — scoped with `bson-request-whitelist` — exempts the one request that records the acceptance.
+
+**The server decides what is written.** The permission's `mergeRequest` stamps the versions being accepted and the timestamp. The body sent by the client carries the whitelisted key and nothing meaningful: a client that stated the version itself could accept terms it was never shown.
+
+**The renewal is not optional.** The token the user holds is a snapshot taken before the acceptance; without a new token the guard keeps blocking them.
+
+```typescript
+import { acceptConsents } from '@restheart-cloud/kit';
+
+// After the user ticks the consent box
+const user = await acceptConsents<{ latestConsents?: { tos: string; pp: string; acceptedAt?: { $date: number } } }>(
+  config,
+  session.user._id
+);
+// user.latestConsents now carries the server-stamped versions
+```
+
+**Parameters**:
+- `config` — `AuthConfig`
+- `userId` — The user's email (the `_id` field)
+- `body` — The request body. Defaults to `{ consents: [] }`, matching a permission whitelisted on `consents`. Pass custom keys when your ACL permission whitelists a different field.
+- `mode` — `'bearer'` (default) or `'cookie'`. Must match how the session was established.
+
+**Returns**: The user document as it is after the acceptance (`UserInfo<E>`).
+
+**Test**: `packages/kit/src/__tests__/integration/consents.test.ts`
 
 ## Error Handling
 
@@ -450,8 +484,9 @@ src/
 ├── team.ts        # Team operations
 ├── invite.ts      # Invitation flows
 ├── password.ts    # Password reset
-├── profile.ts     # Profile updates
-├── types.ts       # TypeScript interfaces
+├── consents.ts    # Consents gating (acceptConsents)
+├── profile.ts     # Profile and user document updates (updateProfile, updateUser, changePassword)
+├── types.ts       # TypeScript interfaces (generic UserInfo<E>)
 └── index.ts       # Public API exports
 ```
 
@@ -502,6 +537,14 @@ npm test -w packages/kit && ./packages/kit/open-report.sh
 | File | Purpose |
 |------|---------|
 | `src/client.ts` | Token storage, API fetch wrapper, URL validation |
+| `src/auth.ts` | Authentication flows, proactive refresh, bearer delivery |
+| `src/team.ts` | Team CRUD, member management, team switching |
+| `src/invite.ts` | Invitation send, accept, activate, list |
+| `src/password.ts` | Forgot password, reset password |
+| `src/profile.ts` | Profile updates, password change |
+| `src/types.ts` | TypeScript interfaces for all data structures |
+| `src/index.ts` | Public API re-exports |
+age, API fetch wrapper, URL validation |
 | `src/auth.ts` | Authentication flows, proactive refresh, bearer delivery |
 | `src/team.ts` | Team CRUD, member management, team switching |
 | `src/invite.ts` | Invitation send, accept, activate, list |

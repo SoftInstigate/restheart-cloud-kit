@@ -160,8 +160,7 @@ The `/nuxt` subpath provides:
 - **Session readers** (`getServerSession`, `getServerSessionWithTeams`): read the current user from the request cookie in server context
 - **Cookie utilities**: `RH_SESSION_COOKIE`, `DEFAULT_COOKIE_OPTIONS`, `rhServerConfig`, `cookieMaxAge`, `resolveCookieOptions`
 
-<!-- openwiki: broken internal link [../architecture/overview.md#pluggable-token-source-sink] heading anchor "pluggable-token-source-sink" does not exist in "../architecture/overview.md". Fix the href or restore the target, then delete this comment. -->
-Uses the core's [pluggable token source/sink](../architecture/overview.md#pluggable-token-source-sink) to read tokens from request cookies and capture tokens for cookie writes — no `localStorage` on the server.
+Uses the core's [pluggable token source and sink](../architecture/overview.md#pluggable-token-source-and-sink) to read tokens from request cookies and capture tokens for cookie writes — no `localStorage` on the server.
 
 ### Source Map
 
