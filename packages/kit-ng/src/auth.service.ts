@@ -212,4 +212,31 @@ export class RhAuthService {
   renewToken(mode: LoginMode = 'bearer'): Observable<string | null> {
     return from(kit.renewToken(this.config, mode));
   }
+
+  /**
+   * An authenticated `fetch` against the service, returned as an Observable.
+   *
+   * The Angular counterpart of React's `auth.api()` — the bearer token is
+   * attached automatically, and the request goes through the Angular
+   * interceptor chain (when `httpClientTransport` is configured).
+   *
+   * ```ts
+   * this.auth.api('/demo').pipe(
+   *   switchMap(res => res.json()),
+   * ).subscribe(data => console.log(data));
+   * ```
+   *
+   * For a POST:
+   * ```ts
+   * this.auth.api('/demo', {
+   *   method: 'POST',
+   *   body: JSON.stringify({ name: 'hello' }),
+   * }).pipe(switchMap(res => res.json()));
+   * ```
+   *
+   * Rejects with an `ApiError` (`{ status, message }`) on any non-2xx response.
+   */
+  api(path: string, init?: RequestInit): Observable<Response> {
+    return from(kit.apiFetch(this.config, path, init));
+  }
 }
