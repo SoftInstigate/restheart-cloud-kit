@@ -51,6 +51,32 @@ export interface AuthConfig {
    * at all.
    */
   transport?: (url: string, init?: RequestInit) => Promise<Response>;
+  /**
+   * Called whenever a call to the service fails, just before the error is
+   * thrown to whoever made the call.
+   *
+   * Session restoration happens on its own schedule — on mount, on navigation,
+   * on a token refresh — with no call site of yours to wrap in a `try`. When it
+   * fails, adapters have to keep the application usable, which means the
+   * failure is absorbed: a rejected `checkSession` ends up as "no user", and
+   * "no user" looks exactly like "signed out". A dropped connection and an
+   * expired session become the same screen.
+   *
+   * This is the seam for telling them apart. It sees every failure, including
+   * the ones no caller is waiting on:
+   *
+   * ```ts
+   * onError: err => {
+   *   if (err.status === 451) showConsentsGate();
+   *   if (err.status === 0) showOfflineBanner();
+   * }
+   * ```
+   *
+   * It observes; it cannot swallow. The error is thrown either way, so this is
+   * not a place to handle failures a caller is already handling — it is a place
+   * to notice the ones nobody is.
+   */
+  onError?: (error: ApiError) => void;
 }
 
 /**

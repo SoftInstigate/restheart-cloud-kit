@@ -13,6 +13,28 @@ function decodeJwtPayload(jwt: string): Record<string, unknown> {
   return JSON.parse(json) as Record<string, unknown>;
 }
 
+/**
+ * The stored token's claims, or `null` when there is no usable token.
+ *
+ * Useful for what the application knows about the user *before* the user
+ * document has been read — `sub` is the user id, which is how an acceptance can
+ * be recorded by a session that is blocked from reading `/users/me`.
+ *
+ * These claims are **not verified**: a JWT payload is base64, and anyone
+ * holding the token can change it. Read them for what the client does next,
+ * never for an access decision — the server re-checks the signature on every
+ * request, which is what actually decides.
+ */
+export function getTokenClaims(): Record<string, unknown> | null {
+  const token = getToken();
+  if (!token) return null;
+  try {
+    return decodeJwtPayload(token);
+  } catch {
+    return null;
+  }
+}
+
 /** Returns the token's exp claim in milliseconds, or null if missing/malformed. */
 export function getTokenExpiry(token: string): number | null {
   try {
@@ -145,11 +167,25 @@ export async function apiFetch(
   // global `fetch` after import is still honoured.
   const send = config.transport ?? ((u: string, i?: RequestInit) => fetch(u, i));
 
-  const res = await send(url, {
-    ...init,
-    headers,
-    credentials: 'include',
-  });
+  let res: Response;
+  try {
+    res = await send(url, {
+      ...init,
+      headers,
+      credentials: 'include',
+    });
+  } catch (cause) {
+    // No response at all — DNS, offline, CORS, an aborted request. Reported in
+    // the same shape as everything else so callers have one error type to
+    // handle, and `status: 0` to tell "never reached the service" from "the
+    // service said no".
+    const err: ApiError = {
+      status: 0,
+      message: cause instanceof Error ? cause.message : 'Network request failed',
+    };
+    config.onError?.(err);
+    throw err;
+  }
 
   if (!res.ok) {
     let message = res.statusText;
@@ -163,6 +199,7 @@ export async function apiFetch(
     }
     const err: ApiError = { status: res.status, message };
     console.error(`[apiFetch] ${init?.method ?? 'GET'} ${url} → ${res.status} ${res.statusText}`, body ?? '');
+    config.onError?.(err);
     throw err;
   }
 

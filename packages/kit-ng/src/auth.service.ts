@@ -196,11 +196,14 @@ export class RhAuthService {
    * renew the token so the guard sees it, and update the `user` signal.
    */
   acceptConsents(body?: Record<string, unknown>, mode: LoginMode = 'bearer'): Observable<UserInfo> {
-    const current = this._user();
-    if (!current) {
+    // The user document may be missing precisely because the rule is blocking
+    // `/users/me` — the case this call exists to get out of. The token still
+    // says who they are.
+    const userId = this._user()?._id ?? (kit.getTokenClaims()?.['sub'] as string | undefined);
+    if (!userId) {
       return throwError(() => ({ status: 0, message: 'acceptConsents requires a signed-in user' }));
     }
-    return from(kit.acceptConsents(this.config, current._id, body, mode)).pipe(
+    return from(kit.acceptConsents(this.config, userId, body, mode)).pipe(
       tap(u => this._user.set(u))
     );
   }

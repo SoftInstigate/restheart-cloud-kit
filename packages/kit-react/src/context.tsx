@@ -252,9 +252,12 @@ export function RhAuthProvider({ config, children }: RhAuthProviderProps): React
   );
   const acceptConsents = useCallback(
     async (body?: Record<string, unknown>, mode: LoginMode = 'bearer'): Promise<UserInfo> => {
-      const current = userRef.current;
-      if (!current) throw { status: 0, message: 'acceptConsents requires a signed-in user' };
-      const u = await kit.acceptConsents(configRef.current, current._id, body, mode);
+      // The user document may be missing precisely because the rule is blocking
+      // `/users/me` — the case this call exists to get out of. The token still
+      // says who they are.
+      const userId = userRef.current?._id ?? (kit.getTokenClaims()?.['sub'] as string | undefined);
+      if (!userId) throw { status: 0, message: 'acceptConsents requires a signed-in user' };
+      const u = await kit.acceptConsents(configRef.current, userId, body, mode);
       setUser(u);
       return u;
     },

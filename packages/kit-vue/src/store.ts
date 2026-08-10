@@ -167,9 +167,12 @@ export function createRhAuthStore(config: AuthConfig): RhAuthStore {
     body?: Record<string, unknown>,
     mode: LoginMode = 'bearer'
   ): Promise<UserInfo> {
-    const current = user.value;
-    if (!current) throw { status: 0, message: 'acceptConsents requires a signed-in user' };
-    const u = await kit.acceptConsents(config, current._id, body, mode);
+    // The user document may be missing precisely because the rule is blocking
+    // `/users/me` — the case this call exists to get out of. The token still
+    // says who they are.
+    const userId = user.value?._id ?? (kit.getTokenClaims()?.['sub'] as string | undefined);
+    if (!userId) throw { status: 0, message: 'acceptConsents requires a signed-in user' };
+    const u = await kit.acceptConsents(config, userId, body, mode);
     user.value = u;
     return u;
   }
