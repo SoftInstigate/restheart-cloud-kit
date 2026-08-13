@@ -43,10 +43,16 @@ interface AuthConfig {
   apiBaseUrl: string;                              // Must be *.restheart.com
   getToken?: () => string | null | Promise<string | null>;  // SSR token source
   setToken?: (token: string) => void;              // SSR token sink
+  transport?: (url: string, init?: RequestInit) => Promise<Response>;  // Custom fetch (e.g., Angular HttpClient)
+  onError?: (error: ApiError) => void;             // Global error observer
 }
 ```
 
 The optional `getToken`/`setToken` callbacks support SSR runtimes (Next.js, Nuxt) where `localStorage` is unavailable. See [Architecture — Pluggable Token Source and Sink](../architecture/overview.md#pluggable-token-source-and-sink) for details.
+
+**`transport`**: Replaces `fetch` with a framework's HTTP client. `kit-ng` uses [`httpClientTransport`](kit-ng.md#httpclienttransport) to route calls through Angular's `HttpClient` so the interceptor chain applies to kit-originated requests.
+
+**`onError`**: Observes every failure, including session-restoration calls no caller is waiting on. It cannot swallow errors — the error is thrown either way. Use it for cross-cutting concerns like offline banners or consent gates.
 
 **Validation**: `apiBaseUrl` must be a RESTHeart Cloud service URL (`*.restheart.com`). Invalid URLs throw an `ApiError`.
 
@@ -380,6 +386,34 @@ const user = await acceptConsents<{ latestConsents?: { tos: string; pp: string; 
 
 **Test**: `packages/kit/src/__tests__/integration/consents.test.ts`
 
+## Authenticated Fetch (`apiFetch`)
+
+The kit exports `apiFetch`, an authenticated `fetch` against the service. Every internal call the kit makes goes through it. It is exported because an application querying its own RESTHeart collections needs exactly the same thing.
+
+```typescript
+import { apiFetch } from '@restheart-cloud/kit';
+
+// GET — pass a path, not a full URL
+const res = await apiFetch(config, '/my-collection?pagesize=10');
+const docs = await res.json();
+
+// POST
+const res = await apiFetch(config, '/my-collection', {
+  method: 'POST',
+  body: JSON.stringify({ name: 'hello' }),
+});
+```
+
+**What it does**:
+- Attaches the Bearer token (from `localStorage` or the configured `getToken` source)
+- Sets `Content-Type: application/json` when a body is present and no header is set
+- Sets `No-Auth-Challenge: true` to suppress the browser's native Basic Auth popup on 401
+- Uses `credentials: 'include'` for cookie-mode compatibility
+- Throws `ApiError` (`{ status, message }`) on any non-2xx response
+- Uses `status: 0` for network failures (DNS, offline, CORS, aborted)
+
+**When to use it directly**: Use `apiFetch` in framework-agnostic code or when writing custom services. Framework adapter users should prefer `auth.api()` which wraps this call — see the [Angular](kit-ng.md#authenticated-fetch), [React](kit-react.md#authenticated-fetch), and [Vue](kit-vue.md#authenticated-fetch) adapter pages.
+
 ## Error Handling
 
 All functions throw `ApiError` on failure:
@@ -536,19 +570,12 @@ npm test -w packages/kit && ./packages/kit/open-report.sh
 
 | File | Purpose |
 |------|---------|
-| `src/client.ts` | Token storage, API fetch wrapper, URL validation |
+| `src/client.ts` | Token storage, `apiFetch`, URL validation |
 | `src/auth.ts` | Authentication flows, proactive refresh, bearer delivery |
 | `src/team.ts` | Team CRUD, member management, team switching |
 | `src/invite.ts` | Invitation send, accept, activate, list |
 | `src/password.ts` | Forgot password, reset password |
-| `src/profile.ts` | Profile updates, password change |
-| `src/types.ts` | TypeScript interfaces for all data structures |
-| `src/index.ts` | Public API re-exports |
-age, API fetch wrapper, URL validation |
-| `src/auth.ts` | Authentication flows, proactive refresh, bearer delivery |
-| `src/team.ts` | Team CRUD, member management, team switching |
-| `src/invite.ts` | Invitation send, accept, activate, list |
-| `src/password.ts` | Forgot password, reset password |
-| `src/profile.ts` | Profile updates, password change |
+| `src/consents.ts` | Consents gating (`acceptConsents`) |
+| `src/profile.ts` | Profile updates, user document updates, password change |
 | `src/types.ts` | TypeScript interfaces for all data structures |
 | `src/index.ts` | Public API re-exports |

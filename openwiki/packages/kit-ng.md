@@ -235,6 +235,32 @@ auth.changePassword(currentPassword: string, newPassword: string): Observable<vo
 auth.clearSession(): void
 ```
 
+#### Authenticated Fetch
+
+```typescript
+// Authenticated GET — bearer token attached automatically
+auth.api(path: string, init?: RequestInit): Observable<Response>
+```
+
+`auth.api()` is the Angular counterpart of React's `auth.api()`. It wraps the core `apiFetch` so that application requests to RESTHeart collections go through the Angular interceptor chain (when `httpClientTransport` is configured) and carry the session token automatically.
+
+```typescript
+// GET
+this.auth.api('/my-collection?pagesize=10').pipe(
+  switchMap(res => res.json()),
+).subscribe(data => console.log(data));
+
+// POST
+this.auth.api('/my-collection', {
+  method: 'POST',
+  body: JSON.stringify({ name: 'hello' }),
+}).pipe(switchMap(res => res.json()));
+```
+
+Rejects with an `ApiError` (`{ status, message }`) on any non-2xx response. See [Core Kit — Authenticated Fetch](kit.md#authenticated-fetch-apifetch) for the underlying behavior.
+
+**When to use**: Use `auth.api()` for any RESTHeart API call from Angular components or services that is not already covered by a dedicated method (e.g., querying custom collections). For calls that already have a wrapper (e.g., `auth.login()`, `auth.listTeamMembers()`), use the wrapper — it handles signal updates.
+
 ## Route Guards
 
 ### authGuard
@@ -296,6 +322,23 @@ provideRhAuth({ apiBaseUrl: environment.apiUrl })
 - **Outgoing requests**: Bearer token already attached by `@restheart-cloud/kit`'s `apiFetch()`
 - **401 responses**: Automatically clears session (token, refresh timer, signals)
 - **Error propagation**: Re-throws error after cleanup
+
+### httpClientTransport
+
+By default the kit speaks `fetch` directly, which means Angular's interceptor chain never sees a login, session check, or token renewal. `httpClientTransport` is a `fetch`-compatible transport backed by Angular's `HttpClient` so the kit's own calls go through the interceptor like everything else the application sends.
+
+```typescript
+import { httpClientTransport } from '@restheart-cloud/kit-ng';
+import { HttpClient } from '@angular/common/http';
+
+const http = inject(HttpClient);
+provideRhAuth({
+  apiBaseUrl: environment.apiUrl,
+  transport: httpClientTransport(http),
+});
+```
+
+This is exported because it is the bridge that makes `rhAuthInterceptor` see kit-originated requests. Without it, cross-cutting concerns written as interceptors are quietly partial.
 
 **Manual Registration** (if not using `provideRhAuth`):
 

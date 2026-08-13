@@ -110,6 +110,31 @@ await auth.resendInvite(email);
 await auth.listInvitations();           // → PendingInvitation[]
 ```
 
+#### Authenticated Fetch
+
+```typescript
+// Authenticated GET — bearer token attached automatically
+auth.api(path: string, init?: RequestInit): Promise<Response>
+```
+
+`auth.api()` wraps the core `apiFetch` so that application requests to RESTHeart collections carry the session token automatically. Vue has no interceptor slot, so this is the primary way to make authenticated API calls from Vue components.
+
+```vue
+<script setup lang="ts">
+import { useAuth } from '@restheart-cloud/kit-vue';
+const auth = useAuth();
+
+async function loadItems() {
+  const res = await auth.api('/my-collection?pagesize=10');
+  const docs = await res.json();
+}
+</script>
+```
+
+Rejects with an `ApiError` (`{ status, message }`) on any non-2xx response. See [Core Kit — Authenticated Fetch](kit.md#authenticated-fetch-apifetch) for the underlying behavior.
+
+**When to use**: Use `auth.api()` for any RESTHeart API call from Vue components that is not already covered by a dedicated method (e.g., querying custom collections).
+
 Methods that perform auto-login (`login`, `activate`, `resetPassword`, `switchTeam`) accept an optional `mode` parameter (`'bearer'` | `'cookie'`) that maps to the backend's `delivery` query parameter.
 
 ## Nuxt Subpath (`/nuxt`)
