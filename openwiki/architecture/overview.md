@@ -104,7 +104,8 @@ The monorepo follows a strict layered architecture:
 
 **Exports**:
 - Auth flows: `register`, `login`, `logout`, `verify`, `checkSession`, `buildVerifyUrl`, `applyBearerDelivery`
-- Token management: `setToken`, `getToken`, `clearToken`, `getTokenExpiry`, `scheduleRefresh`, `cancelRefresh`
+- Token management: `setToken`, `getToken`, `clearToken`, `getTokenExpiry`, `getTokenClaims`, `scheduleRefresh`, `cancelRefresh`, `renewToken`
+- Authenticated fetch: `apiFetch` — the single `fetch` wrapper all internal calls go through, also exported for application use
 - Team operations: `getTeams`, `switchTeam`, `listTeamMembers`, `createTeam`, `updateTeam`, `deleteTeam`, `removeMember`, `updateMemberRole`
 - Invitation flows: `invite`, `getInvitation`, `activate`, `acceptInvite`, `resendInvite`, `listInvitations`
 - Password management: `forgotPassword`, `resetPassword`

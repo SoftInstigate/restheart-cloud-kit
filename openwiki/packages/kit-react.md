@@ -116,6 +116,30 @@ await auth.resendInvite(email);
 await auth.listInvitations();           // → PendingInvitation[]
 ```
 
+#### Authenticated Fetch
+
+```typescript
+// Authenticated GET — bearer token attached automatically
+auth.api(path: string, init?: RequestInit): Promise<Response>
+```
+
+`auth.api()` is the React counterpart of Angular's `rhAuthInterceptor`. React has no interceptor slot, so an app querying its own RESTHeart collections would otherwise attach the bearer token by hand at every call site.
+
+```tsx
+const res = await auth.api('/my-collection?pagesize=10');
+const docs = await res.json();
+
+// POST
+const res = await auth.api('/my-collection', {
+  method: 'POST',
+  body: JSON.stringify({ name: 'hello' }),
+});
+```
+
+Rejects with an `ApiError` (`{ status, message }`) on any non-2xx response. See [Core Kit — Authenticated Fetch](kit.md#authenticated-fetch-apifetch) for the underlying behavior.
+
+**When to use**: Use `auth.api()` for any RESTHeart API call from React components that is not already covered by a dedicated method (e.g., querying custom collections).
+
 Methods that perform auto-login (`login`, `activate`, `resetPassword`, `switchTeam`) accept an optional `mode` parameter (`'bearer'` | `'cookie'`) that maps to the backend's `delivery` query parameter.
 
 ## Next.js Subpath (`/next`)

@@ -99,6 +99,7 @@ Use this table to find the right starting point for common change types:
 | Token delivery (bearer vs cookie) | [Token Delivery](architecture/token-delivery.md) | `packages/kit/src/auth.ts`, `packages/kit/src/client.ts` | `applyBearerDelivery`, `persistToken`, `LoginMode` | `packages/kit/src/__tests__/integration/auth.test.ts` | `npm test -w packages/kit` |
 | Package publishing / release | [Release Process](deployment/release.md) | `.github/workflows/release.yml` | tag-driven versioning | Integration tests (gated) | `git tag X.Y.Z && git push origin X.Y.Z` |
 | Types & interfaces | [Core Kit](packages/kit.md#type-definitions) | `packages/kit/src/types.ts` | `UserInfo<E>`, `TeamMembership`, `AuthConfig`, `ApiError`, `LoginMode` | All integration tests | `npm run build` |
+| Authenticated fetch (`apiFetch` / `auth.api()`) | [Core Kit](packages/kit.md#authenticated-fetch-apifetch) | `packages/kit/src/client.ts` | `apiFetch` | `packages/kit/src/__tests__/unit/client.test.ts` | `npm test -w packages/kit` |
 
 ## Getting Started
 
