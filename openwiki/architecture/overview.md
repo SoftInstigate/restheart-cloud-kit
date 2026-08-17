@@ -30,13 +30,15 @@ restheart-cloud-kit/
 │   │
 │   ├── kit-ng/                 # @restheart-cloud/kit-ng (Angular)
 │   │   ├── src/
-│   │   │   ├── auth.service.ts # Angular service
-│   │   │   ├── auth.guard.ts   # Route guards
-│   │   │   ├── auth.interceptor.ts # HTTP interceptor
-│   │   │   ├── provide-rh-auth.ts  # DI setup
-│   │   │   ├── tokens.ts       # Injection tokens
-│   │   │   ├── __tests__/      # Unit tests (Vitest + Angular runner)
-│   │   │   └── index.ts        # Public API
+│   │   │   ├── auth.service.ts     # Angular service (signals, Observable methods)
+│   │   │   ├── auth.guard.ts       # Route guards (authGuard, publicGuard)
+│   │   │   ├── auth.interceptor.ts # HTTP interceptor (bearer token, 401 handling)
+│   │   │   ├── http-transport.ts   # HttpClient transport (routes kit calls through interceptor)
+│   │   │   ├── provide-rh-auth.ts  # DI setup (provideRhAuth)
+│   │   │   ├── tokens.ts           # Injection tokens (RH_AUTH_CONFIG, RH_KIT_REQUEST)
+│   │   │   ├── test-providers.ts   # Zoneless test environment providers
+│   │   │   ├── *.spec.ts           # Co-located unit tests (Vitest + Angular runner)
+│   │   │   └── index.ts            # Public API
 │   │   └── ng-package.json     # Angular packaging config
 │   │
 │   ├── kit-react/              # @restheart-cloud/kit-react (React)
@@ -163,13 +165,15 @@ Every auto-login endpoint (`login`, `activate`, `resetPassword`, `switchTeam`) a
 
 ### Pluggable Token Source and Sink
 
-The core `AuthConfig` accepts optional `getToken` and `setToken` callbacks:
+The core `AuthConfig` accepts optional callbacks:
 
 ```typescript
 interface AuthConfig {
   apiBaseUrl: string;
   getToken?: () => string | null | Promise<string | null>;  // custom token source
   setToken?: (token: string) => void;                        // custom token sink
+  transport?: (url: string, init?: RequestInit) => Promise<Response>;  // custom fetch (e.g., Angular HttpClient)
+  onError?: (error: ApiError) => void;                       // global error observer
 }
 ```
 
@@ -353,13 +357,24 @@ export const authGuard: CanActivateFn = () => {
 ```typescript
 export const rhAuthInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(RhAuthService);
+  const config = inject(RH_AUTH_CONFIG);
 
-  return next(req).pipe(
+  // Kit's own requests (marked with RH_KIT_REQUEST context) own their 401s
+  // — change-password and token answer 401 for wrong *supplied* credentials.
+  const ownsIts401s = req.context.get(RH_KIT_REQUEST);
+
+  // Only attach bearer token to requests targeting apiBaseUrl
+  if (!req.url.startsWith(config.apiBaseUrl)) {
+    return next(req).pipe(/* 401 cleanup on non-kit requests too */);
+  }
+
+  return next(req.clone({
+    setHeaders: { Authorization: `Bearer ${token}`, 'No-Auth-Challenge': 'true' },
+    withCredentials: true,
+  })).pipe(
     catchError((err) => {
-      if (err instanceof HttpErrorResponse && err.status === 401) {
-        clearToken();
-        cancelRefresh();
-        auth.clearSession();
+      if (!ownsIts401s && err.status === 401) {
+        clearToken(); cancelRefresh(); auth.clearSession();
       }
       return throwError(() => err);
     })

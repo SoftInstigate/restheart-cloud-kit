@@ -319,8 +319,9 @@ provideRhAuth({ apiBaseUrl: environment.apiUrl })
 ```
 
 **Behavior**:
-- **Outgoing requests**: Bearer token already attached by `@restheart-cloud/kit`'s `apiFetch()`
-- **401 responses**: Automatically clears session (token, refresh timer, signals)
+- **Outgoing requests to `apiBaseUrl`**: Bearer token attached automatically; `No-Auth-Challenge: true` header suppresses browser Basic Auth popup; `withCredentials: true` enables cookie-mode compatibility. Requests to other URLs pass through untouched (still get 401 handling).
+- **Kit-originated requests**: Marked with `RH_KIT_REQUEST` context token by `httpClientTransport` so the interceptor does NOT clear the session on their 401s (e.g., wrong current password in `changePassword`).
+- **401 responses on app requests**: Automatically clears session (token, refresh timer, signals)
 - **Error propagation**: Re-throws error after cleanup
 
 ### httpClientTransport
