@@ -160,3 +160,161 @@ export interface ApiError {
   status: number;
   message: string;
 }
+
+// ── Payments — subscriptions ────────────────────────────────────────────────
+
+/** A Stripe Price attached to a plan for one billing interval. */
+export interface PlanPrice {
+  price_id: string;
+  /** In the currency's minor unit (cents for EUR/USD) — pass to {@link formatPrice}, not straight to the page. */
+  amount: number | null;
+  currency: string | null;
+}
+
+/**
+ * A plan from the service's own catalog, as `GET /stripe/plans` returns it —
+ * `name`/`description`/`prices` come from Stripe (`Product`/`Price`), everything
+ * else from the service's own `stripeConfig.subscriptions.plans`.
+ */
+export interface Plan {
+  id: string;
+  name: string;
+  description?: string;
+  seats?: {
+    mode: 'capped' | 'per_seat' | 'unlimited';
+    /** Seat cap for `capped`, or an optional ceiling for `per_seat`. Absent means no cap. */
+    max?: number;
+  };
+  /** Arbitrary limits the deployment declared on the plan (e.g. `max-projects`), opaque to the kit. */
+  limits?: Record<string, number | boolean | string>;
+  /** Keyed by interval — `'month'` and/or `'year'`, whichever the plan configures a price for. */
+  prices?: Record<string, PlanPrice>;
+}
+
+/**
+ * The caller's team's subscription, as `GET /stripe/subscription` returns it —
+ * the same computation the `@subscription` ACL variable resolves server-side,
+ * so this is never stale relative to what a Guards rule just allowed or denied.
+ *
+ * `plan` is `''` for a team with no subscription at all, not `null` — the
+ * server always includes the field.
+ */
+export interface Subscription {
+  plan: string;
+  active: boolean;
+  /** Whether the *caller* (not just the team) holds a seat licence. */
+  licensed: boolean;
+  cancel_at_period_end: boolean;
+  status?: string;
+  trial_end?: { $date: number };
+  current_period_end?: { $date: number };
+  seats: {
+    /** `null` means unlimited. */
+    limit: number | null;
+    licensed: number;
+    /** `null` means unlimited. */
+    available: number | null;
+    over_limit: boolean;
+    over_limit_since?: { $date: number };
+    over_limit_days?: number;
+  };
+}
+
+/** The caller's team's seat licences, as `GET /stripe/licenses` returns them. */
+export interface Licenses {
+  /** User ids (emails) currently holding a seat. */
+  licensed: string[];
+  seats: {
+    limit: number | null;
+    licensed: number;
+    available: number | null;
+  };
+}
+
+/** What `grantLicense` actually did — the `200` vs `201` distinction `apiFetch` alone would discard. */
+export type GrantLicenseResult = 'granted' | 'already-licensed';
+
+// ── Payments — products & orders ────────────────────────────────────────────
+
+/**
+ * A product from the service's catalog collection, as `getCatalog` returns
+ * it — a raw document read, not a dedicated endpoint, so the field names are
+ * exactly what `CatalogReader` validates on disk (`snake_case`), not the
+ * `camelCase` the upstream `CatalogItem` Java record happens to use for the
+ * same fields once parsed.
+ */
+export interface CatalogItem {
+  _id: string;
+  type: 'physical' | 'digital';
+  name: string;
+  description?: string;
+  image_url?: string;
+  /** In the currency's minor unit (cents for EUR/USD) — pass to {@link formatPrice}, not straight to the page. */
+  unit_amount: number;
+  currency?: string;
+  purchasable: boolean;
+  tax_code?: string;
+  /** Present when the item has its own Stripe Price instead of using the service's default currency/pricing. */
+  stripe_price_id?: string;
+}
+
+/** A line item as it was priced at checkout — not the live catalog price. */
+export interface OrderLineItem {
+  product_id: string;
+  type: 'physical' | 'digital';
+  name: string;
+  unit_amount: number;
+  quantity: number;
+  subtotal: number;
+  tax_code?: string;
+}
+
+export type OrderStatus = 'pending_payment' | 'paid' | 'failed' | 'expired';
+
+/**
+ * An order, as `GET /orders/{id}` returns it. `status` starts at
+ * `'pending_payment'` and is moved forward by Stripe's webhook — never by the
+ * client's own redirect back from Checkout. See {@link waitForOrder}.
+ */
+export interface Order {
+  _id: { $oid: string };
+  stripe_session_id: string;
+  stripe_payment_intent?: string | null;
+  /**
+   * Generated for every order, guest or authenticated — it is what lets a
+   * guest, who has no session, look their own order back up. Whether a `GET`
+   * echoes it back to an authenticated buyer depends on the deployment's own
+   * ACL projection; the kit does not assume either way. Treat it like a
+   * password: pass it in the URL to read the order, never log it or display
+   * it beyond the guest checkout flow.
+   */
+  secret?: string;
+  checkout_url: string;
+  buyer_id?: string | null;
+  buyer_email?: string | null;
+  payer: {
+    type: 'team' | 'guest';
+    id?: { $oid: string } | null;
+    stripe_customer_id?: string | null;
+  };
+  status: OrderStatus;
+  requires_shipping?: boolean;
+  line_items: OrderLineItem[];
+  currency: string;
+  amount_subtotal: number;
+  amount_tax?: number;
+  amount_shipping?: number;
+  amount_total: number;
+  amount_refunded: number;
+  shipping_address?: {
+    line1?: string;
+    line2?: string;
+    city?: string;
+    state?: string;
+    postal_code?: string;
+    country?: string;
+  } | null;
+  created_at: { $date: number };
+  paid_at?: { $date: number } | null;
+  expires_at: { $date: number };
+}
