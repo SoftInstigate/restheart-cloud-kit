@@ -10,7 +10,7 @@ import { apiFetch } from './client.js';
  * token afterwards, because the guard reads the JWT. `@subscription` does not:
  * it is resolved server-side from the database on every request, cached only
  * for the life of that request (`SubscriptionVarResolver`). An upgrade is
- * therefore effective immediately, with no rilogin and no `renewToken` call —
+ * therefore effective immediately, with no re-login and no `renewToken` call —
  * copying the consents pattern here would add a needless round trip on every
  * checkout.
  *

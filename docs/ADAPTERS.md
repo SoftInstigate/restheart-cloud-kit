@@ -173,6 +173,26 @@ Every adapter exposes the same surface, so one starter specification serves all 
 to `null` with no HTTP call when there is no stored token), and `login()` also loads teams in
 the same round trip. Get these wrong and team-dependent UI is intermittently empty.
 
+**Payments are a separate surface.** A subscription is not a session, so it does not live on
+the auth store: `RhPaymentsService` (Angular), `usePayments()` under `RhPaymentsProvider`
+(React), `usePayments()` under `createRhPayments(config, rhAuth)` (Vue). Each owns `subscription`, `plan`,
+`isSubscribed`, `canManageBilling`, `seatsAvailable` and the methods that go with them, and
+reads the user from the auth surface only to derive `canManageBilling`.
+
+Three rules the adapters must share, all three easy to get wrong:
+
+- **Opt-in.** Nothing touches `/stripe/*` unless `config.payments === true`. A service without
+  the plugin answers `404` on those paths, so a payments-unaware app would log one on every
+  startup.
+- **Reload on the team, not on the user.** The subscription belongs to the team, so it loads on
+  sign-in and reloads on `switchTeam`. It must *not* reload on `updateProfile` or
+  `acceptConsents` — both re-run `checkSession` and hand back a freshly parsed user document,
+  so an adapter that keys its effect on the user object's identity re-reads the subscription on
+  every profile edit. Key it on the team id (`ADAPTER_CONTRACT.md`, E10).
+- **`canManageBilling` is configurable.** It compares the user's team role against
+  `config.ownershipRole` (default `'owner'`), because the server compares against the
+  deployment's configured ownership role, not the literal string.
+
 **Extensible user document.** `UserInfo` and `register()` accept a generic type parameter for
 application-specific fields declared in the users collection JSON Schema (e.g. `consents`).
 When no schema is configured the server silently drops extra properties — the request still
@@ -254,6 +274,13 @@ these are not symmetric tasks:
 4. `kit-vue` + starter, then `/nuxt` on the same pattern.
 
 Svelte does not justify an adapter until the above are done.
+
+**Payments on the SSR subpaths.** Section E of the adapter contract is reactive client state,
+which `*/next` and `*/nuxt` do not have — so it does not port to them as written. What does
+apply is a server-side read: a `getServerSubscription` alongside `getServerSession`, so a
+server component or a middleware can gate a route on the subscription *before* render, the
+same way `rhAuthMiddleware` gates on the session today. Not implemented; the SPA adapters
+carry payments on their own for now.
 
 ### Keeping the starters from drifting
 

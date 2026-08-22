@@ -1,6 +1,6 @@
 # @restheart-cloud/kit-vue
 
-Wraps [`@restheart-cloud/kit`](https://www.npmjs.com/package/@restheart-cloud/kit) in a Vue plugin with composables and navigation guards. A [`/nuxt`](#nuxt-subpath) subpath adds server-side rendering support for Nuxt.
+Wraps [`@restheart-cloud/kit`](https://www.npmjs.com/package/@restheart-cloud/kit) in Vue plugins with composables and navigation guards — `useAuth()` for authentication, [`usePayments()`](#usepayments) for subscriptions and orders. A [`/nuxt`](#nuxt-subpath) subpath adds server-side rendering support for Nuxt.
 
 Pairs with [RESTHeart Cloud](https://cloud.restheart.com), which gives you a production-ready backend — MongoDB, REST API, authentication, signup/signin, all managed.
 
@@ -109,9 +109,96 @@ const routes = [
 ];
 ```
 
+## `usePayments`
+
+Payments are a second plugin, because a subscription is not a session. They need the `stripe`
+plugin on the service, and an explicit opt-in — without `payments: true` no `/stripe/*` call is
+ever made:
+
+```ts
+// main.ts
+import { createRhAuth, createRhPayments } from '@restheart-cloud/kit-vue';
+
+const config = {
+  apiBaseUrl: import.meta.env.VITE_API_URL,
+  payments: true,
+  ownershipRole: 'owner',   // default; set it if your deployment overrides the role
+};
+
+const rhAuth = createRhAuth(config);
+const rhPayments = createRhPayments(config, rhAuth);
+
+app.use(rhAuth);
+app.use(rhPayments);
+```
+
+`createRhPayments` follows the auth store's user: the subscription belongs to the team, so it
+loads on sign-in and reloads on `switchTeam`.
+
+```vue
+<script setup lang="ts">
+import { usePayments } from '@restheart-cloud/kit-vue';
+const payments = usePayments();
+
+async function upgrade() {
+  try {
+    const { url } = await payments.createCheckoutSession('gold', 'month');
+    window.location.href = url;
+  } catch (err) {
+    // 409 means "already subscribed" — Stripe's Portal handles plan changes
+    if (err.status === 409) {
+      const { url } = await payments.openBillingPortal();
+      window.location.href = url;
+    }
+  }
+}
+</script>
+
+<template>
+  <p v-if="payments.subscription.value">
+    Plan: <strong>{{ payments.plan.value }}</strong>
+  </p>
+  <button v-if="payments.canManageBilling.value" @click="upgrade">Change plan</button>
+</template>
+```
+
+**State (Vue refs):** `subscription`, `plan`, `isSubscribed`, `canManageBilling`, `seatsAvailable`.
+
+**Methods:** `loadSubscription`, `getPlans`, `createCheckoutSession`, `openBillingPortal`,
+`getLicenses`, `grantLicense`, `revokeLicense`, `getCatalog`, `createOrder`, `getOrder`,
+`waitForSubscription`, `waitForOrder`.
+
+### The Checkout return page
+
+The redirect back from Stripe races the webhook, so reading `subscription` as the page mounts
+can still show the old plan. Poll instead — and treat a timeout as "not yet", not as a failed
+payment:
+
+```ts
+onMounted(async () => {
+  try {
+    await payments.waitForSubscription(s => s.plan === 'gold' && s.active);
+    status.value = 'success';
+  } catch (err) {
+    status.value = err.name === 'WaitTimeoutError' ? 'pending' : 'error';
+  }
+});
+```
+
+`waitForSubscription` updates the store's `subscription` itself when it resolves. See the
+[core's payments guide](https://www.npmjs.com/package/@restheart-cloud/kit#payments) for the
+full reasoning.
+
+> Prefer wiring the store yourself? `createRhPaymentsStore(config, user)` is exported too —
+> `createRhPayments` is just that plus the `provide()` that makes `usePayments()` work.
+
 ## Nuxt subpath
 
 For Nuxt apps, `@restheart-cloud/kit-vue/nuxt` adds the server pieces the SPA adapter can't cover — see [docs/ADAPTERS.md](../../docs/ADAPTERS.md).
+
+> **Payments are client-side only.** The `/nuxt` subpath has no payments counterpart yet:
+> there is no `getServerSubscription` to gate a route on the subscription before render.
+> Read it from `usePayments()` in a component.
 
 ```ts
 // server/middleware/rh-auth.ts — proactive refresh + guards before render

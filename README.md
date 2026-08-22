@@ -9,7 +9,7 @@ This is a monorepo with two layers: a **framework-agnostic core** and **framewor
 ## Core
 
 **[`@restheart-cloud/kit`](./packages/kit/README.md)** [![npm](https://img.shields.io/npm/v/@restheart-cloud/kit)](https://www.npmjs.com/package/@restheart-cloud/kit)  
-Pure TypeScript, zero dependencies. All the auth logic: signup, login, email verification, invitations, password reset, multi-team. Works with any framework or none.
+Pure TypeScript, zero dependencies. All the auth logic: signup, login, email verification, invitations, password reset, multi-team. Plus [payments](./packages/kit/README.md#payments) for apps that sell something: subscription plans, Stripe Checkout and Portal, seat licences, products and orders — no Stripe.js, no publishable key. Works with any framework or none.
 
 ## Framework adapters
 
@@ -22,6 +22,11 @@ refresh and guards, first-party session cookie, fragment→cookie bridge, and se
 
 **[`@restheart-cloud/kit-vue`](./packages/kit-vue/README.md)** [![npm](https://img.shields.io/npm/v/@restheart-cloud/kit-vue)](https://www.npmjs.com/package/@restheart-cloud/kit-vue)  
 Vue — composables and navigation guards, plus a `/nuxt` subpath for Nuxt on the same pattern.
+
+Each adapter exposes payments as its own surface, kept separate from auth because a
+subscription is not a session: `RhPaymentsService` (Angular), `RhPaymentsProvider` +
+`usePayments()` (React), `createRhPayments` + `usePayments()` (Vue). Subscription state loads
+on sign-in and reloads on team switch, and stays untouched when `payments` is not enabled.
 
 See **[docs/ADAPTERS.md](./docs/ADAPTERS.md)** for the adapter contract, the roadmap, and how
 the access token is delivered in SPA and server-rendered apps.

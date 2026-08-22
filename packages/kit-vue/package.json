@@ -1,7 +1,7 @@
 {
   "name": "@restheart-cloud/kit-vue",
   "version": "0.0.0",
-  "description": "Vue composables and navigation guards for RESTHeart Cloud authentication — wraps @restheart-cloud/kit. Includes a /nuxt subpath for Nuxt server-side rendering.",
+  "description": "Vue composables and navigation guards for RESTHeart Cloud authentication and payments — wraps @restheart-cloud/kit. Includes a /nuxt subpath for Nuxt server-side rendering.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

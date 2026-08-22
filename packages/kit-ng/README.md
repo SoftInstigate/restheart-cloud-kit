@@ -1,6 +1,6 @@
 # @restheart-cloud/kit-ng
 
-Wraps [`@restheart-cloud/kit`](https://www.npmjs.com/package/@restheart-cloud/kit) in an Angular service with signals, route guards, and an HTTP interceptor.
+Wraps [`@restheart-cloud/kit`](https://www.npmjs.com/package/@restheart-cloud/kit) in Angular services with signals, route guards, and an HTTP interceptor — authentication in `RhAuthService`, and [payments](#rhpaymentsservice) in `RhPaymentsService`.
 
 Pairs with [RESTHeart Cloud](https://cloud.restheart.com), which gives you a production-ready backend — MongoDB, REST API, authentication, signup/signin, all managed.
 
@@ -158,6 +158,73 @@ export const routes: Routes = [
 ```
 
 `authGuard` checks the in-memory token first — no HTTP call if the user is already authenticated in the current session.
+
+## `RhPaymentsService`
+
+Payments live in their own service, because a subscription is not a session. It needs the
+`stripe` plugin on the service, and an explicit opt-in — without `payments: true` no
+`/stripe/*` call is ever made:
+
+```typescript
+provideRhAuth({
+  apiBaseUrl: 'https://my-service.restheart.com',
+  payments: true,
+  ownershipRole: 'owner',   // default; set it if your deployment overrides the role
+})
+```
+
+`subscription` loads on sign-in and reloads on `switchTeam` — nothing to wire up:
+
+```typescript
+@Component({
+  template: `
+    @if (payments.subscription(); as sub) {
+      <p>Plan: <strong>{{ sub.plan }}</strong> — {{ sub.active ? 'active' : 'inactive' }}</p>
+      @if (payments.canManageBilling()) {
+        <button (click)="upgrade()">Change plan</button>
+      }
+    }
+  `,
+})
+export class BillingComponent {
+  payments = inject(RhPaymentsService);
+
+  upgrade() {
+    this.payments.createCheckoutSession('gold', 'month').subscribe({
+      next: ({ url }) => (window.location.href = url),
+      // 409 means "already subscribed" — Stripe's Portal handles plan changes
+      error: (err) => err.status === 409 && this.openPortal(),
+    });
+  }
+
+  openPortal() {
+    this.payments.openBillingPortal().subscribe(({ url }) => (window.location.href = url));
+  }
+}
+```
+
+**Signals:** `subscription`, `plan`, `isSubscribed`, `canManageBilling`, `seatsAvailable`.
+
+**Methods:** `loadSubscription`, `getPlans`, `createCheckoutSession`, `openBillingPortal`,
+`getLicenses`, `grantLicense`, `revokeLicense`, `getCatalog`, `createOrder`, `getOrder`,
+`waitForSubscription`, `waitForOrder` — each returning an `Observable`.
+
+### The Checkout return page
+
+The redirect back from Stripe races the webhook, so reading `subscription()` as the page
+mounts can still show the old plan. Poll instead — and treat a timeout as "not yet", not as a
+failed payment:
+
+```typescript
+this.payments.waitForSubscription(s => s.plan === 'gold' && s.active).subscribe({
+  next: () => this.status.set('success'),
+  error: (err) => this.status.set(err.name === 'WaitTimeoutError' ? 'pending' : 'error'),
+});
+```
+
+`waitForSubscription` updates the `subscription` signal itself when it resolves. See the
+[core's payments guide](https://www.npmjs.com/package/@restheart-cloud/kit#payments) for the
+full reasoning.
 
 ## Quickstart
 

@@ -1,8 +1,10 @@
 # @restheart-cloud/kit
 
-Adds signup and login to your frontend — zero dependencies, works with Angular, React, Vue, or vanilla JS.
+Adds signup, login and payments to your frontend — zero dependencies, works with Angular, React, Vue, or vanilla JS.
 
 Covers every [`restheart-accounts`](https://restheart.org/docs/accounts) flow: signup, login, email verification, password reset — plus team management for apps that need it: invitations, member roles, multi-team switching.
+
+For apps that sell something, it also covers [`restheart-stripe`](#payments): subscription plans, Stripe Checkout and Customer Portal, seat licences, and a product/order flow with guest checkout. No Stripe.js, no publishable key — the whole flow is hosted pages, so the kit hands you a URL and you navigate to it.
 
 Pairs with [RESTHeart Cloud](https://cloud.restheart.com), which gives you a production-ready backend — MongoDB, REST API, authentication, signup/signin, all managed.
 
@@ -135,6 +137,36 @@ Errors are thrown as `{ status: number; message: string }`.
 | `getTeams(config)` | List teams the authenticated user belongs to |
 | `switchTeam(config, teamId, mode?)` | Switch active team (`mode`: `'bearer'` (default) or `'cookie'`) — in bearer mode, the stored token is replaced with the freshly issued one carrying the new team claim |
 
+### Subscriptions
+
+Requires the [`stripe` plugin](#payments) on the service. See [Payments](#payments) for the three things that are easy to get wrong.
+
+| Function | Description |
+|---|---|
+| `getPlans(config)` | The service's plan catalog — no session required, safe from a public pricing page |
+| `getSubscription(config)` | The caller's team's subscription. Any member may call it, not just the billing owner |
+| `createCheckoutSession(config, plan, interval)` | Start Checkout, returns `{url}` to navigate to. **Rejects `409`** when already subscribed — send those to the Portal instead |
+| `openBillingPortal(config)` | Start a Customer Portal session, returns `{url}`. **Rejects `402`** for a team that never checked out |
+| `getLicenses(config)` | The team's seat licences |
+| `grantLicense(config, userId)` | Grant a seat — resolves `'granted'` (201) or `'already-licensed'` (200), rejects `409` when no seat is free |
+| `revokeLicense(config, userId)` | Revoke a seat |
+| `waitForSubscription(config, predicate, opts?)` | Poll until `predicate` holds — for the Checkout return page. See [the webhook race](#the-redirect-beats-the-webhook) |
+
+### Products and orders
+
+| Function | Description |
+|---|---|
+| `getCatalog(config, opts?)` | Read the catalog collection (`opts.collection` defaults to `'catalog'`, `pagesize`, `page`) |
+| `createOrder(config, items, email?, collection?)` | Create an order and start Checkout — returns `{_id, checkout_url, secret}`. Pass `email` for guest checkout |
+| `getOrder(config, id, secret?, collection?)` | Read an order back. `secret` is the guest path — no session needed |
+| `waitForOrder(config, id, secret?, opts?)` | Poll until the order leaves `'pending_payment'` — for the order return page |
+
+### Money
+
+| Function | Description |
+|---|---|
+| `formatPrice(amountMinorUnits, currency, locale?)` | Format a Stripe amount. **Not** `amount / 100` — JPY has 0 decimals, BHD has 3 |
+
 ## Consents
 
 Blocking users who have not accepted the current terms is a server-side rule — a [Guards](https://restheart.org/docs/cloud/guards#_example_gating_on_consents) condition that refuses every request from a user whose document does not carry the current versions, plus an ACL permission that exempts the one request recording the acceptance. What the client contributes is small, and easy to get wrong in exactly one way.
@@ -172,11 +204,100 @@ const mustAccept = user !== null && user.latestConsents?.tos !== TOS_VERSION;
 
 The guard, on the other hand, reads the claims — so the fields it tests must be in the service's JWT claim list.
 
+## Payments
+
+Requires the `stripe` plugin on the service. A service without it answers `404` on every
+`/stripe/*` path, so the adapters only touch them when you opt in:
+
+```typescript
+const config = { apiBaseUrl: 'https://my-service.restheart.com', payments: true };
+```
+
+The whole flow is hosted pages — Checkout and the Customer Portal both hand back a URL:
+
+```typescript
+import { createCheckoutSession, openBillingPortal } from '@restheart-cloud/kit';
+
+const { url } = await createCheckoutSession(config, 'gold', 'month');
+window.location.href = url;
+```
+
+Three things are easy to get wrong. All three are the reason this layer exists.
+
+### The redirect beats the webhook
+
+After Checkout, Stripe sends the buyer back to your success URL over the browser, and reports
+the payment over a *separate* server-to-server webhook. There is no ordering guarantee between
+the two. A page that reads `getSubscription()` the moment it mounts will often show the **old**
+plan — so the user who just paid is told they haven't.
+
+Poll instead, with an explicit exit condition:
+
+```typescript
+import { waitForSubscription, WaitTimeoutError } from '@restheart-cloud/kit';
+
+try {
+  const sub = await waitForSubscription(config, s => s.plan === 'gold' && s.active);
+  showConfirmation(sub);
+} catch (err) {
+  if (err instanceof WaitTimeoutError) {
+    // NOT a failed payment — Stripe already has the money, the webhook is just late.
+    showPleaseCheckBackShortly();
+  } else {
+    throw err;
+  }
+}
+```
+
+The first check runs immediately, before any wait, so the common case (webhook already landed)
+stays instant. `WaitTimeoutError` is deliberately a different type from `ApiError`, so
+"you are not subscribed" and "you are, we just haven't heard yet" never collapse into the same
+error screen. `waitForOrder(config, id, secret)` is the products counterpart, same shape.
+
+### The token is never renewed
+
+Unlike `acceptConsents`, nothing in the payments path renews the token — and it must not.
+The `@subscription` ACL variable is resolved server-side from the database on every request,
+so an upgrade is effective **immediately, without a re-login**. Adding a `renewToken()` after a
+plan change buys nothing and costs a round trip on every purchase.
+
+### Not everyone may manage billing
+
+`createCheckoutSession`, `openBillingPortal` and the licence functions all answer `403` to a
+plain member. `getSubscription` does not — any member can see their team's plan.
+
+The server compares against the deployment's *configured* ownership role, not the literal
+string `"owner"`. If yours overrides it, tell the kit, or the adapters' `canManageBilling` will
+show the billing button to people who get a `403` and hide it from the people entitled to it:
+
+```typescript
+const config = { apiBaseUrl: '…', payments: true, ownershipRole: 'admin' };
+```
+
+### Amounts are in the currency's minor unit
+
+`amount / 100` is wrong for JPY (0 decimals) and BHD (3). `Intl.NumberFormat` already knows
+each currency's digits, so `formatPrice` delegates to it:
+
+```typescript
+import { formatPrice } from '@restheart-cloud/kit';
+
+formatPrice(1990, 'eur', 'en-IE');   // "€19.90"
+formatPrice(500, 'jpy', 'ja-JP');    // "¥500"
+formatPrice(19900, 'bhd', 'en-BH');  // "BHD 19.900"
+```
+
+Pass a `locale` explicitly on the server, where there is no browser locale to inherit.
+
 ## Types
 
 ```typescript
 interface AuthConfig {
   apiBaseUrl: string;
+  /** Opt in to payments. Without it, no /stripe/* call is ever made. */
+  payments?: boolean;
+  /** The role that may manage billing. Defaults to 'owner'. */
+  ownershipRole?: string;
 }
 
 type UserInfo<E extends object = Record<never, never>> = {
@@ -200,9 +321,28 @@ interface Invitation {
   isNewUser: boolean;
   expiresAt: string;
 }
+
+interface Subscription {
+  plan: string;              // '' when the team has no subscription at all
+  active: boolean;
+  licensed: boolean;         // whether the *caller* holds a seat
+  cancel_at_period_end: boolean;
+  seats: {
+    limit: number | null;    // null means unlimited
+    licensed: number;
+    available: number | null;
+    over_limit: boolean;
+  };
+}
+
+type OrderStatus = 'pending_payment' | 'paid' | 'failed' | 'expired';
 ```
+
+`Plan`, `PlanPrice`, `Licenses`, `GrantLicenseResult`, `CatalogItem`, `Order`, `OrderLineItem`
+and `WaitOptions` are exported too.
 
 ## Framework adapters
 
 - **Angular** → [`@restheart-cloud/kit-ng`](https://www.npmjs.com/package/@restheart-cloud/kit-ng) — signals, guards, interceptor
-- React → `@restheart-cloud/kit-react` *(coming soon)*
+- **React** → [`@restheart-cloud/kit-react`](https://www.npmjs.com/package/@restheart-cloud/kit-react) — context, hooks, guards, plus a `/next` subpath
+- **Vue** → [`@restheart-cloud/kit-vue`](https://www.npmjs.com/package/@restheart-cloud/kit-vue) — composables, navigation guards, plus a `/nuxt` subpath

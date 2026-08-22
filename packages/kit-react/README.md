@@ -1,6 +1,6 @@
 # @restheart-cloud/kit-react
 
-Wraps [`@restheart-cloud/kit`](https://www.npmjs.com/package/@restheart-cloud/kit) in a React context with hooks and route guards. A [`/next`](#nextjs-subpath) subpath adds server-side rendering support for Next.js.
+Wraps [`@restheart-cloud/kit`](https://www.npmjs.com/package/@restheart-cloud/kit) in a React context with hooks and route guards — `useAuth()` for authentication, [`usePayments()`](#usepayments) for subscriptions and orders. A [`/next`](#nextjs-subpath) subpath adds server-side rendering support for Next.js.
 
 Pairs with [RESTHeart Cloud](https://cloud.restheart.com), which gives you a production-ready backend — MongoDB, REST API, authentication, signup/signin, all managed.
 
@@ -136,9 +136,87 @@ import { AuthGuard, PublicGuard } from '@restheart-cloud/kit-react';
 
 `AuthGuard` redirects to `/auth/login` when unauthenticated; `PublicGuard` redirects to `/` when already authenticated. While the initial session check runs, both render their `fallback` prop (default `null`) instead of redirecting, so a reload doesn't flash the wrong screen.
 
+## `usePayments`
+
+Payments have their own provider and hook, because a subscription is not a session. They need
+the `stripe` plugin on the service, and an explicit opt-in — without `payments: true` no
+`/stripe/*` call is ever made:
+
+```tsx
+const config = {
+  apiBaseUrl: 'https://my-service.restheart.com',
+  payments: true,
+  ownershipRole: 'owner',   // default; set it if your deployment overrides the role
+};
+
+<RhAuthProvider config={config}>
+  <RhPaymentsProvider config={config}>
+    <App />
+  </RhPaymentsProvider>
+</RhAuthProvider>
+```
+
+`RhPaymentsProvider` goes *inside* `RhAuthProvider` — it reads the user from it to derive
+`canManageBilling`. The subscription loads on sign-in and reloads on `switchTeam`:
+
+```tsx
+function Billing() {
+  const payments = usePayments();
+
+  async function upgrade() {
+    try {
+      const { url } = await payments.createCheckoutSession('gold', 'month');
+      window.location.href = url;
+    } catch (err) {
+      // 409 means "already subscribed" — Stripe's Portal handles plan changes
+      if (err.status === 409) {
+        const { url } = await payments.openBillingPortal();
+        window.location.href = url;
+      }
+    }
+  }
+
+  if (!payments.subscription) return <p>No subscription</p>;
+  return (
+    <>
+      <p>Plan: <strong>{payments.plan}</strong></p>
+      {payments.canManageBilling && <button onClick={upgrade}>Change plan</button>}
+    </>
+  );
+}
+```
+
+**State:** `subscription`, `plan`, `isSubscribed`, `canManageBilling`, `seatsAvailable`.
+
+**Methods:** `loadSubscription`, `getPlans`, `createCheckoutSession`, `openBillingPortal`,
+`getLicenses`, `grantLicense`, `revokeLicense`, `getCatalog`, `createOrder`, `getOrder`,
+`waitForSubscription`, `waitForOrder`.
+
+### The Checkout return page
+
+The redirect back from Stripe races the webhook, so reading `subscription` as the page mounts
+can still show the old plan. Poll instead — and treat a timeout as "not yet", not as a failed
+payment:
+
+```tsx
+useEffect(() => {
+  payments.waitForSubscription(s => s.plan === 'gold' && s.active)
+    .then(() => setStatus('success'))
+    .catch(err => setStatus(err.name === 'WaitTimeoutError' ? 'pending' : 'error'));
+}, []);
+```
+
+`waitForSubscription` updates the provider's `subscription` itself when it resolves. See the
+[core's payments guide](https://www.npmjs.com/package/@restheart-cloud/kit#payments) for the
+full reasoning.
+
 ## Next.js subpath
 
 For Next.js App Router apps, `@restheart-cloud/kit-react/next` adds the server pieces the SPA adapter can't cover — see [docs/ADAPTERS.md](../../docs/ADAPTERS.md) for the full rationale.
+
+> **Payments are client-side only.** The `/next` subpath has no payments counterpart yet:
+> there is no `getServerSubscription` to gate a server component or middleware on the
+> subscription before render. Read it from `usePayments()` in a client component.
 
 ```ts
 // middleware.ts — proactive refresh + guards before render

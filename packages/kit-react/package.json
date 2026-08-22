@@ -1,7 +1,7 @@
 {
   "name": "@restheart-cloud/kit-react",
   "version": "0.0.0",
-  "description": "React context, hooks, and route guards for RESTHeart Cloud authentication — wraps @restheart-cloud/kit. Includes a /next subpath for Next.js server-side rendering.",
+  "description": "React context, hooks, and route guards for RESTHeart Cloud authentication and payments — wraps @restheart-cloud/kit. Includes a /next subpath for Next.js server-side rendering.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

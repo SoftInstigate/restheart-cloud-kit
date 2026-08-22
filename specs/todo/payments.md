@@ -1,6 +1,9 @@
 # Extending the kit to payments
 
-**Status:** to do. **Repo:** `restheart-cloud-kit` (core + 5 adapter surfaces).
+**Status:** Tasks 1–4 and 7 done; Task 5 done for the three SPA adapters; Task 6 done except the
+live integration tests. See [Where this stands](#where-this-stands) at the bottom for what
+remains and why.
+**Repo:** `restheart-cloud-kit` (core + 5 adapter surfaces).
 **Depends on:** a service with the `stripe` plugin configured — see "Rollout blocker" at the bottom.
 
 ## Why
@@ -537,7 +540,7 @@ export class TeamBillingComponent {
   licenses = signal<Licenses | null>(null);
 
   loadLicenses() {
-    this.payments.getLicenses().subscribe(l => this.grantLicense(l));
+    this.payments.getLicenses().subscribe(l => this.licenses.set(l));
   }
 
   grantSeat(email: string) {
@@ -610,3 +613,58 @@ Unlike `acceptConsents`, payments do **not** renew the token. The `@subscription
 reads the state from the database on every request, not from the JWT. An upgrade is therefore
 effective immediately, without a re-login. Don't add a `renewToken()` after a plan change — it
 would be a needless round trip.
+
+---
+
+## Where this stands
+
+| Task | State |
+|---|---|
+| 1 — core: subscriptions | done |
+| 2 — core: products and orders | done |
+| 3 — core: waiting for the webhook | done |
+| 4 — core: formatting amounts | done |
+| 5 — adapter: reactive state | done for `kit-ng`, `kit-react`, `kit-vue`; **not** for the two SSR subpaths |
+| 6 — adapter contract and tests | contract and adapter unit tests (E1–E10) done; **live integration tests not written** |
+| 7 — documentation | done |
+
+The core ships `payments.ts`, `orders.ts` and `money.ts` with 28 unit tests. Each SPA adapter
+exposes payments as its own surface, separate from auth: `RhPaymentsService` (Angular),
+`RhPaymentsProvider` + `usePayments()` (React), `createRhPayments` + `usePayments()` (Vue).
+`docs/ADAPTER_CONTRACT.md` section E is the authoritative list of required behaviours.
+
+Two things remain.
+
+### Live integration tests (Task 6)
+
+Everything for them is specified above — the `RH_TEST_STRIPE` gate, the service configuration,
+the ACL, and what they should cover. They are not written because the rollout blocker still
+holds: no reachable service has the `stripe` plugin enabled. Write them when one does; the
+gating pattern means they will skip, not fail, everywhere else.
+
+### Payments on the SSR subpaths (Task 5)
+
+`*/next` and `*/nuxt` have no payments support, and the adapter contract's section E does not
+port to them as written: E1–E10 are about reactive client state, which those surfaces do not
+have. They are session, cookie and middleware helpers that run *before* render.
+
+What would genuinely apply is a **server-side read** — a `getServerSubscription` alongside the
+existing `getServerSession`, so a Next.js server component or a Nuxt route middleware can gate
+on the subscription before rendering, the way `rhAuthMiddleware` gates on the session today.
+That is a real gap: today an SSR app has to render the page and let a client component
+discover the subscription.
+
+It is deliberately deferred rather than dropped. The dominant constraint above ("added to all
+five, or to none") was written about the *client* state contract, and stretching it to cover a
+server API that has no client counterpart would have meant inventing the shape under time
+pressure. Doing it properly means answering: does it read the subscription through the request
+cookie's token, does middleware get a redirect helper for "subscribed-only" routes, and does it
+share the `payments` opt-in flag or take its own.
+
+### One rule worth not losing
+
+E10 in the adapter contract exists because all three adapters originally got it wrong: they
+keyed the subscription reload on the *user object's identity*. Since `updateProfile` and
+`acceptConsents` both re-run `checkSession` and hand back a freshly parsed user document, every
+profile edit re-read the subscription. The reload must key on the **team id** — the subscription
+belongs to the team, not to the profile.
