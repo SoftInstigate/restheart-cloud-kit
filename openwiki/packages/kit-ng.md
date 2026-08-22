@@ -366,7 +366,7 @@ await auth.switchTeam(teamId);
 ```
 
 **How it works**:
-1. Backend returns token in response body (`delivery=body`)
+1. `login()` reads token from `Auth-Token` response header; `activate`, `resetPassword`, `switchTeam` use `delivery=body` to get the token in the response JSON body
 2. Token stored in `localStorage`
 3. Proactive refresh scheduled at 80% of TTL
 4. All subsequent requests include `Authorization: Bearer <token>`
