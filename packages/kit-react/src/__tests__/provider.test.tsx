@@ -159,7 +159,9 @@ const paymentsWrapper = ({ children }: { children: ReactNode }) => (
 
 function signedInWithSubscription() {
   vi.mocked(kit.getToken).mockReturnValue('tok');
-  vi.mocked(kit.checkSession).mockResolvedValue(user);
+  // A fresh object per call, as a real HTTP/JSON response gives: the adapter
+  // must key the reload on the team, not on the user object's identity.
+  vi.mocked(kit.checkSession).mockImplementation(async () => ({ ...user }));
   vi.mocked(kit.getTeams).mockResolvedValue([{ id: { $oid: '1' }, role: 'owner' }] as kit.TeamMembership[]);
   vi.mocked(kit.getSubscription).mockResolvedValue(subscriptionFixture);
 }
@@ -217,12 +219,14 @@ describe('E. Payments', () => {
     await waitFor(() => expect(result.current.payments.subscription).not.toBeNull());
 
     // Update mocks BEFORE switchTeam — the effect fires during checkSession.
-    // A fresh object (as a real HTTP/JSON response would produce) is required:
-    // React bails out of a useState update on an Object.is-equal value, so
-    // reusing the same `user` reference would silently no-op the effect.
+    // switchTeam re-checks the session and the server answers with the user
+    // carrying the *new* team; that team change is what triggers the reload.
     const newSub = { ...subscriptionFixture, plan: 'silver', active: true };
     vi.mocked(kit.getSubscription).mockResolvedValue(newSub);
-    vi.mocked(kit.checkSession).mockResolvedValue({ ...user });
+    vi.mocked(kit.checkSession).mockResolvedValue({
+      ...user,
+      team: { _id: { $oid: '2' }, role: 'owner' },
+    });
 
     await act(async () => {
       await result.current.auth.switchTeam({ $oid: '2' });
@@ -324,5 +328,23 @@ describe('E. Payments', () => {
     });
 
     expect(result.current.plan).toBe('platinum');
+  });
+
+  it('E10 updateProfile does not reload the subscription — the profile is not team state', async () => {
+    signedInWithSubscription();
+    vi.mocked(kit.updateProfile).mockResolvedValue(undefined);
+
+    const { result } = renderHook(() => useAuthAndPayments(), { wrapper: paymentsWrapper });
+    await waitFor(() => expect(result.current.auth.isAuthenticated).toBe(true));
+    await waitFor(() => expect(result.current.payments.subscription).not.toBeNull());
+
+    vi.mocked(kit.getSubscription).mockClear();
+    await act(async () => {
+      await result.current.auth.updateProfile({ firstName: 'New' });
+    });
+
+    // updateProfile re-runs checkSession, which hands back a fresh user
+    // document with the same team — no reason to re-read the subscription.
+    expect(kit.getSubscription).not.toHaveBeenCalled();
   });
 });

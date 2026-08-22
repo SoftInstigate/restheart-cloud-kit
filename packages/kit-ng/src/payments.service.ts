@@ -21,8 +21,9 @@ import { RhAuthService } from './auth.service.js';
  * Reads the current user from {@link RhAuthService} to derive
  * `canManageBilling`, but owns its own subscription state.
  *
- * Subscription is loaded automatically when the user becomes authenticated
- * (via an `effect` watching `auth.user`). No manual wiring needed.
+ * Subscription is loaded automatically when the user signs in and reloaded
+ * when they switch team (via an `effect` watching {@link teamKey}). No manual
+ * wiring needed.
  *
  * Only active when `config.payments` is `true` — otherwise every method
  * is a no-op and no `/stripe/*` call is ever made.
@@ -42,6 +43,22 @@ export class RhPaymentsService {
   );
   readonly seatsAvailable = computed(() => this._subscription()?.seats?.available ?? null);
 
+  /**
+   * The team the subscription belongs to: `null` when signed out, `''` for a
+   * signed-in user with no team.
+   *
+   * The effect below tracks this rather than `auth.user()` itself. Both
+   * `updateProfile` and `acceptConsents` re-run `checkSession`, which replaces
+   * the user with a freshly parsed document — tracking that object's identity
+   * would reload the subscription on every profile edit and consent
+   * acceptance, which the adapter contract rules out. A subscription changes
+   * with the team, not with the profile.
+   */
+  private readonly teamKey = computed(() => {
+    const user = this.auth.user();
+    return user ? (user.team?._id?.$oid ?? '') : null;
+  });
+
   private get paymentsEnabled(): boolean {
     return this.config.payments === true;
   }
@@ -49,12 +66,12 @@ export class RhPaymentsService {
   constructor() {
     if (this.paymentsEnabled) {
       effect(() => {
-        const user = this.auth.user();
+        const teamKey = this.teamKey();
         untracked(() => {
-          if (user) {
-            this.loadSubscription().subscribe();
-          } else {
+          if (teamKey === null) {
             this._subscription.set(null);
+          } else {
+            this.loadSubscription().subscribe();
           }
         });
       });

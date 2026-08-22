@@ -134,7 +134,9 @@ function paymentsService(ownershipRole?: string): RhPaymentsService {
 
 function signedInWithSubscription(teams: unknown[] = [{ id: { $oid: '1' }, role: 'owner' }]) {
   vi.mocked(kit.getToken).mockReturnValue('tok');
-  vi.mocked(kit.checkSession).mockResolvedValue(user);
+  // A fresh object per call, as a real HTTP/JSON response gives: the adapter
+  // must key the reload on the team, not on the user object's identity.
+  vi.mocked(kit.checkSession).mockImplementation(async () => ({ ...user }));
   vi.mocked(kit.getTeams).mockResolvedValue(teams as kit.TeamMembership[]);
   vi.mocked(kit.getSubscription).mockResolvedValue(subscriptionFixture);
 }
@@ -186,12 +188,14 @@ describe('E. Payments', () => {
     await new Promise(r => setTimeout(r, 0));
 
     // Update mocks BEFORE switchTeam — the effect fires during checkSession.
-    // A fresh object (as a real HTTP/JSON response would produce) is required:
-    // Angular signals skip notifying on an Object.is-equal value, so reusing
-    // the same `user` reference would silently no-op the effect.
+    // switchTeam re-checks the session and the server answers with the user
+    // carrying the *new* team; that team change is what triggers the reload.
     const newSub = { ...subscriptionFixture, plan: 'silver', active: true };
     vi.mocked(kit.getSubscription).mockResolvedValue(newSub);
-    vi.mocked(kit.checkSession).mockResolvedValue({ ...user });
+    vi.mocked(kit.checkSession).mockResolvedValue({
+      ...user,
+      team: { _id: { $oid: '2' }, role: 'owner' },
+    });
 
     await firstValueFrom(auth.switchTeam({ $oid: '2' }));
     await new Promise(r => setTimeout(r, 0));
@@ -294,5 +298,24 @@ describe('E. Payments', () => {
     const result = await firstValueFrom(payments.waitForSubscription(s => s.plan === 'platinum'));
     expect(result.plan).toBe('platinum');
     expect(payments.plan()).toBe('platinum');
+  });
+
+  it('E10 updateProfile does not reload the subscription — the profile is not team state', async () => {
+    signedInWithSubscription();
+    vi.mocked(kit.updateProfile).mockResolvedValue(undefined);
+
+    const payments = paymentsService();
+    const auth = TestBed.inject(RhAuthService);
+    await firstValueFrom(auth.checkSession());
+    await new Promise(r => setTimeout(r, 0));
+    expect(payments.subscription()).not.toBeNull();
+
+    vi.mocked(kit.getSubscription).mockClear();
+    await firstValueFrom(auth.updateProfile({ firstName: 'New' }));
+    await new Promise(r => setTimeout(r, 0));
+
+    // updateProfile re-runs checkSession, which hands back a fresh user
+    // document with the same team — no reason to re-read the subscription.
+    expect(kit.getSubscription).not.toHaveBeenCalled();
   });
 });

@@ -166,9 +166,15 @@ describe('E. Payments', () => {
     await vi.waitFor(() => expect(auth.isAuthenticated.value).toBe(true));
     await vi.waitFor(() => expect(payments.subscription.value).not.toBeNull());
 
-    // Update mock BEFORE switchTeam — the watch fires during checkSession
+    // Update mocks BEFORE switchTeam — the watch fires during checkSession.
+    // switchTeam re-checks the session and the server answers with the user
+    // carrying the *new* team; that team change is what triggers the reload.
     const newSub = { ...subscriptionFixture, plan: 'silver', active: true };
     vi.mocked(kit.getSubscription).mockResolvedValue(newSub);
+    vi.mocked(kit.checkSession).mockImplementation(async () => ({
+      ...user,
+      team: { _id: { $oid: '2' }, role: 'owner' },
+    }));
 
     await auth.switchTeam({ $oid: '2' });
     await vi.waitFor(() => expect(payments.plan.value).toBe('silver'));
@@ -261,5 +267,23 @@ describe('E. Payments', () => {
     const result = await payments.waitForSubscription(sub => sub.plan === 'platinum');
     expect(result.plan).toBe('platinum');
     expect(payments.plan.value).toBe('platinum');
+  });
+
+  it('E10 updateProfile does not reload the subscription — the profile is not team state', async () => {
+    signedInWithSubscription();
+    vi.mocked(kit.updateProfile).mockResolvedValue(undefined);
+
+    const auth = createRhAuthStore(paymentsConfig);
+    const payments = createRhPaymentsStore(paymentsConfig, auth.user);
+    await vi.waitFor(() => expect(auth.isAuthenticated.value).toBe(true));
+    await vi.waitFor(() => expect(payments.subscription.value).not.toBeNull());
+
+    vi.mocked(kit.getSubscription).mockClear();
+    await auth.updateProfile({ firstName: 'New' });
+    await new Promise(r => setTimeout(r, 0));
+
+    // updateProfile re-runs checkSession, which hands back a fresh user
+    // document with the same team — no reason to re-read the subscription.
+    expect(kit.getSubscription).not.toHaveBeenCalled();
   });
 });

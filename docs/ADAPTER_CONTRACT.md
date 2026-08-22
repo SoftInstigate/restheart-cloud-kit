@@ -76,16 +76,28 @@ state (signals / context / refs) and the framework glue (guards, middleware, coo
 | E7 | `canManageBilling` | `true` iff `user.team.role` equals the configured `ownershipRole` (default `'owner'`); a case with a custom `ownershipRole` must be covered |
 | E8 | `checkout` returning `409` | the error reaches the caller with `status: 409`, state does not change |
 | E9 | `waitForSubscription` resolves | updates `subscription` with the new value |
+| E10 | `updateProfile` / `acceptConsents` | **no** reload — both re-run `checkSession` and hand back a fresh user document, but the team has not changed. Key the reload on the team id, not on the user object's identity, or every profile edit re-reads the subscription |
 
 ## Rollout status
 
 | Adapter | A | B | C | D | E |
 |---|---|---|---|---|---|
-| `kit-react` | ✅ | ✅ | n/a | — | pending |
-| `kit-react/next` | — | — | — | D1–D9 ✅, D10 pending | — |
-| `kit-vue` | ✅ | ✅ | n/a | — | pending |
-| `kit-vue/nuxt` | — | — | — | D1–D9 ✅, D10 pending | — |
-| `kit-ng` | ✅ | ✅ | C1 ✅ | n/a | pending |
+| `kit-react` | ✅ | ✅ | n/a | — | ✅ |
+| `kit-react/next` | — | — | — | D1–D9 ✅, D10 pending | not applicable — see below |
+| `kit-vue` | ✅ | ✅ | n/a | — | ✅ |
+| `kit-vue/nuxt` | — | — | — | D1–D9 ✅, D10 pending | not applicable — see below |
+| `kit-ng` | ✅ | ✅ | C1 ✅ | n/a | ✅ |
+
+### Payments and the SSR surfaces
+
+Section E is reactive client state, which `*/next` and `*/nuxt` do not have — they are
+session, cookie and middleware helpers that run before render. Nothing in E1–E10 has a
+server-side counterpart, so those two rows are `not applicable` rather than `pending`.
+
+What *would* apply there — a `getServerSubscription` alongside `getServerSession`, so a
+server component or middleware can gate a route on the subscription before render — is not
+implemented. It is a real gap, tracked in `specs/todo/payments.md`, not an oversight in this
+table.
 
 ## CI
 

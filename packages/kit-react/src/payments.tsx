@@ -160,15 +160,24 @@ export function RhPaymentsProvider({ config, children }: RhPaymentsProviderProps
     }
   }, []);
 
-  // Load subscription when user becomes authenticated, clear on logout.
+  // The team the subscription belongs to: null when signed out, '' for a
+  // signed-in user with no team. The effect below depends on this string
+  // rather than on `auth.user` itself — both `updateProfile` and
+  // `acceptConsents` re-run `checkSession`, replacing the user with a freshly
+  // parsed document, and depending on that object's identity would reload the
+  // subscription on every profile edit and consent acceptance. A subscription
+  // changes with the team, not with the profile.
+  const teamKey = auth.user ? (auth.user.team?._id?.$oid ?? '') : null;
+
+  // Load the subscription on sign-in and on team switch, clear it on sign-out.
   useEffect(() => {
     if (!paymentsEnabled) return;
-    if (auth.user) {
-      loadSubscription();
-    } else {
+    if (teamKey === null) {
       setSubscription(null);
+    } else {
+      loadSubscription();
     }
-  }, [auth.user, paymentsEnabled, loadSubscription]);
+  }, [teamKey, paymentsEnabled, loadSubscription]);
 
   // ── Methods ────────────────────────────────────────────────────────────
   const getPlans = useCallback(

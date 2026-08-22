@@ -129,13 +129,22 @@ export function createRhPaymentsStore(
     }
   }
 
-  // Watch the auth user: load subscription when authenticated, clear on logout.
+  // The team the subscription belongs to: null when signed out, '' for a
+  // signed-in user with no team. The watcher below tracks this rather than the
+  // user ref itself — both `updateProfile` and `acceptConsents` re-run
+  // `checkSession`, replacing the user with a freshly parsed document, and
+  // watching that object would reload the subscription on every profile edit
+  // and consent acceptance. A subscription changes with the team, not with the
+  // profile.
+  const teamKey = computed(() => (user.value ? (user.value.team?._id?.$oid ?? '') : null));
+
+  // Load the subscription on sign-in and on team switch, clear it on sign-out.
   if (paymentsEnabled) {
-    watch(user, (u) => {
-      if (u) {
-        loadSubscription();
-      } else {
+    watch(teamKey, (key) => {
+      if (key === null) {
         subscription.value = null;
+      } else {
+        loadSubscription();
       }
     }, { immediate: true });
   }
