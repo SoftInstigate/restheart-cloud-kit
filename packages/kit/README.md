@@ -160,6 +160,8 @@ Requires the [`stripe` plugin](#payments) on the service. See [Payments](#paymen
 | `createOrder(config, items, email?, collection?)` | Create an order and start Checkout — returns `{_id, checkout_url, secret}`. Pass `email` for guest checkout |
 | `getOrder(config, id, secret?, collection?)` | Read an order back. `secret` is the guest path — no session needed |
 | `waitForOrder(config, id, secret?, opts?)` | Poll until the order leaves `'pending_payment'` — for the order return page |
+| `readOrderRef(url?)` | Read `{id, secret}` out of the Checkout return URL — see [below](#knowing-which-order-came-back) |
+| `clearOrderRef()` | Strip them from the address bar once read |
 
 ### Money
 
@@ -253,6 +255,45 @@ The first check runs immediately, before any wait, so the common case (webhook a
 stays instant. `WaitTimeoutError` is deliberately a different type from `ApiError`, so
 "you are not subscribed" and "you are, we just haven't heard yet" never collapse into the same
 error screen. `waitForOrder(config, id, secret)` is the products counterpart, same shape.
+
+### Knowing which order came back
+
+The return page has a second problem, one step before the webhook race: it does not know
+*which* order it is showing. Stripe substitutes only `{CHECKOUT_SESSION_ID}` in the success
+URL, and a guest has no session for the server to recognise them by.
+
+RESTHeart's `stripe` plugin closes that gap. Put the placeholders in the configured success
+URL and it interpolates them when it creates the Checkout session:
+
+```
+# stripe.conf
+/stripeConfig/products/success-url ->
+  "https://shop.example.com/order#order={ORDER_ID}&secret={ORDER_SECRET}"
+```
+
+Then, on the return page:
+
+```typescript
+import { readOrderRef, clearOrderRef, waitForOrder } from '@restheart-cloud/kit';
+
+const ref = readOrderRef();          // reads window.location
+if (ref) {
+  clearOrderRef();                   // out of the address bar, immediately
+  const order = await waitForOrder(config, ref.id, ref.secret);
+}
+```
+
+**Put `{ORDER_SECRET}` in the fragment (`#`), not the query string.** The secret is a bearer
+credential — it is the only thing standing between a stranger and a guest's order, email and
+shipping address included. A fragment is never sent to the server, so it stays out of access
+logs, proxy logs and `Referer` headers. `readOrderRef` reads the fragment first for that
+reason, but accepts either.
+
+Both the placeholders and this pair of functions are optional. `readOrderRef` returns `null`
+on a service that has not configured them, which is the normal answer on a deployment that
+predates them — keep whatever fallback you had (stashing the reference in `localStorage`
+before redirecting is the usual one, and it is what the ecommerce starter still does as a
+backstop).
 
 ### The token is never renewed
 

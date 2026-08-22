@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createOrder, getCatalog, getOrder, waitForOrder } from '../../index';
+import { createOrder, getCatalog, getOrder, readOrderRef, waitForOrder } from '../../index';
 import type { AuthConfig, Order } from '../../types';
 
 const apiBaseUrl = 'https://x.restheart.com';
@@ -150,5 +150,47 @@ describe('waitForOrder', () => {
     await vi.advanceTimersByTimeAsync(2000);
 
     await expect(promise).rejects.toMatchObject({ name: 'WaitTimeoutError' });
+  });
+});
+
+describe('readOrderRef', () => {
+  // The counterpart of RESTHeart's `interpolateOrderRef`: whatever the plugin
+  // wrote into the success URL, this has to read back.
+
+  it('reads the fragment — the placement that keeps the secret out of logs', () => {
+    const ref = readOrderRef('https://shop.example.com/order#order=abc123&secret=s3cr3t');
+    expect(ref).toEqual({ id: 'abc123', secret: 's3cr3t' });
+  });
+
+  it('reads the query string too, for deployments that put it there', () => {
+    const ref = readOrderRef('https://shop.example.com/order?order=abc123&secret=s3cr3t');
+    expect(ref).toEqual({ id: 'abc123', secret: 's3cr3t' });
+  });
+
+  it('prefers the fragment when a URL somehow carries both', () => {
+    const ref = readOrderRef('https://shop.example.com/o?order=fromQuery#order=fromFragment');
+    expect(ref?.id).toBe('fromFragment');
+  });
+
+  it('returns the id alone when only {ORDER_ID} was interpolated', () => {
+    // Valid for an authenticated buyer: the session identifies them, so the
+    // order reads back without a secret.
+    expect(readOrderRef('https://shop.example.com/order#order=abc123')).toEqual({ id: 'abc123' });
+  });
+
+  it('returns null when the placeholders were never configured', () => {
+    // The normal answer on a deployment that predates this — callers keep
+    // whatever fallback they had.
+    expect(readOrderRef('https://shop.example.com/order?session=cs_test_x')).toBeNull();
+  });
+
+  it('decodes percent-encoded values', () => {
+    const ref = readOrderRef('https://shop.example.com/order#order=abc&secret=a+b%26c');
+    expect(ref?.secret).toBe('a b&c');
+  });
+
+  it('returns null rather than throwing on a URL it cannot parse', () => {
+    expect(readOrderRef('not a url')).toBeNull();
+    expect(readOrderRef('')).toBeNull();
   });
 });

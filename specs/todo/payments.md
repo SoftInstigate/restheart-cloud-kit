@@ -325,7 +325,11 @@ Example override file:
 # Products (optional, for order tests)
 /stripeConfig/products/enabled -> true
 /stripeConfig/products/default-currency -> eur
-/stripeConfig/products/success-url -> "https://test-app.example.com/order?session={CHECKOUT_SESSION_ID}"
+# {ORDER_ID}/{ORDER_SECRET} are interpolated by the plugin, and belong in the
+# fragment: a fragment never reaches a server, so the secret — a bearer
+# credential — stays out of access logs and Referer headers. Read back with
+# the core's readOrderRef()/clearOrderRef().
+/stripeConfig/products/success-url -> "https://test-app.example.com/order#order={ORDER_ID}&secret={ORDER_SECRET}"
 /stripeConfig/products/cancel-url -> "https://test-app.example.com/cart"
 
 # Plugins

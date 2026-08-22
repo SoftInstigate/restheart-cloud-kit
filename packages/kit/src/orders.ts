@@ -94,6 +94,102 @@ export async function getOrder(
   return res.json() as Promise<Order>;
 }
 
+/** An order reference recovered from the Checkout return URL. */
+export interface OrderRef {
+  id: string;
+  /** Absent when the deployment only interpolates `{ORDER_ID}`. */
+  secret?: string;
+}
+
+/**
+ * Reads the order reference Stripe's redirect brought back.
+ *
+ * Stripe substitutes only `{CHECKOUT_SESSION_ID}` in the success URL, so on its
+ * own the return page learns nothing about *which* order it is showing — and a
+ * guest has no session for the server to recognise them by. RESTHeart's `stripe`
+ * plugin fills that gap: configure `products.success-url` with `{ORDER_ID}` and
+ * `{ORDER_SECRET}` and it interpolates them when it creates the session.
+ *
+ * ```
+ * success-url: https://shop.example.com/order#order={ORDER_ID}&secret={ORDER_SECRET}
+ * ```
+ *
+ * This reads the **fragment first, then the query string**, because that is the
+ * order of preference for putting them there. A fragment never leaves the
+ * browser: it is absent from access logs, proxy logs and `Referer` headers,
+ * which matters because the secret is a bearer credential — it is the only thing
+ * standing between a stranger and a guest's order, email and shipping address
+ * included.
+ *
+ * Returns `null` when neither carries an order id, which is the normal answer on
+ * a deployment that has not configured the placeholders. Callers should keep
+ * whatever fallback they had (see the ecommerce starter, which stashes the
+ * reference in `localStorage` before redirecting).
+ *
+ * ```ts
+ * const ref = readOrderRef();          // reads window.location
+ * if (ref) {
+ *   clearOrderRef();                   // strip it from the address bar
+ *   const order = await waitForOrder(config, ref.id, ref.secret);
+ * }
+ * ```
+ *
+ * @param url Defaults to `window.location.href`. Pass one explicitly to test,
+ *            or on a server, where there is no `window`.
+ */
+export function readOrderRef(url?: string): OrderRef | null {
+  const href = url ?? (typeof window !== 'undefined' ? window.location.href : '');
+  if (!href) return null;
+
+  let parsed: URL;
+  try {
+    parsed = new URL(href);
+  } catch {
+    return null;
+  }
+
+  // The fragment is the recommended placement, so it wins when both are present.
+  const fromFragment = new URLSearchParams(parsed.hash.replace(/^#/, ''));
+  const fromQuery = parsed.searchParams;
+
+  for (const params of [fromFragment, fromQuery]) {
+    const id = params.get('order');
+    if (id) {
+      const secret = params.get('secret');
+      return secret ? { id, secret } : { id };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Strips the order reference from the address bar, leaving the rest of the URL
+ * alone.
+ *
+ * Call it as soon as {@link readOrderRef} has the values. A secret sitting in
+ * the address bar is one screenshot, one shared link or one bookmark away from
+ * being someone else's — and it stays in session history until it is replaced.
+ *
+ * No-op outside a browser.
+ */
+export function clearOrderRef(): void {
+  if (typeof window === 'undefined' || !window.history?.replaceState) return;
+
+  const url = new URL(window.location.href);
+
+  const fragment = new URLSearchParams(url.hash.replace(/^#/, ''));
+  fragment.delete('order');
+  fragment.delete('secret');
+  const remainingHash = fragment.toString();
+  url.hash = remainingHash ? `#${remainingHash}` : '';
+
+  url.searchParams.delete('order');
+  url.searchParams.delete('secret');
+
+  window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+}
+
 /**
  * Polls {@link getOrder} until it leaves `'pending_payment'` — the products
  * counterpart of `waitForSubscription`, for the same reason: the redirect
