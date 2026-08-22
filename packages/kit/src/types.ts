@@ -77,6 +77,32 @@ export interface AuthConfig {
    * to notice the ones nobody is.
    */
   onError?: (error: ApiError) => void;
+
+  /**
+   * Opt-in to subscription and payment features.
+   *
+   * When `true`, adapters load the team's subscription on `checkSession`,
+   * `login` and `switchTeam`, and expose `subscription`, `plan`,
+   * `isSubscribed`, `canManageBilling` and `seatsAvailable` as reactive state.
+   *
+   * When `false` or absent (the default), no call to `/stripe/*` is ever made
+   * — a service without the `stripe` plugin would respond `404` on those
+   * paths, and this flag prevents that from happening on every app startup.
+   */
+  payments?: boolean;
+
+  /**
+   * The role that grants billing management rights.
+   *
+   * Used to derive `canManageBilling`: `true` when the current user's team
+   * role matches this value. Defaults to `'owner'`.
+   *
+   * **Must match the service's `accountsConfig.ownership-role`** — if the
+   * deployment overrides it (via `override-accounts-ownership-role`), hardcoding
+   * `'owner'` here would show the billing button to the wrong people and hide
+   * it from the right ones. The default is correct for most deployments.
+   */
+  ownershipRole?: string;
 }
 
 /**

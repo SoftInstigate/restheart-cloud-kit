@@ -268,3 +268,346 @@ servizio raggiungibile. Oggi è abilitato solo in IT, e l'ambiente IT gira su im
 snapshot che vanno ricostruite dalla CI di `restheart` — vedi
 `restheart-cloud-server/specs/todo/stripe-plugin-service-nodes.md`, Fase 5. Il codice del kit e
 gli unit test degli adapter non dipendono da questo e possono procedere prima.
+
+### Configurazione del servizio per i test di integrazione
+
+I test di integrazione del core (`packages/kit/src/__tests__/integration/`) girano contro un
+servizio RESTHeart Cloud reale. Per testare i pagamenti serve un servizio con il plugin `stripe`
+abilitato e configurato. Le variabili d'ambiente sono le stesse degli altri test (`RH_TEST_API_URL`,
+`RH_TEST_ADMIN_PASSWORD`), più una nuova per abilitare i test pagamento.
+
+#### Variabili d'ambiente
+
+| Variabile | Obbligatoria | Descrizione |
+|---|---|---|
+| `RH_TEST_API_URL` | sì | URL base del servizio (es. `https://xxx.restheart.com`) |
+| `RH_TEST_ADMIN_PASSWORD` | sì | Password dell'utente `root` per le chiamate admin |
+| `RH_TEST_STRIPE` | no | Se assente o vuota, i test pagamento vengono **saltati** (non falliti). Imposta a `true` solo quando il servizio ha il plugin `stripe` attivo. |
+
+Il pattern è lo stesso già usato da `helpers.ts`: i test gated saltano silenziosamente quando la
+variabile non c'è, così lo stesso codice gira in CI (dove il servizio ha stripe) e in locale (dove
+spesso non ce l'ha).
+
+#### Configurazione lato servizio (`stripe.conf`)
+
+Il servizio di test deve avere il plugin `stripe` abilitato con almeno un piano acquistabile.
+Esempio di override file:
+
+```bash
+# Master switch
+/stripeConfig/enabled -> true
+/stripeConfig/secret-key -> "${STRIPE_SECRET_KEY}"
+/stripeConfig/webhook-secret -> "${STRIPE_WEBHOOK_SECRET}"
+
+# Subscriptions
+/stripeConfig/subscriptions/enabled -> true
+/stripeConfig/subscriptions/default-plan -> free
+/stripeConfig/subscriptions/success-url -> "https://test-app.example.com/billing?success=true"
+/stripeConfig/subscriptions/cancel-url -> "https://test-app.example.com/billing?canceled=true"
+/stripeConfig/subscriptions/portal-return-url -> "https://test-app.example.com/billing"
+
+# Un piano free (non acquistabile) e un piano gold (acquistabile)
+/stripeConfig/subscriptions/plans -> {
+  "free": {
+    "seats": { "mode": "capped", "max": 1 },
+    "limits": { "max-projects": 3 }
+  },
+  "gold": {
+    "price-id-monthly": "price_...",
+    "price-id-annual": "price_...",
+    "seats": { "mode": "capped", "max": 10 },
+    "limits": { "max-projects": 50 }
+  }
+}
+
+# Products (opzionale, per test ordini)
+/stripeConfig/products/enabled -> true
+/stripeConfig/products/default-currency -> eur
+/stripeConfig/products/success-url -> "https://test-app.example.com/order?session={CHECKOUT_SESSION_ID}"
+/stripeConfig/products/cancel-url -> "https://test-app.example.com/cart"
+
+# Plugins
+/stripeService/enabled -> true
+/stripeInitializer/enabled -> true
+/stripeWebhookService/enabled -> true
+/stripeCheckoutService/enabled -> true
+/stripePortalService/enabled -> true
+/stripeSubscriptionService/enabled -> true
+/stripePlansService/enabled -> true
+/stripeCatalogCache/enabled -> true
+/stripeLicensesService/enabled -> true
+/ordersCheckoutInterceptor/enabled -> true
+/ordersCheckoutResponseInterceptor/enabled -> true
+```
+
+Le chiavi Stripe devono essere **test keys** (`sk_test_...`, `whsec_...`), mai le live.
+I `price-id-*` sono i Price ID reali dal dashboard Stripe di test — servono almeno un mensile e/o
+un annuale per il piano `gold`.
+
+#### ACL per i test
+
+Il servizio di test deve permettere:
+
+1. **Registrazione e login** — già configurato per gli altri test
+2. **`GET /stripe/plans`** — accesso anonimo (o autenticato, dipende dall'ACL del deployment)
+3. **`GET /stripe/subscription`** — accesso a qualsiasi membro del team
+4. **`POST /stripe/checkout`**, **`POST /stripe/portal`**, **`GET/POST/DELETE /stripe/licenses`** — accesso solo al ruolo di ownership (default `owner`)
+
+Se l'ACL del servizio di test usa le regole di default di RESTHeart Cloud, queste sono già
+coperte. Se usa regole custom, verificare che i path `/stripe/*` non siano bloccati.
+
+#### Cosa testano i test di integrazione pagamento
+
+I test verificano il **flusso lato client**, non Stripe stesso:
+
+1. `getPlans()` — legge il catalogo piani dal servizio
+2. `getSubscription()` — legge lo stato della sottoscrizione del team corrente
+3. `createCheckoutSession()` — crea una sessione di checkout (riceve l'URL, non lo segue)
+4. `openBillingPortal()` — crea una sessione portal (riceve l'URL)
+5. `getLicenses()` / `grantLicense()` / `revokeLicense()` — gestione licenze
+6. `createOrder()` / `getOrder()` — flusso ordini (se products abilitato)
+
+Non testano il pagamento effettivo su Stripe — quello lo gestisce il webhook server-side.
+I test gated vanno saltati con `it.skip` o con un guard all'inizio del file quando
+`RH_TEST_STRIPE` non è impostata.
+
+---
+
+## Tutorial: usare i pagamenti con Angular (`kit-ng`)
+
+### 1. Configurazione
+
+Abilita i pagamenti nella config del provider. Senza `payments: true`, nessuna chiamata a
+`/stripe/*` parte mai — un servizio senza il plugin `stripe` risponderebbe `404` a ogni avvio.
+
+```ts
+// app.config.ts
+import { provideRhAuth } from '@restheart-cloud/kit-ng';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideRhAuth({
+      apiBaseUrl: 'https://mio-servizio.restheart.com',
+      payments: true,                // opt-in esplicito
+      ownershipRole: 'owner',        // default, sovrascrivibile se il tenant ha un ruolo diverso
+    }),
+  ],
+};
+```
+
+### 2. Leggere lo stato della sottoscrizione
+
+Lo stato è reattivo — i signal si aggiornano automaticamente dopo `checkSession`, `login` e
+`switchTeam`.
+
+```ts
+import { Component, inject } from '@angular/core';
+import { RhPaymentsService } from '@restheart-cloud/kit-ng';
+
+@Component({
+  selector: 'app-pricing',
+  template: `
+    @if (payments.subscription(); as sub) {
+      <p>Piano attuale: <strong>{{ sub.plan }}</strong></p>
+      <p>Stato: {{ sub.active ? 'Attivo' : 'Non attivo' }}</p>
+      <p>Posti: {{ sub.seats.licensed }} / {{ sub.seats.limit ?? 'illimitati' }}</p>
+    } @else {
+      <p>Nessun abbonamento</p>
+    }
+  `,
+})
+export class PricingComponent {
+  payments = inject(RhPaymentsService);
+}
+```
+
+### 3. Mostrare il catalogo piani
+
+`getPlans()` non richiede sessione — è sicuro chiamarla da una pagina pubblica.
+
+```ts
+@Component({ /* ... */ })
+export class PlansComponent {
+  private payments = inject(RhPaymentsService);
+  plans = signal<Plan[]>([]);
+
+  ngOnInit() {
+    this.payments.getPlans().subscribe(res => this.plans.set(res.plans));
+  }
+}
+```
+
+### 4. Avviare il Checkout
+
+`createCheckoutSession` restituisce un URL — reindirizza l'utente con `window.location.href`.
+
+```ts
+checkout(planId: string, interval: 'month' | 'year') {
+  this.payments.createCheckoutSession(planId, interval).subscribe({
+    next: ({ url }) => window.location.href = url,
+    error: (err: ApiError) => {
+      if (err.status === 409) {
+        // Ha già un abbonamento — mandalo al Portal per l'upgrade
+        this.openPortal();
+      }
+    },
+  });
+}
+```
+
+### 5. Pagina di ritorno dal Checkout (il buco del webhook)
+
+Dopo il redirect da Stripe, il webhook potrebbe non essere ancora arrivato. **Non** usare
+`getSubscription()` direttamente — usa `waitForSubscription` con un predicato.
+
+```ts
+@Component({ /* ... */ })
+export class CheckoutSuccessComponent {
+  private payments = inject(RhPaymentsService);
+  private route = inject(ActivatedRoute);
+  status = signal<'loading' | 'success' | 'timeout'>('loading');
+  subscription = signal<Subscription | null>(null);
+
+  ngOnInit() {
+    const plan = this.route.snapshot.queryParamMap.get('plan') ?? '';
+
+    this.payments.waitForSubscription(
+      sub => sub.plan === plan && sub.active,
+      { timeoutMs: 30_000, intervalMs: 1_000 }
+    ).subscribe({
+      next: sub => {
+        this.subscription.set(sub);
+        this.status.set('success');
+      },
+      error: err => {
+        if (err.name === 'WaitTimeoutError') {
+          this.status.set('timeout');
+          // Il pagamento è andato a buon fine su Stripe,
+          // il webhook arriverà a breve. Mostra un messaggio
+          // "torna tra qualche secondo" invece di un errore.
+        }
+      },
+    });
+  }
+}
+```
+
+**Attenzione:** `waitForSubscription` aggiorna automaticamente il signal `subscription`
+dell'adapter quando risolve — non serve chiamare `loadSubscription()` dopo.
+
+### 6. Chi può fare cosa
+
+```ts
+@Component({ /* ... */ })
+export class BillingComponent {
+  payments = inject(RhPaymentsService);
+
+  // true solo per chi ha il ruolo di ownership (default: 'owner')
+  get showBillingButtons(): boolean {
+    return this.payments.canManageBilling();
+  }
+}
+```
+
+- `getSubscription()` — chiunque nel team può chiamarla
+- `createCheckoutSession()`, `openBillingPortal()`, `getLicenses()`, `grantLicense()`,
+  `revokeLicense()` — solo `canManageBilling === true`
+
+### 7. Aprire il Portal
+
+```ts
+openPortal() {
+  this.payments.openBillingPortal().subscribe({
+    next: ({ url }) => window.location.href = url,
+    error: (err: ApiError) => {
+      if (err.status === 402) {
+        // Mai fatto il checkout — reindirizza al checkout invece
+        this.router.navigate(['/pricing']);
+      }
+    },
+  });
+}
+```
+
+### 8. Gestire le licenze (posti)
+
+```ts
+@Component({ /* ... */ })
+export class TeamBillingComponent {
+  payments = inject(RhPaymentsService);
+  licenses = signal<Licenses | null>(null);
+
+  loadLicenses() {
+    this.payments.getLicenses().subscribe(l => this.grantLicense(l));
+  }
+
+  grantSeat(email: string) {
+    this.payments.grantLicense(email).subscribe({
+      next: result => {
+        // result è 'granted' o 'already-licensed'
+        this.loadLicenses(); // ricarica
+      },
+      error: (err: ApiError) => {
+        if (err.status === 409) alert('Nessun posto disponibile');
+        if (err.status === 404) alert('Utente non è un membro del team');
+      },
+    });
+  }
+
+  revokeSeat(email: string) {
+    this.payments.revokeLicense(email).subscribe(() => this.loadLicenses());
+  }
+}
+```
+
+### 9. Prodotti e ordini (modalità products)
+
+```ts
+// Catalogo — lettura normale, niente di speciale
+this.payments.getCatalog().subscribe(items => /* ... */);
+
+// Creare un ordine (autenticato)
+this.payments.createOrder(
+  [{ productId: 'SKU-1', quantity: 1 }]
+).subscribe(order => {
+  window.location.href = order.checkout_url;
+});
+
+// Guest checkout — passa l'email, nessuna sessione richiesta
+this.payments.createOrder(
+  [{ productId: 'SKU-1', quantity: 1 }],
+  'buyer@example.com'
+).subscribe(order => {
+  // Salva order._id e order.secret per la pagina di ritorno
+  window.location.href = order.checkout_url;
+});
+
+// Pagina di ritorno ordine — stesso pattern di waitForSubscription
+this.payments.waitForOrder(orderId, secret).subscribe({
+  next: order => {
+    if (order.status === 'paid') /* mostra conferma */;
+  },
+  error: err => {
+    if (err.name === 'WaitTimeoutError') /* "torna tra poco" */;
+  },
+});
+```
+
+### 10. Formattare gli importi
+
+Gli importi di Stripe sono in unità minore (centesimi per EUR/USD, interi per JPY).
+
+```ts
+import { formatPrice } from '@restheart-cloud/kit';
+
+formatPrice(1990, 'eur');          // "€19.90"
+formatPrice(500, 'jpy', 'it-IT');  // "¥500"
+formatPrice(19900, 'bhd');         // "BHD 19.900"
+```
+
+### Nota importante: nessun rinnovo del token
+
+A differenza di `acceptConsents`, i pagamenti **non** rinnovano il token. Il risolutore ACL
+`@subscription` legge lo stato dal database a ogni richiesta, non dal JWT. Un upgrade è quindi
+effettivo immediatamente, senza rilogin. Non aggiungere `renewToken()` dopo un cambio di piano —
+sarebbe un round trip inutile.

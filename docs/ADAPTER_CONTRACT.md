@@ -63,15 +63,29 @@ state (signals / context / refs) and the framework glue (guards, middleware, coo
 | D9 | `rhLogout` | clears the cookie |
 | D10 | fragment bridge | reads `#access_token`, POSTs it, strips the hash |
 
+## E. Payments — every SPA adapter
+
+| # | Scenario | Expected |
+|---|---|---|
+| E1 | bootstrap without `payments` in config | no call to `/stripe/*`; `subscription=null`, `plan=null`, `isSubscribed=false`, `seatsAvailable=null` |
+| E2 | bootstrap with `payments`, session valid | loads `subscription` after user and teams |
+| E3 | `login` with `payments` | loads `subscription` in the same flow |
+| E4 | `switchTeam` | reloads `subscription` (the subscription belongs to the team) |
+| E5 | `logout` | clears `subscription` along with user and teams |
+| E6 | `clearSession` | clears `subscription` along with user and teams |
+| E7 | `canManageBilling` | `true` iff `user.team.role` equals the configured `ownershipRole` (default `'owner'`); a case with a custom `ownershipRole` must be covered |
+| E8 | `checkout` returning `409` | the error reaches the caller with `status: 409`, state does not change |
+| E9 | `waitForSubscription` resolves | updates `subscription` with the new value |
+
 ## Rollout status
 
-| Adapter | A | B | C | D |
-|---|---|---|---|---|
-| `kit-react` | ✅ | ✅ | n/a | — |
-| `kit-react/next` | — | — | — | D1–D9 ✅, D10 pending |
-| `kit-vue` | ✅ | ✅ | n/a | — |
-| `kit-vue/nuxt` | — | — | — | D1–D9 ✅, D10 pending |
-| `kit-ng` | ✅ | ✅ | C1 ✅ | n/a |
+| Adapter | A | B | C | D | E |
+|---|---|---|---|---|---|
+| `kit-react` | ✅ | ✅ | n/a | — | pending |
+| `kit-react/next` | — | — | — | D1–D9 ✅, D10 pending | — |
+| `kit-vue` | ✅ | ✅ | n/a | — | pending |
+| `kit-vue/nuxt` | — | — | — | D1–D9 ✅, D10 pending | — |
+| `kit-ng` | ✅ | ✅ | C1 ✅ | n/a | pending |
 
 ## CI
 

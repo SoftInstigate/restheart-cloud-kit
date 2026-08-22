@@ -1,4 +1,5 @@
 export { RhAuthService } from './auth.service.js';
+export { RhPaymentsService } from './payments.service.js';
 export { authGuard, publicGuard } from './auth.guard.js';
 export { rhAuthInterceptor } from './auth.interceptor.js';
 export { httpClientTransport } from './http-transport.js';

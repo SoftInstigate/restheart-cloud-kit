@@ -2,6 +2,8 @@ export { createRhAuth } from './create.js';
 export type { RhAuth } from './create.js';
 export { createRhAuthStore } from './store.js';
 export type { RhAuthStore } from './store.js';
+export { createRhPaymentsStore } from './payments.js';
+export type { RhPaymentsStore } from './payments.js';
 export { useAuth } from './use-auth.js';
 export { buildGuards } from './guards.js';
 export type { RhGuards, GuardOptions } from './guards.js';

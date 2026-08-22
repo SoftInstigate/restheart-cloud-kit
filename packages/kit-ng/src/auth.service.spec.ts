@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import * as kit from '@restheart-cloud/kit';
 import { RhAuthService } from './auth.service';
+import { RhPaymentsService } from './payments.service';
 import { RH_AUTH_CONFIG } from './tokens';
 
 // The core is integration-tested against a live instance; here we mock it and
@@ -10,7 +11,7 @@ import { RH_AUTH_CONFIG } from './tokens';
 vi.mock('@restheart-cloud/kit');
 
 const config = { apiBaseUrl: 'https://x.restheart.com' };
-const user = { _id: 'a@b.com', roles: ['user'] } as kit.UserInfo;
+const user = { _id: 'a@b.com', roles: ['user'], team: { _id: { $oid: '1' }, role: 'owner' } } as kit.UserInfo;
 
 function service(): RhAuthService {
   TestBed.configureTestingModule({
@@ -105,5 +106,193 @@ describe('RhAuthService', () => {
     expect(kit.cancelRefresh).toHaveBeenCalledOnce();
     expect(svc.user()).toBeNull();
     expect(svc.teams()).toHaveLength(0);
+  });
+});
+
+// ── Payments (E1–E9) ───────────────────────────────────────────────────────
+
+const subscriptionFixture: kit.Subscription = {
+  plan: 'gold',
+  active: true,
+  licensed: true,
+  cancel_at_period_end: false,
+  seats: { limit: 10, licensed: 3, available: 7, over_limit: false },
+};
+
+function paymentsService(ownershipRole?: string): RhPaymentsService {
+  TestBed.configureTestingModule({
+    providers: [
+      RhAuthService,
+      RhPaymentsService,
+      { provide: RH_AUTH_CONFIG, useValue: { apiBaseUrl: 'https://x.restheart.com', payments: true, ownershipRole } },
+    ],
+  });
+  // Inject RhAuthService first so it's created with the test module's config
+  TestBed.inject(RhAuthService);
+  return TestBed.inject(RhPaymentsService);
+}
+
+function signedInWithSubscription(teams: unknown[] = [{ id: { $oid: '1' }, role: 'owner' }]) {
+  vi.mocked(kit.getToken).mockReturnValue('tok');
+  vi.mocked(kit.checkSession).mockResolvedValue(user);
+  vi.mocked(kit.getTeams).mockResolvedValue(teams as kit.TeamMembership[]);
+  vi.mocked(kit.getSubscription).mockResolvedValue(subscriptionFixture);
+}
+
+describe('E. Payments', () => {
+  it('E1 bootstrap without payments: no call to /stripe/*, subscription stays null', async () => {
+    signedIn();
+    // Use the non-payments service (config without payments: true)
+    const svc = service();
+    await firstValueFrom(svc.checkSession());
+    // RhPaymentsService is not injected here — no payments config
+    expect(kit.getSubscription).not.toHaveBeenCalled();
+  });
+
+  it('E2 bootstrap with payments, session valid: loads subscription', async () => {
+    signedInWithSubscription();
+    const payments = paymentsService();
+    const auth = TestBed.inject(RhAuthService);
+    await firstValueFrom(auth.checkSession());
+    // The effect in RhPaymentsService fires after user is set
+    await new Promise(r => setTimeout(r, 0));
+    expect(payments.subscription()).not.toBeNull();
+    expect(payments.plan()).toBe('gold');
+    expect(payments.isSubscribed()).toBe(true);
+    expect(payments.seatsAvailable()).toBe(7);
+    expect(kit.getSubscription).toHaveBeenCalled();
+  });
+
+  it('E3 login with payments: loads subscription in the same flow', async () => {
+    vi.mocked(kit.login).mockResolvedValue(user);
+    vi.mocked(kit.getTeams).mockResolvedValue([{ id: { $oid: '1' }, role: 'owner' }] as kit.TeamMembership[]);
+    vi.mocked(kit.getSubscription).mockResolvedValue(subscriptionFixture);
+
+    const payments = paymentsService();
+    const auth = TestBed.inject(RhAuthService);
+    await firstValueFrom(auth.login('a@b.com', 'pw'));
+    await new Promise(r => setTimeout(r, 0));
+    expect(payments.subscription()).not.toBeNull();
+    expect(payments.plan()).toBe('gold');
+  });
+
+  it('E4 switchTeam reloads subscription', async () => {
+    signedInWithSubscription();
+    vi.mocked(kit.switchTeam).mockResolvedValue('newtok');
+
+    const payments = paymentsService();
+    const auth = TestBed.inject(RhAuthService);
+    await firstValueFrom(auth.checkSession());
+    await new Promise(r => setTimeout(r, 0));
+
+    // Update mocks BEFORE switchTeam — the effect fires during checkSession.
+    // A fresh object (as a real HTTP/JSON response would produce) is required:
+    // Angular signals skip notifying on an Object.is-equal value, so reusing
+    // the same `user` reference would silently no-op the effect.
+    const newSub = { ...subscriptionFixture, plan: 'silver', active: true };
+    vi.mocked(kit.getSubscription).mockResolvedValue(newSub);
+    vi.mocked(kit.checkSession).mockResolvedValue({ ...user });
+
+    await firstValueFrom(auth.switchTeam({ $oid: '2' }));
+    await new Promise(r => setTimeout(r, 0));
+    expect(payments.plan()).toBe('silver');
+  });
+
+  it('E5 logout clears subscription', async () => {
+    signedInWithSubscription();
+    vi.mocked(kit.logout).mockResolvedValue(undefined);
+
+    const payments = paymentsService();
+    const auth = TestBed.inject(RhAuthService);
+    await firstValueFrom(auth.checkSession());
+    await new Promise(r => setTimeout(r, 0));
+    expect(payments.subscription()).not.toBeNull();
+
+    await firstValueFrom(auth.logout());
+    await new Promise(r => setTimeout(r, 0));
+    expect(payments.subscription()).toBeNull();
+    expect(payments.plan()).toBeNull();
+    expect(payments.isSubscribed()).toBe(false);
+  });
+
+  it('E6 clearSession clears subscription', async () => {
+    signedInWithSubscription();
+
+    const payments = paymentsService();
+    const auth = TestBed.inject(RhAuthService);
+    await firstValueFrom(auth.checkSession());
+    await new Promise(r => setTimeout(r, 0));
+    expect(payments.subscription()).not.toBeNull();
+
+    auth.clearSession();
+    await new Promise(r => setTimeout(r, 0));
+    expect(payments.subscription()).toBeNull();
+  });
+
+  it('E7 canManageBilling is true when user role matches ownershipRole (default owner)', async () => {
+    signedInWithSubscription();
+    const payments = paymentsService();
+    const auth = TestBed.inject(RhAuthService);
+    await firstValueFrom(auth.checkSession());
+    await new Promise(r => setTimeout(r, 0));
+    expect(payments.canManageBilling()).toBe(true);
+  });
+
+  it('E7 canManageBilling is false for a member', async () => {
+    const memberUser = { _id: 'b@c.com', roles: ['user'], team: { _id: { $oid: '1' }, role: 'member' } } as kit.UserInfo;
+    vi.mocked(kit.getToken).mockReturnValue('tok');
+    vi.mocked(kit.checkSession).mockResolvedValue(memberUser);
+    vi.mocked(kit.getTeams).mockResolvedValue([{ id: { $oid: '1' }, role: 'member' }] as kit.TeamMembership[]);
+    vi.mocked(kit.getSubscription).mockResolvedValue(subscriptionFixture);
+
+    const payments = paymentsService();
+    const auth = TestBed.inject(RhAuthService);
+    await firstValueFrom(auth.checkSession());
+    await new Promise(r => setTimeout(r, 0));
+    expect(payments.canManageBilling()).toBe(false);
+  });
+
+  it('E7 canManageBilling respects custom ownershipRole', async () => {
+    const adminUser = { _id: 'a@b.com', roles: ['user'], team: { _id: { $oid: '1' }, role: 'admin' } } as unknown as kit.UserInfo;
+    vi.mocked(kit.getToken).mockReturnValue('tok');
+    vi.mocked(kit.checkSession).mockResolvedValue(adminUser);
+    vi.mocked(kit.getTeams).mockResolvedValue([{ id: { $oid: '1' }, role: 'admin' }] as unknown as kit.TeamMembership[]);
+    vi.mocked(kit.getSubscription).mockResolvedValue(subscriptionFixture);
+
+    const payments = paymentsService('admin');
+    const auth = TestBed.inject(RhAuthService);
+    await firstValueFrom(auth.checkSession());
+    await new Promise(r => setTimeout(r, 0));
+    expect(payments.canManageBilling()).toBe(true);
+  });
+
+  it('E8 checkout returning 409: error reaches caller, state unchanged', async () => {
+    signedInWithSubscription();
+    vi.mocked(kit.createCheckoutSession).mockRejectedValue({ status: 409, message: 'already subscribed' });
+
+    const payments = paymentsService();
+    const auth = TestBed.inject(RhAuthService);
+    await firstValueFrom(auth.checkSession());
+    await new Promise(r => setTimeout(r, 0));
+    expect(payments.subscription()).not.toBeNull();
+
+    await expect(firstValueFrom(payments.createCheckoutSession('gold', 'month'))).rejects.toMatchObject({ status: 409 });
+    expect(payments.subscription()).not.toBeNull();
+  });
+
+  it('E9 waitForSubscription updates subscription on resolve', async () => {
+    signedInWithSubscription();
+    const newSub = { ...subscriptionFixture, plan: 'platinum', active: true };
+    vi.mocked(kit.waitForSubscription).mockResolvedValue(newSub);
+
+    const payments = paymentsService();
+    const auth = TestBed.inject(RhAuthService);
+    await firstValueFrom(auth.checkSession());
+    await new Promise(r => setTimeout(r, 0));
+    expect(payments.subscription()).not.toBeNull();
+
+    const result = await firstValueFrom(payments.waitForSubscription(s => s.plan === 'platinum'));
+    expect(result.plan).toBe('platinum');
+    expect(payments.plan()).toBe('platinum');
   });
 });
