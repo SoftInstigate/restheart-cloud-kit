@@ -48,33 +48,46 @@ RESTHeart Cloud Kit supports two authentication modes:
 
 ### Token Flow
 
-1. **Login**: `POST /token` returns JWT in response body
+1. **Login**: `POST /token` returns JWT in the `Auth-Token` response header
 2. **Storage**: Token stored in `localStorage` (with in-memory fallback)
 3. **Requests**: `apiFetch()` attaches `Authorization: Bearer <token>` header
 4. **Refresh**: Proactive refresh at 80% of TTL (~12 minutes)
 5. **Logout**: Token removed from storage
 
-### Token Delivery Parameter
+### Token Delivery Mechanisms
 
-When using bearer mode, the `delivery=body` query parameter tells the backend to return the token in the response body:
+Bearer mode uses two delivery mechanisms depending on the endpoint:
+
+**Login (`POST /token`)** — Token comes in the `Auth-Token` response header. The kit reads it with `res.headers.get('Auth-Token')`. No `delivery` query parameter is needed.
+
+**Auto-login endpoints** — `activate`, `resetPassword`, and `switchTeam` use the `delivery=body` query parameter to return the token in the JSON response body (`access_token` field), with the `Auth-Token` header as a fallback. This is handled by `applyBearerDelivery()` from [`@restheart-cloud/kit`](../packages/kit.md):
 
 ```typescript
-// Login
-POST /token?delivery=body
+// Login — token in Auth-Token header (no delivery param)
+POST /token
 
-// Activate account
+// Activate account — token in response body
 PATCH /auth/activate?delivery=body
 
-// Reset password
+// Reset password — token in response body
 PATCH /auth/reset-password?delivery=body
 
-// Switch team
+// Switch team — token in response body
 POST /auth/switch-team?delivery=body
 ```
 
 ### Response Format
 
-**Bearer mode response**:
+**Login response** — Token in `Auth-Token` response header:
+```
+HTTP/1.1 200 OK
+Auth-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+
+{ "message": "Login successful" }
+```
+
+**Auto-login response** (activate, resetPassword, switchTeam) — Token in JSON body when `delivery=body`:
 ```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -83,10 +96,7 @@ POST /auth/switch-team?delivery=body
 }
 ```
 
-Or token in `Auth-Token` header:
-```
-Auth-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
+The `applyBearerDelivery()` function extracts the token: it checks the body's `access_token` field first, then falls back to the `Auth-Token` header.
 
 ## Cookie Mode
 
