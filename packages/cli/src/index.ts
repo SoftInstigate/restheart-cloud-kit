@@ -20,9 +20,6 @@ export type { ServiceClient, Document, IndexKeys } from './service.js';
 
 export { isApiError } from './http.js';
 
-export { ecommercePlan } from './recipes/ecommerce.js';
-export type { EcommerceOptions } from './recipes/ecommerce.js';
-
 export { step, definePlan, runPlan } from './plan.js';
 export type {
   Step,

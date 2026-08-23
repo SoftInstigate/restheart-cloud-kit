@@ -44,4 +44,12 @@ describe('fromEnv', () => {
     // A CI variable that exists and was never populated arrives exactly this way.
     expect(() => resolveEnvRefs({ k: fromEnv('K') }, { K: '' })).toThrow(MissingEnvError);
   });
+
+  it('refuses to be serialised unresolved', () => {
+    // Without a throwing `toJSON` this would succeed and quietly produce
+    // `{"secret-key":{"name":"K"}}` — an object where the secret should be,
+    // written to the service with nothing to notice. Every body in this package
+    // is resolved first, so this is a backstop, not a path.
+    expect(() => JSON.stringify({ 'secret-key': fromEnv('K') })).toThrow(/unresolved/);
+  });
 });

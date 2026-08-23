@@ -12,9 +12,22 @@ This package makes it a file:
 
 ```ts
 // rh-plan.ts
-import { ecommercePlan } from '@restheart-cloud/cli/recipes/ecommerce';
+import { definePlan, step } from '@restheart-cloud/cli';
 
-export default ecommercePlan({ appOrigin: 'https://shop.example.com' });
+export default definePlan('Shop', [
+  step('catalog collection', {
+    check: ({ service }) => service.collectionExists('catalog'),
+    apply: ({ service }) => service.createCollection('catalog'),
+  }),
+  step('guests may read the catalog', {
+    check: ({ service }) => service.permissionExists('catalog-read-anon'),
+    apply: ({ service }) => service.putPermission('catalog-read-anon', {
+      predicate: "path(/catalog) and method(GET)",
+      roles: ['$unauthenticated'],
+      priority: 100,
+    }),
+  }),
+]);
 ```
 
 ```bash
@@ -34,6 +47,13 @@ Ecommerce on ea820b: 1 satisfied, 5 applied
 
 Run it again and every line is `·` — satisfied, nothing written.
 
+That output is [`rh-plan.ts` in the ecommerce starter][starter-plan] — a real plan for a real app,
+which lives in that repo rather than in this one. This package ships the surface a plan is written
+against; a plan belongs to the application it configures, and changes in the same commit as the
+code that depends on it.
+
+[starter-plan]: https://github.com/SoftInstigate/restheart-cloud-starter-ecommerce/blob/main/rh-plan.ts
+
 ## Installing
 
 Two install shapes, because there are two things here and they are used at different moments.
@@ -43,7 +63,7 @@ npm i -g @restheart-cloud/cli    # the `rhc` command, for a terminal
 npm i -D @restheart-cloud/cli    # the library, for a project whose plan file imports it
 ```
 
-A plan file imports `definePlan`, `step`, `fromEnv` and the recipes, so a project that has one
+A plan file imports `definePlan`, `step` and `fromEnv`, so a project that has one
 wants the local dependency — a global install is not on Node's resolution path and the import
 would not resolve. The `rhc` command is account-level and outlives any one project, so it wants
 the global one. Installing both is normal here, the same way `vite` is both a bin and the module
@@ -149,9 +169,10 @@ over the real key. `REDACTED` and `isRedacted()` are exported so you can *recogn
 in this package ever produces one.
 
 A blank or absent secret is **not** redacted, because "not configured" is information you need,
-and turning it into bullets would erase it. That distinction is what lets the ecommerce recipe
-re-run with no secrets in the environment at all: a stored key comes back as bullets, the check
-passes, and the apply that would have read `STRIPE_SECRET_KEY` never runs.
+and turning it into bullets would erase it. That distinction is what lets a plan re-run with no
+secrets in the environment at all: a stored key comes back as bullets, a check written as
+`isRedacted(v) || v !== ''` passes, and the apply that would have read `STRIPE_SECRET_KEY` never
+runs.
 
 ## From a pipeline
 

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createServiceClient } from '../../service.js';
+import { fromEnv, MissingEnvError } from '../../env.js';
 import type { AdminClient } from '../../admin.js';
 
 /** A JWT whose payload says when it expires. Only `exp` is ever read. */
@@ -143,5 +144,29 @@ describe('service client', () => {
       'PUT /_schemas/orders',
     ]);
     expect(calls[1]!.body).toEqual({ keys: { sku: 1 }, ops: { unique: true } });
+  });
+
+  it('resolves fromEnv on the way out, like the admin client does', async () => {
+    // The admin client is not the only place a plan can want a secret — a user
+    // document has a password. A marker that got here unresolved would be
+    // written as an object, and only its `toJSON` guard would say so.
+    const { admin, calls } = harness({ 'PUT /users/robot': { status: 201 } });
+    (admin as unknown as { env: Record<string, string> }).env = { ROBOT_PASSWORD: 'hunter2' };
+    const service = createServiceClient(admin, 'ea820b');
+
+    await service.createUser('robot', { roles: ['worker'], password: fromEnv('ROBOT_PASSWORD') });
+
+    expect(calls[0]!.body).toEqual({ roles: ['worker'], password: 'hunter2' });
+  });
+
+  it('fails naming the variable rather than writing an object', async () => {
+    const { admin, calls } = harness({ 'PUT /users/robot': { status: 201 } });
+    (admin as unknown as { env: Record<string, string> }).env = {};
+    const service = createServiceClient(admin, 'ea820b');
+
+    await expect(
+      service.createUser('robot', { password: fromEnv('ROBOT_PASSWORD') })
+    ).rejects.toThrow(MissingEnvError);
+    expect(calls.filter(c => c.method === 'PUT')).toHaveLength(0);
   });
 });

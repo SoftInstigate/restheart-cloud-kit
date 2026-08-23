@@ -25,6 +25,7 @@ export interface EnvRef {
   /** The environment variable this stands for. A name, never a value. */
   readonly name: string;
   toString(): string;
+  toJSON(): never;
 }
 
 /**
@@ -44,6 +45,19 @@ export function fromEnv(name: string): string {
     // prints the variable's name, which is not a secret. It never prints a
     // value, because it never holds one.
     toString: () => `fromEnv(${name})`,
+    // The backstop, and the reason it is worth having: `JSON.stringify` on an
+    // unresolved marker would otherwise succeed and quietly emit
+    // `{"name":"STRIPE_SECRET_KEY"}` — an object where the secret should be,
+    // written to the service without a word. Every request body in this package
+    // is resolved before it is serialised, so this should never fire; it exists
+    // because "should never" is not a guarantee, and a loud failure beats a
+    // config that looks configured.
+    toJSON: () => {
+      throw new Error(
+        `fromEnv(${name}) reached JSON serialisation unresolved — ` +
+          'this is a bug in @restheart-cloud/cli, not in your plan'
+      );
+    },
   };
   return ref as unknown as string;
 }

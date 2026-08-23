@@ -152,3 +152,81 @@ describe('runPlan', () => {
     expect(seen[0]).toEqual({ admin, service, srvId: 'ea820b' });
   });
 });
+
+/**
+ * The properties a real plan is written to have, against a target that
+ * remembers what was done to it.
+ *
+ * Deliberately synthetic. A concrete plan — the ecommerce one — belongs to the
+ * application it configures and lives in that starter's repo; what has to hold
+ * *here* is that the runner gives any such plan idempotence and an honest dry
+ * run, and a fake target shows that without tying this suite to one app's
+ * collection names.
+ */
+describe('a multi-step plan against a stateful target', () => {
+  /** Six things that must exist, none of which do yet. */
+  function target() {
+    const done = new Set<string>();
+    const writes: string[] = [];
+    const steps = ['collection', 'index', 'plugin', 'plugin config', 'read rule', 'write rule'].map(
+      name =>
+        step(name, {
+          check: () => done.has(name),
+          apply: () => {
+            writes.push(name);
+            done.add(name);
+          },
+        })
+    );
+    return { steps, writes, done };
+  }
+
+  it('configures an empty target, then does nothing at all the second time', async () => {
+    const t = target();
+    const plan = definePlan('Six', t.steps);
+    const opts = { admin, service, srvId: 'ea820b' };
+
+    const first = await runPlan(plan, opts);
+    expect(first.steps.map(s => s.state)).toEqual(Array(6).fill('applied'));
+    expect(first.ok).toBe(true);
+    expect(t.writes).toHaveLength(6);
+
+    const second = await runPlan(plan, opts);
+    expect(second.steps.map(s => s.state)).toEqual(Array(6).fill('satisfied'));
+    expect(second.ok).toBe(true);
+    // The point of the whole exercise: a re-run is not a cheaper run, it is no
+    // run at all.
+    expect(t.writes).toHaveLength(6);
+  });
+
+  it('a dry run reports every outstanding step, not just the first', async () => {
+    const t = target();
+    t.done.add('collection');
+
+    const report = await runPlan(definePlan('Six', t.steps), {
+      admin,
+      service,
+      srvId: 'ea820b',
+      dryRun: true,
+    });
+
+    expect(report.steps.map(s => s.state)).toEqual([
+      'satisfied', 'missing', 'missing', 'missing', 'missing', 'missing',
+    ]);
+    expect(t.writes).toHaveLength(0);
+    expect(report.ok).toBe(false);
+  });
+
+  it('a partially configured target applies only what is left', async () => {
+    const t = target();
+    t.done.add('collection');
+    t.done.add('plugin');
+
+    const report = await runPlan(definePlan('Six', t.steps), { admin, service, srvId: 'ea820b' });
+
+    expect(report.steps.map(s => s.state)).toEqual([
+      'satisfied', 'applied', 'satisfied', 'applied', 'applied', 'applied',
+    ]);
+    expect(t.writes).toEqual(['index', 'plugin config', 'read rule', 'write rule']);
+  });
+});

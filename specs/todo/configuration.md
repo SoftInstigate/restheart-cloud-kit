@@ -302,7 +302,7 @@ result.
 
 ## Task 5 — the ecommerce plan, as the first real consumer
 
-**File:** `packages/cli/recipes/ecommerce.ts`, wired into `restheart-cloud-starter-ecommerce`
+**File:** `rh-plan.ts` **in `restheart-cloud-starter-ecommerce`**, not in this repo.
 
 The three settings the starter's README currently asks the developer to get right by hand — the
 `success-url`, the anonymous `GET /catalog`, the anonymous `POST /orders` — become steps, plus the
@@ -310,6 +310,18 @@ collections, the indexes and the `stripe` plugin's install/config/init.
 
 This is the test of whether the generic surface is actually general: if the plan cannot express
 those without reaching around the API, the API is wrong.
+
+**It lives in the starter, not here.** This package ships the surface a plan is written against;
+a plan is the configuration of one application, and belongs beside the code that depends on it so
+the two change in the same commit. Shipping it here as a `recipes/` export would have made this
+package the owner of another repo's configuration — and would have weakened the test above, since
+a recipe compiled inside the package can reach module-private internals that a real consumer
+cannot. Importing only from the public entry point is what makes "the surface is general" a claim
+with evidence.
+
+The corollary is that the runner's own tests must not depend on that plan. They use a synthetic
+multi-step target instead (`plan.test.ts`), which is what actually needs asserting here:
+idempotence, an honest dry run, and applying only what is outstanding.
 
 **Acceptance:** a fresh service goes from empty to a working shop with one command, and the
 starter's README replaces its manual checklist with it.
@@ -370,27 +382,31 @@ is free and real); the service client uses a small internal `request()` that pro
 
 ## Where this stands
 
-Written and unit-tested: `packages/cli`, with `src/{types,env,http,admin,service,plan,cli}.ts`,
-`src/recipes/ecommerce.ts` and unit suites for each. Nothing has run against a live service yet.
+Written and unit-tested: `packages/cli`, with `src/{types,env,http,admin,service,plan,cli}.ts` and
+unit suites for each. The ecommerce plan is `rh-plan.ts` in the starter's own repo. Nothing has run
+against a live service yet.
 
-Two departures from what is written above, both forced by the build rather than by a change of mind:
+Three departures from what is written above:
 
-- **`src/recipes/ecommerce.ts`, not `recipes/ecommerce.ts`.** `tsconfig` has `rootDir: ./src`, so a
-  sibling directory would not emit into `dist`. Exposed as the `./recipes/ecommerce` subpath.
+- **The package is `@restheart-cloud/cli`, not `@restheart-cloud/kit-config`,** and the bin is
+  `rhc apply` rather than a bare `rh-config`. See [`provisioning.md`](./provisioning.md) — a global
+  install of a package named `kit-config` would not have satisfied a plan file's import anyway.
 - **A sixth ecommerce step.** The starter's README lists three settings that must line up; writing
   them as code exposed a fourth, `orders-read-anon`, without which the buyer pays, lands on
   `/shop/order` and is answered `401` by the page whose whole job is to reassure them. That the
   omission surfaced this way is the strongest evidence the exercise was worth doing.
+- **No `recipes/` export.** Task 5 is a file in the starter, for the reasons stated there. The
+  runner's own coverage moved onto a synthetic target, which is what belonged there in the first
+  place.
 
 Outstanding:
 
 - **A live run.** Task 5's acceptance — "a fresh service goes from empty to a working shop with one
   command" — is the only one no unit test can stand in for.
-- **Wiring the starter.** `restheart-cloud-starter-ecommerce` still carries the manual checklist in
-  its Open points; it should carry an `rh-plan.ts` and a line of shell instead. Left until the live
-  run proves the plan, because a README that documents an unverified command is worse than one that
-  documents a manual procedure.
-- **`testPlugin` is unused by any recipe.** It validates a stored config against the real provider,
+- **Publishing.** The starter's `rh-plan.ts` imports `@restheart-cloud/cli`, which is unpublished,
+  so the starter cannot yet declare the dependency and its README keeps the manual checklist
+  alongside the plan. Both close with the first release that includes this package.
+- **`testPlugin` is unused by any plan.** It validates a stored config against the real provider,
   which is a better check for "stripe configured" than comparing fields — but it is a network call
   to Stripe inside a `check`, run on every dry run. Worth deciding deliberately rather than by
   default.

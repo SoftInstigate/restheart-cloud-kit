@@ -1,6 +1,7 @@
 import { getTokenExpiry } from '@restheart-cloud/kit';
 import type { AdminClient } from './admin.js';
 import { existsOr404, request } from './http.js';
+import { resolveEnvRefs, defaultEnv } from './env.js';
 
 /**
  * A document as RESTHeart stores it. Loose on purpose: an ACL permission, a
@@ -87,6 +88,19 @@ export function createServiceClient(admin: AdminClient, srvId: string): ServiceC
     return request(url, path, { ...init, token }, admin.config.transport);
   }
 
+  /**
+   * Serialise a body, resolving `fromEnv` markers on the way out.
+   *
+   * The admin client is not the only place a plan can want a secret: a user
+   * document has a password, a permission can carry a token. Without this a
+   * marker would reach `JSON.stringify` and, but for its `toJSON` guard, be
+   * written as `{"name":"…"}` — an object where the secret should be, with no
+   * error to notice. Resolution stays where it was: as late as possible, in the
+   * call that puts the value on the wire and nowhere else.
+   */
+  const body = (value: unknown): string =>
+    JSON.stringify(resolveEnvRefs(value, admin.env ?? defaultEnv()));
+
   const seg = (s: string) => encodeURIComponent(s);
 
   return {
@@ -99,7 +113,7 @@ export function createServiceClient(admin: AdminClient, srvId: string): ServiceC
     async createCollection(name, meta) {
       await send(`/${seg(name)}`, {
         method: 'PUT',
-        body: JSON.stringify(meta ?? {}),
+        body: body(meta ?? {}),
       });
     },
 
@@ -118,26 +132,26 @@ export function createServiceClient(admin: AdminClient, srvId: string): ServiceC
     async createIndex(coll, id, keys, opts) {
       await send(`/${seg(coll)}/_indexes/${seg(id)}`, {
         method: 'PUT',
-        body: JSON.stringify({ keys, ...(opts ? { ops: opts } : {}) }),
+        body: body({ keys, ...(opts ? { ops: opts } : {}) }),
       });
     },
 
     permissionExists: (id) => existsOr404(() => send(`/acl/${seg(id)}`)),
 
     async putPermission(id, doc) {
-      await send(`/acl/${seg(id)}`, { method: 'PUT', body: JSON.stringify(doc) });
+      await send(`/acl/${seg(id)}`, { method: 'PUT', body: body(doc) });
     },
 
     userExists: (id) => existsOr404(() => send(`/users/${seg(id)}`)),
 
     async createUser(id, doc) {
-      await send(`/users/${seg(id)}`, { method: 'PUT', body: JSON.stringify(doc) });
+      await send(`/users/${seg(id)}`, { method: 'PUT', body: body(doc) });
     },
 
     schemaExists: (coll) => existsOr404(() => send(`/_schemas/${seg(coll)}`)),
 
     async putSchema(coll, schema) {
-      await send(`/_schemas/${seg(coll)}`, { method: 'PUT', body: JSON.stringify(schema) });
+      await send(`/_schemas/${seg(coll)}`, { method: 'PUT', body: body(schema) });
     },
 
     fetch: send,
