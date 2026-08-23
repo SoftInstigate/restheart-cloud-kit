@@ -57,25 +57,45 @@ copies interoperate.
 ## Task 1 — the session
 
 **File:** `packages/cli/src/session.ts`
+**Depends on:** personal access tokens — `restheart-cloud-server/specs/todo/personal-access-tokens.md`,
+which depends in turn on [restheart#699](https://github.com/SoftInstigate/restheart/issues/699) and
+[#700](https://github.com/SoftInstigate/restheart/issues/700), milestone 9.8.0.
 
-`/token` on the admin node has `ttl: 1440` (`etc/prod-admin.yml:132`) — twenty-four hours. That is
-what makes `rhc login` worth having rather than a synonym for setting two environment variables:
-one login covers a day's work.
+**This task was specified as email and password, and that was wrong.** A user who signed up with
+Google has no password, so `rhc login` would simply not work for them — and there is no client-side
+fix, because the OAuth callback returns no token at all: it sets an httpOnly cookie on
+`cloud-api.restheart.com`, and `frontend-success-url` is fixed server configuration. Telling an SSO
+user to invent a password through the reset flow undoes the reason they chose SSO and makes an
+account password-attackable that was not.
 
-Stored at `~/.config/restheart/session.json`, mode `0600`, holding the token and the account it
-belongs to. **Never the password** — a stored password is a stored password whatever the file mode
-says, and there is nothing here that needs to re-authenticate unattended.
+The wider problem is that `RH_CLOUD_PASSWORD` in a pipeline's secret store is the **account**
+password: it reaches billing and every service, and it cannot be revoked without changing it
+everywhere. That is the wrong credential for CI whether or not the user has one.
 
-**Precedence, and it matters:** `RH_CLOUD_EMAIL`/`RH_CLOUD_PASSWORD` win over the stored session,
-always. A pipeline has no `rhc login` step and must keep working exactly as it does today; a
-developer's stored session must never be what a CI run silently falls back to, nor the reverse.
+So the credential is a **personal access token**, issued from the console and carrying a derived
+`cli` role that is deny-by-default — it cannot start a purchase, which is the constraint from
+[the dominant constraint](#the-dominant-constraint) enforcing itself rather than depending on this
+CLI to refuse.
 
-An expired token is not an error to decorate — it is `run rhc login`. The exit is non-zero and the
-message says that and nothing else.
+```bash
+rhc login                       # prompts for a token, or reads RH_CLOUD_TOKEN
+```
 
-**Acceptance:** `rhc login` then `rhc setup` with no environment variables set works; the same
-`setup` with `RH_CLOUD_*` set uses those and not the file; a session file older than its token's
-`exp` produces "session expired, run rhc login" rather than a `401`.
+Stored at `~/.config/restheart/session.json`, mode `0600`. The token goes in the file — that is
+what a PAT is for, and unlike a password it is revocable one at a time and scoped to what a CLI
+does. **Never a password**, which the CLI now never sees at all.
+
+**Precedence, and it matters:** `RH_CLOUD_TOKEN` wins over the stored file, always. A pipeline has
+no `rhc login` step, and a developer's stored session must never be what a CI run silently falls
+back to, nor the reverse.
+
+A revoked or expired token is not an error to decorate — it is `run rhc login`, or in CI, "this
+token was revoked or has expired". Non-zero exit, and the message says that and nothing else.
+
+**Acceptance:** a user who signed up with Google authenticates and runs `rhc setup` without ever
+setting a password; `rhc login` then `rhc setup` works with no environment variables set; the same
+`setup` with `RH_CLOUD_TOKEN` set uses that and not the file; a revoked token produces a message
+naming the cause rather than a bare `401`.
 
 ## Task 2 — `rhc new free`
 

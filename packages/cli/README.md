@@ -181,6 +181,17 @@ is interactive — never from a flag, which would put a password in the shell hi
 process list of every other user on the machine. A run that authenticates itself and needs only
 environment variables is already shaped like a CI job.
 
+> **Two known limitations, both closing in the same change.** A password is the wrong credential
+> here, in two ways. If you signed up with Google or GitHub you have no password, so this does not
+> work for you at all — and there is no workaround, because the OAuth flow returns no token, only
+> an httpOnly cookie. And the password this asks for is the *account* password: it reaches billing
+> and every service you own, and revoking it means changing it everywhere it is used.
+>
+> The replacement is a personal access token carrying a role that cannot spend money — tracked in
+> [restheart#699](https://github.com/SoftInstigate/restheart/issues/699) and
+> [#700](https://github.com/SoftInstigate/restheart/issues/700) (milestone 9.8.0). Until then,
+> prefer a dedicated account for CI over your own.
+
 ```yaml
 # .github/workflows/deploy.yml
 - run: npx @restheart-cloud/cli setup --srv ea820b
