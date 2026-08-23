@@ -31,6 +31,17 @@ on sign-in and reloads on team switch, and stays untouched when `payments` is no
 See **[docs/ADAPTERS.md](./docs/ADAPTERS.md)** for the adapter contract, the roadmap, and how
 the access token is delivered in SPA and server-rendered apps.
 
+## Configuration
+
+**[`@restheart-cloud/kit-config`](./packages/kit-config/README.md)** [![npm](https://img.shields.io/npm/v/@restheart-cloud/kit-config)](https://www.npmjs.com/package/@restheart-cloud/kit-config)  
+The other half of forking a starter: the service it talks to. Collections, indexes, ACL
+permissions and plugin configuration as a plan committed to git, applied idempotently by a CLI —
+so the README checklist becomes `npx @restheart-cloud/kit-config --plan ./rh-plan.ts --srv ea820b`,
+and a `--dry-run` in CI tells you what a service is missing before a deploy claims it worked.
+
+Not an adapter: it runs in Node rather than a browser, holds no reactive state, and authenticates
+as your RESTHeart Cloud account rather than as a tenant. [Why](./docs/ADAPTERS.md#6-what-kit-config-is-not).
+
 ## Quickstart
 
 The fastest path to a working Angular app:

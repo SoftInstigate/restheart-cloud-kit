@@ -6,7 +6,8 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/index.js",
+    "./recipes/ecommerce": "./dist/recipes/ecommerce.js"
   },
   "bin": {
     "rh-config": "./dist/cli.js"

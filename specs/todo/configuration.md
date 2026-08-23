@@ -1,6 +1,8 @@
 # Extending the kit to configuration
 
-**Status:** to do. **Repo:** `restheart-cloud-kit` (a new package, not a fourth adapter).
+**Status:** Tasks 1–6 written, unit-tested, not yet run against a live service. See
+[Where this stands](#where-this-stands) at the bottom.
+**Repo:** `restheart-cloud-kit` (a new package, not a fourth adapter).
 **Depends on:** nothing new server-side — everything below already exists and is verified.
 
 ## Why
@@ -363,3 +365,32 @@ directly.
 URL is server-issued rather than caller-chosen. The admin client uses `apiFetch` (where the guard
 is free and real); the service client uses a small internal `request()` that produces the same
 `ApiError` shape.
+
+---
+
+## Where this stands
+
+Written and unit-tested: `packages/kit-config`, with `src/{types,env,http,admin,service,plan,cli}.ts`,
+`src/recipes/ecommerce.ts` and unit suites for each. Nothing has run against a live service yet.
+
+Two departures from what is written above, both forced by the build rather than by a change of mind:
+
+- **`src/recipes/ecommerce.ts`, not `recipes/ecommerce.ts`.** `tsconfig` has `rootDir: ./src`, so a
+  sibling directory would not emit into `dist`. Exposed as the `./recipes/ecommerce` subpath.
+- **A sixth ecommerce step.** The starter's README lists three settings that must line up; writing
+  them as code exposed a fourth, `orders-read-anon`, without which the buyer pays, lands on
+  `/shop/order` and is answered `401` by the page whose whole job is to reassure them. That the
+  omission surfaced this way is the strongest evidence the exercise was worth doing.
+
+Outstanding:
+
+- **A live run.** Task 5's acceptance — "a fresh service goes from empty to a working shop with one
+  command" — is the only one no unit test can stand in for.
+- **Wiring the starter.** `restheart-cloud-starter-ecommerce` still carries the manual checklist in
+  its Open points; it should carry an `rh-plan.ts` and a line of shell instead. Left until the live
+  run proves the plan, because a README that documents an unverified command is worse than one that
+  documents a manual procedure.
+- **`testPlugin` is unused by any recipe.** It validates a stored config against the real provider,
+  which is a better check for "stripe configured" than comparing fields — but it is a network call
+  to Stripe inside a `check`, run on every dry run. Worth deciding deliberately rather than by
+  default.
