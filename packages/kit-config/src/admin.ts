@@ -153,11 +153,15 @@ export function createAdminClient(config: AdminClientConfig): AdminClient {
     getPluginConfig: (srvId, pluginId) =>
       json<PluginConfig>(`${pluginPath(srvId, pluginId)}/config`),
 
-    updatePluginConfig: (srvId, pluginId, pluginConfig) =>
-      json<MutationResult>(`${pluginPath(srvId, pluginId)}/config`, {
+    // `async` deliberately: `resolveEnvRefs` throws on a missing variable, and
+    // an otherwise-Promise-returning method that throws synchronously is a trap
+    // — a caller using `.catch()` rather than `try`/`await` would miss it.
+    async updatePluginConfig(srvId, pluginId, pluginConfig) {
+      return json<MutationResult>(`${pluginPath(srvId, pluginId)}/config`, {
         method: 'PATCH',
         body: JSON.stringify(resolveEnvRefs(pluginConfig, env)),
-      }),
+      });
+    },
 
     installPlugin: (srvId, pluginId) => post(`${pluginPath(srvId, pluginId)}/install`),
 
