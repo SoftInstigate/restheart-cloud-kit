@@ -117,7 +117,7 @@ state, and none of it applies here: there is no user to track, no session to res
 update. Adding a `RhConfigService` alongside `RhAuthService` and `RhPaymentsService` would suggest a
 parity that does not exist and cannot exist — the thing does not run in a browser.
 
-It gets its own package, **`@restheart-cloud/kit-config`**, depending on `@restheart-cloud/kit` for
+It gets its own package, **`@restheart-cloud/cli`**, depending on `@restheart-cloud/kit` for
 `login`, `apiFetch` and the error type. The client layer stays isomorphic (`fetch` only, no Node
 built-ins) so it can be unit-tested without a live service; only the CLI is Node-specific.
 
@@ -125,7 +125,7 @@ built-ins) so it can be unit-tested without a live service; only the CLI is Node
 
 ## Task 1 — the admin client
 
-**File:** `packages/kit-config/src/admin.ts`
+**File:** `packages/cli/src/admin.ts`
 
 `createAdminClient(config)` over the admin node, taking the same `AuthConfig` the core already
 understands — `apiBaseUrl` pointing at `cloud-api.restheart.com`.
@@ -155,7 +155,7 @@ back leaves the stored secret intact.
 
 ## Task 2 — the service-node client
 
-**File:** `packages/kit-config/src/service.ts`
+**File:** `packages/cli/src/service.ts`
 
 `createServiceClient(admin, srvId)` — derived from the admin client, because that is where the
 token comes from. It calls `/srvs-mgmt/{srvId}/jwt` on first use, caches `{token, url}`, and
@@ -176,7 +176,7 @@ step satisfied; the same run against an empty one configures it; the second run 
 
 ## Task 3 — the step runner
 
-**File:** `packages/kit-config/src/plan.ts`
+**File:** `packages/cli/src/plan.ts`
 
 ```ts
 const plan = definePlan('Ecommerce', [
@@ -251,11 +251,11 @@ provider-side rejection when it is not; a dry run of that plan touches `process.
 
 ## Task 4 — the CLI
 
-**File:** `packages/kit-config/src/cli.ts`, `bin` entry
+**File:** `packages/cli/src/cli.ts`, `bin` entry
 
 ```bash
-npx @restheart-cloud/kit-config --plan ./rh-plan.ts --srv ea820b
-npx @restheart-cloud/kit-config --plan ./rh-plan.ts --srv ea820b --dry-run
+npx @restheart-cloud/cli apply --plan ./rh-plan.ts --srv ea820b
+npx @restheart-cloud/cli apply --plan ./rh-plan.ts --srv ea820b --dry-run
 ```
 
 Credentials by prompt or environment (`RH_CLOUD_EMAIL`, `RH_CLOUD_PASSWORD`) — never by flag, which
@@ -272,7 +272,7 @@ job, not shaped into one after the fact.
 
 ```yaml
 # .github/workflows/deploy.yml
-- run: npx @restheart-cloud/kit-config --plan ./rh-plan.ts --srv ea820b
+- run: npx @restheart-cloud/cli apply --plan ./rh-plan.ts --srv ea820b
   env:
     RH_CLOUD_EMAIL: ${{ secrets.RH_CLOUD_EMAIL }}
     RH_CLOUD_PASSWORD: ${{ secrets.RH_CLOUD_PASSWORD }}
@@ -283,7 +283,7 @@ job, not shaped into one after the fact.
 # bitbucket-pipelines.yml
 - step:
     script:
-      - npx @restheart-cloud/kit-config --plan ./rh-plan.ts --srv ea820b
+      - npx @restheart-cloud/cli apply --plan ./rh-plan.ts --srv ea820b
     # RH_CLOUD_EMAIL, RH_CLOUD_PASSWORD, STRIPE_SECRET_KEY set as repository/deployment variables
 ```
 
@@ -302,7 +302,7 @@ result.
 
 ## Task 5 — the ecommerce plan, as the first real consumer
 
-**File:** `packages/kit-config/recipes/ecommerce.ts`, wired into `restheart-cloud-starter-ecommerce`
+**File:** `packages/cli/recipes/ecommerce.ts`, wired into `restheart-cloud-starter-ecommerce`
 
 The three settings the starter's README currently asks the developer to get right by hand — the
 `success-url`, the anonymous `GET /catalog`, the anonymous `POST /orders` — become steps, plus the
@@ -316,7 +316,7 @@ starter's README replaces its manual checklist with it.
 
 ## Task 6 — documentation
 
-**Files:** `packages/kit-config/README.md`, root `README.md`, `docs/ADAPTERS.md`
+**Files:** `packages/cli/README.md`, root `README.md`, `docs/ADAPTERS.md`
 
 `docs/ADAPTERS.md` gets a short section stating what this package is *not*: not an adapter, no
 section-E contract, does not run in a browser — with the `originVetoer` reason, so nobody
@@ -370,7 +370,7 @@ is free and real); the service client uses a small internal `request()` that pro
 
 ## Where this stands
 
-Written and unit-tested: `packages/kit-config`, with `src/{types,env,http,admin,service,plan,cli}.ts`,
+Written and unit-tested: `packages/cli`, with `src/{types,env,http,admin,service,plan,cli}.ts`,
 `src/recipes/ecommerce.ts` and unit suites for each. Nothing has run against a live service yet.
 
 Two departures from what is written above, both forced by the build rather than by a change of mind:

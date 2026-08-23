@@ -32,4 +32,4 @@ jobs:
 
       # Scope to the adapters explicitly — never --workspaces, which would also
       # run kit's integration test suite (that one needs the live instance).
-      - run: npm test -w packages/kit-react -w packages/kit-vue -w packages/kit-ng
+      - run: npm test -w packages/kit-react -w packages/kit-vue -w packages/kit-ng -w packages/cli

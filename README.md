@@ -31,16 +31,22 @@ on sign-in and reloads on team switch, and stays untouched when `payments` is no
 See **[docs/ADAPTERS.md](./docs/ADAPTERS.md)** for the adapter contract, the roadmap, and how
 the access token is delivered in SPA and server-rendered apps.
 
-## Configuration
+## The CLI
 
-**[`@restheart-cloud/kit-config`](./packages/kit-config/README.md)** [![npm](https://img.shields.io/npm/v/@restheart-cloud/kit-config)](https://www.npmjs.com/package/@restheart-cloud/kit-config)  
+**[`@restheart-cloud/cli`](./packages/cli/README.md)** [![npm](https://img.shields.io/npm/v/@restheart-cloud/cli)](https://www.npmjs.com/package/@restheart-cloud/cli)  
 The other half of forking a starter: the service it talks to. Collections, indexes, ACL
-permissions and plugin configuration as a plan committed to git, applied idempotently by a CLI —
-so the README checklist becomes `npx @restheart-cloud/kit-config --plan ./rh-plan.ts --srv ea820b`,
-and a `--dry-run` in CI tells you what a service is missing before a deploy claims it worked.
+permissions and plugin configuration as a plan committed to git, applied idempotently — so the
+README checklist becomes one command, and a `--dry-run` in CI tells you what a service is missing
+before a deploy claims it worked.
+
+```bash
+npm i -g @restheart-cloud/cli                # the `rhc` command
+npm i -D @restheart-cloud/cli                # the library, for a project's plan file
+npx @restheart-cloud/cli apply --plan ./rh-plan.ts --srv ea820b   # a pipeline
+```
 
 Not an adapter: it runs in Node rather than a browser, holds no reactive state, and authenticates
-as your RESTHeart Cloud account rather than as a tenant. [Why](./docs/ADAPTERS.md#6-what-kit-config-is-not).
+as your RESTHeart Cloud account rather than as a tenant. [Why](./docs/ADAPTERS.md#6-what-the-cli-is-not).
 
 ## Quickstart
 
@@ -55,16 +61,16 @@ The fastest path to a working Angular app:
 
 ```bash
 npm install     # install all workspace dependencies
-npm run build   # build kit, then the adapters (kit-ng, kit-react, kit-vue)
+npm run build   # build kit, then the adapters (kit-ng, kit-react, kit-vue) and the cli
 ```
 
 > **Node ≥ 22.22.3** is required — the Angular 22 CLI that runs `kit-ng`'s tests enforces it.
 > The rest of the workspace is fine on any Node 22.
 
-Each adapter depends on `kit` at the exact version `0.0.0` — the version every package carries
+Each package depends on `kit` at the exact version `0.0.0` — the version every package carries
 in git, since releases are tag-driven. That is deliberate: any looser range is also satisfied
 by a published version, so npm resolves `kit` from the registry instead of linking the local
-workspace, and the adapter then compiles against a stale copy. The release workflow rewrites
+workspace, and the dependant then compiles against a stale copy. The release workflow rewrites
 this range to the tag before publishing, so `0.0.0` never reaches npm.
 
 If workspace resolution ever looks wrong, reinstall from scratch — note that the nested
@@ -121,7 +127,7 @@ git tag 1.2.3
 git push origin 1.2.3
 ```
 
-CI runs the integration tests against the RESTHeart Cloud test instance. If they pass, all four packages (`kit`, `kit-ng`, `kit-react`, `kit-vue`) are published to npm at that version. If they fail, nothing is published.
+CI runs the integration tests against the RESTHeart Cloud test instance. If they pass, all five packages (`kit`, `kit-ng`, `kit-react`, `kit-vue`, `cli`) are published to npm at that version. If they fail, nothing is published.
 
 Integration tests can also be triggered manually from the **Actions** tab → **Integration Tests** → **Run workflow**.
 

@@ -1,7 +1,7 @@
 {
-  "name": "@restheart-cloud/kit-config",
+  "name": "@restheart-cloud/cli",
   "version": "0.0.0",
-  "description": "Configure a RESTHeart Cloud service from a plan committed to git — collections, indexes, permissions and plugins, applied idempotently from a CLI or a CI pipeline.",
+  "description": "The RESTHeart Cloud CLI. Configure a service from a plan committed to git — collections, indexes, permissions and plugins, applied idempotently from a terminal or a CI pipeline.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -10,15 +10,22 @@
     "./recipes/ecommerce": "./dist/recipes/ecommerce.js"
   },
   "bin": {
-    "rh-config": "./dist/cli.js"
+    "rhc": "./dist/cli.js"
   },
+  "keywords": [
+    "restheart",
+    "restheart-cloud",
+    "cli",
+    "configuration",
+    "infrastructure-as-code"
+  ],
   "files": [
     "dist"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SoftInstigate/restheart-cloud-kit.git",
-    "directory": "packages/kit-config"
+    "directory": "packages/cli"
   },
   "license": "MIT",
   "scripts": {
@@ -27,7 +34,7 @@
     "test:unit": "vitest run --config vitest.unit.config.ts"
   },
   "dependencies": {
-    "@restheart-cloud/kit": "*"
+    "@restheart-cloud/kit": "0.0.0"
   },
   "devDependencies": {
     "@types/node": "^22",

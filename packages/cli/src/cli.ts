@@ -8,10 +8,16 @@ import { runPlan, type Plan, type PlanReport, type ProgressEvent } from './plan.
 const DEFAULT_API = 'https://cloud-api.restheart.com';
 
 const USAGE = `
-rh-config — apply a configuration plan to a RESTHeart Cloud service
+rhc — the RESTHeart Cloud CLI
 
-  npx @restheart-cloud/kit-config --plan ./rh-plan.ts --srv ea820b
-  npx @restheart-cloud/kit-config --plan ./rh-plan.ts --srv ea820b --dry-run
+  rhc apply --plan ./rh-plan.ts --srv ea820b
+  rhc apply --plan ./rh-plan.ts --srv ea820b --dry-run
+
+  npm i -g @restheart-cloud/cli   for a terminal
+  npx @restheart-cloud/cli apply  for a pipeline
+
+Commands
+  apply           Apply a configuration plan to a service.
 
 Options
   --plan <file>   A module exporting a plan (default export, or \`plan\`).
@@ -33,7 +39,12 @@ Exit codes
   2  a dry run found work outstanding — configuration drift, not an error
 `;
 
+/** The commands this version answers to. `login` and `new` are specced, not built. */
+const COMMANDS = ['apply'] as const;
+type Command = (typeof COMMANDS)[number];
+
 interface Args {
+  command?: Command;
   plan?: string;
   srv?: string;
   api: string;
@@ -44,6 +55,18 @@ interface Args {
 
 function parseArgs(argv: string[]): Args {
   const args: Args = { api: DEFAULT_API, dryRun: false, json: false, help: false };
+
+  // The first bare word is the command. Taken before the option loop so an
+  // unknown one is rejected as a command rather than as a stray option.
+  const first = argv[0];
+  if (first !== undefined && !first.startsWith('-')) {
+    if (!(COMMANDS as readonly string[]).includes(first)) {
+      throw new Error(`unknown command: ${first}\nAvailable: ${COMMANDS.join(', ')}`);
+    }
+    args.command = first as Command;
+    argv = argv.slice(1);
+  }
+
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     switch (a) {
@@ -158,9 +181,13 @@ function summarise(report: PlanReport): void {
 async function main(): Promise<number> {
   const args = parseArgs(process.argv.slice(2));
 
-  if (args.help) {
-    process.stdout.write(USAGE);
-    return 0;
+  if (args.help || args.command === undefined) {
+    // No command is not an error worth a non-zero exit only when it was asked
+    // for: `rhc` alone should show what it can do, `rhc --plan x` should not
+    // silently guess that `apply` was meant.
+    const asked = args.help || process.argv.length <= 2;
+    (asked ? process.stdout : process.stderr).write(USAGE);
+    return asked ? 0 : 1;
   }
   if (!args.plan || !args.srv) {
     process.stderr.write(`--plan and --srv are both required.\n${USAGE}`);

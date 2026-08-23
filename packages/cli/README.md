@@ -1,4 +1,4 @@
-# @restheart-cloud/kit-config
+# @restheart-cloud/cli
 
 Configure a RESTHeart Cloud service from a plan committed to git.
 
@@ -12,13 +12,13 @@ This package makes it a file:
 
 ```ts
 // rh-plan.ts
-import { ecommercePlan } from '@restheart-cloud/kit-config/recipes/ecommerce';
+import { ecommercePlan } from '@restheart-cloud/cli/recipes/ecommerce';
 
 export default ecommercePlan({ appOrigin: 'https://shop.example.com' });
 ```
 
 ```bash
-npx @restheart-cloud/kit-config --plan ./rh-plan.ts --srv ea820b
+npx @restheart-cloud/cli apply --plan ./rh-plan.ts --srv ea820b
 ```
 
 ```
@@ -33,6 +33,30 @@ Ecommerce on ea820b: 1 satisfied, 5 applied
 ```
 
 Run it again and every line is `·` — satisfied, nothing written.
+
+## Installing
+
+Two install shapes, because there are two things here and they are used at different moments.
+
+```bash
+npm i -g @restheart-cloud/cli    # the `rhc` command, for a terminal
+npm i -D @restheart-cloud/cli    # the library, for a project whose plan file imports it
+```
+
+A plan file imports `definePlan`, `step`, `fromEnv` and the recipes, so a project that has one
+wants the local dependency — a global install is not on Node's resolution path and the import
+would not resolve. The `rhc` command is account-level and outlives any one project, so it wants
+the global one. Installing both is normal here, the same way `vite` is both a bin and the module
+`defineConfig` comes from.
+
+In a pipeline, neither: `npx @restheart-cloud/cli apply …` and nothing to keep installed.
+
+The two copies do not conflict. `fromEnv` markers are matched with `Symbol.for`, which is the
+global symbol registry rather than a per-module identity, and a `Plan` is plain data —
+`{ name, steps: [{ name, check, apply }] }`, no `instanceof`, no shared class. So the `rhc` you
+have installed can run a plan built against a different version of the library. That is a
+property to preserve, not an accident: a `Symbol()` in place of `Symbol.for` would break it
+silently.
 
 ## Node only, and not by accident
 
@@ -54,7 +78,7 @@ The unit is not an operation, it is a **step**: a `check` that answers satisfied
 `apply` that makes it so.
 
 ```ts
-import { definePlan, step } from '@restheart-cloud/kit-config';
+import { definePlan, step } from '@restheart-cloud/cli';
 
 export default definePlan('Blog', [
   step('posts collection', {
@@ -138,7 +162,7 @@ environment variables is already shaped like a CI job.
 
 ```yaml
 # .github/workflows/deploy.yml
-- run: npx @restheart-cloud/kit-config --plan ./rh-plan.ts --srv ea820b
+- run: npx @restheart-cloud/cli apply --plan ./rh-plan.ts --srv ea820b
   env:
     RH_CLOUD_EMAIL: ${{ secrets.RH_CLOUD_EMAIL }}
     RH_CLOUD_PASSWORD: ${{ secrets.RH_CLOUD_PASSWORD }}
@@ -150,7 +174,7 @@ environment variables is already shaped like a CI job.
 # bitbucket-pipelines.yml
 - step:
     script:
-      - npx @restheart-cloud/kit-config --plan ./rh-plan.ts --srv ea820b
+      - npx @restheart-cloud/cli apply --plan ./rh-plan.ts --srv ea820b
     # RH_CLOUD_*, STRIPE_* as repository or deployment variables
 ```
 
@@ -170,6 +194,8 @@ misconfigured Stripe key fails the pipeline before it can report success.
 ## CLI
 
 ```
+rhc apply --plan <file> --srv <id> [options]
+
 --plan <file>   A module exporting a plan (default export, or `plan`).
                 A function export is called with no arguments.
 --srv <id>      The service to configure.
@@ -177,6 +203,14 @@ misconfigured Stripe key fails the pipeline before it can report success.
 --api <url>     Admin node (default https://cloud-api.restheart.com).
 --json          Emit the report as JSON instead of a step list.
 ```
+
+`apply` is the only command today. `rhc login` and `rhc new free|shared` — a stored session and
+service creation from the terminal — are specified in
+[`specs/todo/provisioning.md`](../../specs/todo/provisioning.md) and not built. The subcommand is
+there from the first release so that adding them is not a breaking change.
+
+Provisioning will deliberately not be reachable from a plan: a pipeline re-runs a plan on every
+merge, and a step that could create a *shared* service would start a purchase per merge.
 
 A `.ts` plan needs a runtime that can load one — Node 22.18+ strips types on its own, anything
 earlier wants `npx tsx`.

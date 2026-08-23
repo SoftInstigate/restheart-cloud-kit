@@ -37,9 +37,11 @@ jobs:
           npm pkg set version=${{ github.ref_name }} -w packages/kit-ng
           npm pkg set version=${{ github.ref_name }} -w packages/kit-react
           npm pkg set version=${{ github.ref_name }} -w packages/kit-vue
+          npm pkg set version=${{ github.ref_name }} -w packages/cli
           npm pkg set dependencies.@restheart-cloud/kit=${{ github.ref_name }} -w packages/kit-ng
           npm pkg set dependencies.@restheart-cloud/kit=${{ github.ref_name }} -w packages/kit-react
           npm pkg set dependencies.@restheart-cloud/kit=${{ github.ref_name }} -w packages/kit-vue
+          npm pkg set dependencies.@restheart-cloud/kit=${{ github.ref_name }} -w packages/cli
 
       - run: npm install
 
@@ -67,3 +69,4 @@ jobs:
           npm publish --access public packages/kit-ng/dist
           npm publish --access public -w packages/kit-react
           npm publish --access public -w packages/kit-vue
+          npm publish --access public -w packages/cli

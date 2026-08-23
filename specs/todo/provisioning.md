@@ -1,6 +1,6 @@
 # `rhc` — a session, and a service you can create from the terminal
 
-**Status:** to do. **Repo:** `restheart-cloud-kit`, inside the existing `@restheart-cloud/kit-config`.
+**Status:** to do. **Repo:** `restheart-cloud-kit`, inside the existing `@restheart-cloud/cli`.
 **Depends on:** `GET /srv-tiers` on the admin node — see
 `restheart-cloud-server/specs/todo/srv-tiers-endpoint.md`. Everything else exists today.
 **Related:** [`configuration.md`](./configuration.md), whose CLI this extends.
@@ -43,16 +43,20 @@ rhc new shared --name shop      # a service, after you pay for it in a browser
 rhc apply --plan ./rh-plan.ts --srv ea820b
 ```
 
-`rhc` replaces `rh-config` as the bin name. The tool is no longer only about configuration, and
-`rh-config login` would read as a lie. `apply` is what the current flag-only invocation becomes;
-the flags are unchanged.
+`rhc` and the `apply` subcommand are **already in place** — the package was renamed from
+`kit-config` to `@restheart-cloud/cli` and the subcommand introduced before the first publish, so
+that adding `login` and `new` is not a breaking change. `apply` is what the flag-only invocation
+became; its flags are unchanged.
 
 Same package. `login`, `new` and `apply` share the admin client, the session and the error
-handling, and splitting them would duplicate all three to buy a smaller npm page.
+handling, and splitting them would duplicate all three to buy a smaller npm page. The package is
+installed globally for `rhc` and locally for a project's plan file — two shapes for two audiences,
+which works because a `Plan` is plain data and `fromEnv` matches with `Symbol.for`, so the two
+copies interoperate.
 
 ## Task 1 — the session
 
-**File:** `packages/kit-config/src/session.ts`
+**File:** `packages/cli/src/session.ts`
 
 `/token` on the admin node has `ttl: 1440` (`etc/prod-admin.yml:132`) — twenty-four hours. That is
 what makes `rhc login` worth having rather than a synonym for setting two environment variables:
@@ -75,7 +79,7 @@ message says that and nothing else.
 
 ## Task 2 — `rhc new free`
 
-**File:** `packages/kit-config/src/commands/new.ts`
+**File:** `packages/cli/src/commands/new.ts`
 
 `POST /provision/free` with `{name, region, tags, org}`. The `srvId` is not in the body — it is in
 the `Location` header, as the service URL, and gets parsed out of the hostname.

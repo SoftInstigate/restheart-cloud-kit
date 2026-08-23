@@ -292,9 +292,9 @@ implementations pinned to a kit version, or the ongoing maintenance is budgeted 
 
 ---
 
-## 6. What `kit-config` is not
+## 6. What the CLI is not
 
-`@restheart-cloud/kit-config` sits in this monorepo and depends on the core, so it looks like a
+`@restheart-cloud/cli` sits in this monorepo and depends on the core, so it looks like a
 fourth adapter in the tree listing. It is not one, and the difference is worth stating once so
 nobody re-litigates it in six months.
 
@@ -319,7 +319,7 @@ that is not a browser, passes. A browser-facing configuration surface is therefo
 that can be built, whatever API is put in front of it.
 
 That constraint happens to agree with the security reading. The credential the adapters handle is
-a **tenant** token, scoped to one service. The credential `kit-config` handles is the **RESTHeart
+a **tenant** token, scoped to one service. The credential the CLI handles is the **RESTHeart
 Cloud account**, which governs every service on it and its billing. Those do not belong in the
 same layer, and one of them does not belong in a deployed page at all.
 
@@ -329,12 +329,12 @@ The layering, then:
 @restheart-cloud/kit             the core — login, apiFetch, the error type
         │
         ├── kit-ng / kit-react / kit-vue     browser, tenant token, reactive state
-        └── kit-config                       Node, SaaS account, no state at all
+        └── @restheart-cloud/cli            Node, SaaS account, no state at all
 ```
 
-`kit-config` reuses `login` and `apiFetch` for the admin node — supplying its own
+`@restheart-cloud/cli` reuses `login` and `apiFetch` for the admin node — supplying its own
 `getToken`/`setToken`, because `AuthConfig`'s default store is `localStorage` and Node has none.
 It does *not* use `apiFetch` for the service node: `apiFetch` validates that the base URL is a
 `*.restheart.com` service, which is a real guard on a browser-facing kit, and a service node's URL
 is server-issued rather than caller-chosen (`http://…​.cloud.local:8081` in a local integration
-environment). See [`packages/kit-config/README.md`](../packages/kit-config/README.md).
+environment). See [`packages/cli/README.md`](../packages/cli/README.md).

@@ -18,7 +18,7 @@
  * dry run never resolves one at all, because a dry run runs no `apply`.
  */
 
-const MARKER = Symbol.for('@restheart-cloud/kit-config:fromEnv');
+const MARKER = Symbol.for('@restheart-cloud/cli:fromEnv');
 
 export interface EnvRef {
   readonly [MARKER]: true;
