@@ -20,14 +20,14 @@ export type { ServiceClient, Document, IndexKeys } from './service.js';
 
 export { isApiError } from './http.js';
 
-export { step, definePlan, runPlan } from './plan.js';
+export { step, defineSetup, runSetup } from './setup.js';
 export type {
   Step,
   StepContext,
   StepState,
   StepResult,
-  Plan,
-  PlanReport,
+  Setup,
+  SetupReport,
   ProgressEvent,
   RunOptions,
-} from './plan.js';
+} from './setup.js';

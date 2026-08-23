@@ -176,10 +176,10 @@ step satisfied; the same run against an empty one configures it; the second run 
 
 ## Task 3 — the step runner
 
-**File:** `packages/cli/src/plan.ts`
+**File:** `packages/cli/src/setup.ts`
 
 ```ts
-const plan = definePlan('Ecommerce', [
+const setup = defineSetup('Ecommerce', [
   step('catalog collection', {
     check: ({ service }) => service.collectionExists('catalog'),
     apply: ({ service }) => service.createCollection('catalog'),
@@ -194,11 +194,11 @@ const plan = definePlan('Ecommerce', [
   }),
 ]);
 
-const report = await runPlan(plan, { admin, srvId, dryRun: false });
+const report = await runSetup(setup, { admin, srvId, dryRun: false });
 ```
 
 A step receives a **context**, `{ service, admin, srvId }`, not a bare service client: Task 5's
-plugin steps — install, config, init — are admin-node operations, and a plan that could only reach
+plugin steps — install, config, init — are admin-node operations, and a setup that could only reach
 the service node could not express them. `srvId` rides along so a step body never has to close
 over the value the runner was given.
 
@@ -221,10 +221,10 @@ Progress is a callback, not `console.log` — the CLI subscribes to it, and so c
 **Acceptance:** a step whose `apply` succeeds but whose `check` still fails is reported failed; a
 dry run writes nothing.
 
-### Secrets in a plan that lives in git
+### Secrets in a setup that lives in git
 
-A plan file for a real starter (Task 5) is committed alongside the code it configures. A step's
-`apply` needs a live Stripe secret key; the plan file must never hold one.
+A setup file for a real starter (Task 5) is committed alongside the code it configures. A step's
+`apply` needs a live Stripe secret key; the setup file must never hold one.
 
 ```ts
 apply: ({ admin, srvId }) => admin.updatePluginConfig(srvId, 'stripe', {
@@ -237,7 +237,7 @@ apply: ({ admin, srvId }) => admin.updatePluginConfig(srvId, 'stripe', {
 admin client, walking the payload immediately before serialising it — so the secret exists as a
 value only inside the request that carries it. It reads through an injectable `env` record
 defaulting to `globalThis.process?.env ?? {}`, which keeps the client layer free of a Node import
-(the Dominant constraint) and lets a unit test supply an environment without setting one. It is never returned to the plan, never held in the
+(the Dominant constraint) and lets a unit test supply an environment without setting one. It is never returned to the setup, never held in the
 report, and a dry run never resolves one at all, because a dry run runs no `apply`.
 
 An unset variable fails the step with *"missing STRIPE_SECRET_KEY"*. The failure names the
@@ -245,17 +245,17 @@ variable, which is not a secret; the marker's `toString` is the same name, so a 
 into a log through some other path prints `fromEnv(STRIPE_SECRET_KEY)` rather than anything
 useful.
 
-**Acceptance:** a plan referencing `fromEnv('STRIPE_SECRET_KEY')` applies correctly when the
+**Acceptance:** a setup referencing `fromEnv('STRIPE_SECRET_KEY')` applies correctly when the
 variable is set, and fails naming the variable rather than sending `undefined` and collecting a
-provider-side rejection when it is not; a dry run of that plan touches `process.env` not at all.
+provider-side rejection when it is not; a dry run of that setup touches `process.env` not at all.
 
 ## Task 4 — the CLI
 
 **File:** `packages/cli/src/cli.ts`, `bin` entry
 
 ```bash
-npx @restheart-cloud/cli apply --plan ./rh-plan.ts --srv ea820b
-npx @restheart-cloud/cli apply --plan ./rh-plan.ts --srv ea820b --dry-run
+npx @restheart-cloud/cli setup --srv ea820b
+npx @restheart-cloud/cli setup --srv ea820b --dry-run
 ```
 
 Credentials by prompt or environment (`RH_CLOUD_EMAIL`, `RH_CLOUD_PASSWORD`) — never by flag, which
@@ -272,7 +272,7 @@ job, not shaped into one after the fact.
 
 ```yaml
 # .github/workflows/deploy.yml
-- run: npx @restheart-cloud/cli apply --plan ./rh-plan.ts --srv ea820b
+- run: npx @restheart-cloud/cli setup --srv ea820b
   env:
     RH_CLOUD_EMAIL: ${{ secrets.RH_CLOUD_EMAIL }}
     RH_CLOUD_PASSWORD: ${{ secrets.RH_CLOUD_PASSWORD }}
@@ -283,7 +283,7 @@ job, not shaped into one after the fact.
 # bitbucket-pipelines.yml
 - step:
     script:
-      - npx @restheart-cloud/cli apply --plan ./rh-plan.ts --srv ea820b
+      - npx @restheart-cloud/cli setup --srv ea820b
     # RH_CLOUD_EMAIL, RH_CLOUD_PASSWORD, STRIPE_SECRET_KEY set as repository/deployment variables
 ```
 
@@ -300,27 +300,27 @@ writes; the same command, run as a GitHub Actions step with secrets set as repos
 as a Bitbucket Pipelines step with them set as repository/deployment variables, produces the same
 result.
 
-## Task 5 — the ecommerce plan, as the first real consumer
+## Task 5 — the ecommerce setup, as the first real consumer
 
-**File:** `rh-plan.ts` **in `restheart-cloud-starter-ecommerce`**, not in this repo.
+**File:** `rhc.setup.ts` **in `restheart-cloud-starter-ecommerce`**, not in this repo.
 
 The three settings the starter's README currently asks the developer to get right by hand — the
 `success-url`, the anonymous `GET /catalog`, the anonymous `POST /orders` — become steps, plus the
 collections, the indexes and the `stripe` plugin's install/config/init.
 
-This is the test of whether the generic surface is actually general: if the plan cannot express
+This is the test of whether the generic surface is actually general: if the setup cannot express
 those without reaching around the API, the API is wrong.
 
-**It lives in the starter, not here.** This package ships the surface a plan is written against;
-a plan is the configuration of one application, and belongs beside the code that depends on it so
+**It lives in the starter, not here.** This package ships the surface a setup is written against;
+a setup is the configuration of one application, and belongs beside the code that depends on it so
 the two change in the same commit. Shipping it here as a `recipes/` export would have made this
 package the owner of another repo's configuration — and would have weakened the test above, since
 a recipe compiled inside the package can reach module-private internals that a real consumer
 cannot. Importing only from the public entry point is what makes "the surface is general" a claim
 with evidence.
 
-The corollary is that the runner's own tests must not depend on that plan. They use a synthetic
-multi-step target instead (`plan.test.ts`), which is what actually needs asserting here:
+The corollary is that the runner's own tests must not depend on that setup. They use a synthetic
+multi-step target instead (`setup.test.ts`), which is what actually needs asserting here:
 idempotence, an honest dry run, and applying only what is outstanding.
 
 **Acceptance:** a fresh service goes from empty to a working shop with one command, and the
@@ -340,7 +340,7 @@ re-litigates it in six months.
 
 `Task 1` → `Task 2` → `Task 3` → `Task 5` → `Task 4` → `Task 6`.
 
-Task 5 before Task 4 on purpose: the plan for a real service is what proves the runner's shape, and
+Task 5 before Task 4 on purpose: the setup for a real service is what proves the runner's shape, and
 it is cheaper to change that shape before a CLI is built on top of it.
 
 ## Out of scope
@@ -359,7 +359,7 @@ it is cheaper to change that shape before a CLI is built on top of it.
 **A plugin's schema is reachable before it is installed.** `handleListServicePlugins` builds
 `available` by reading the whole `plugins` catalog collection, so `GET /plugins-mgmt/{srvId}`
 already returns every plugin's `config_schema` — installed or not. `configSchema()` reads it from
-there, one call, and a plan can be validated before the run rather than four steps into it.
+there, one call, and a setup can be validated before the run rather than four steps into it.
 
 **`install` takes no configuration.** `handleInstallPlugin` builds the initial config itself and
 ignores the request body, so configuring a plugin is always a second step. That is the better
@@ -382,15 +382,25 @@ is free and real); the service client uses a small internal `request()` that pro
 
 ## Where this stands
 
-Written and unit-tested: `packages/cli`, with `src/{types,env,http,admin,service,plan,cli}.ts` and
-unit suites for each. The ecommerce plan is `rh-plan.ts` in the starter's own repo. Nothing has run
+Written and unit-tested: `packages/cli`, with `src/{types,env,http,admin,service,setup,cli}.ts` and
+unit suites for each. The ecommerce setup is `rhc.setup.ts` in the starter's own repo. Nothing has run
 against a live service yet.
 
-Three departures from what is written above:
+Four departures from what is written above:
 
+- **"Setup", not "plan".** This spec called the file a *plan*, and that word is borrowed from
+  Terraform — where it means the **output of a dry run**, not the input file. Terraform's input is
+  a *configuration*; `terraform plan` is the command that says what would change. Using their word
+  for the opposite thing is worse than not borrowing it, and it showed: the word had to be
+  explained every time it appeared. The nearer ancestor was never Terraform but Ansible — a list of
+  named idempotent tasks reporting `ok/changed/skipped/failed`, which is literally
+  `satisfied/applied/skipped/failed`. So: `defineSetup`, `runSetup`, `Setup`, `SetupReport`,
+  `rhc setup`, and `rhc.setup.ts` discovered by convention so the flag can be dropped.
+  "Config" was the alternative and lost on collision: this tool already reads and writes plugin
+  *config*, and two meanings of the word in one tool is a real cost.
 - **The package is `@restheart-cloud/cli`, not `@restheart-cloud/kit-config`,** and the bin is
-  `rhc apply` rather than a bare `rh-config`. See [`provisioning.md`](./provisioning.md) — a global
-  install of a package named `kit-config` would not have satisfied a plan file's import anyway.
+  `rhc setup` rather than a bare `rh-config`. See [`provisioning.md`](./provisioning.md) — a global
+  install of a package named `kit-config` would not have satisfied a setup file's import anyway.
 - **A sixth ecommerce step.** The starter's README lists three settings that must line up; writing
   them as code exposed a fourth, `orders-read-anon`, without which the buyer pays, lands on
   `/shop/order` and is answered `401` by the page whose whole job is to reassure them. That the
@@ -403,10 +413,10 @@ Outstanding:
 
 - **A live run.** Task 5's acceptance — "a fresh service goes from empty to a working shop with one
   command" — is the only one no unit test can stand in for.
-- **Publishing.** The starter's `rh-plan.ts` imports `@restheart-cloud/cli`, which is unpublished,
+- **Publishing.** The starter's `rhc.setup.ts` imports `@restheart-cloud/cli`, which is unpublished,
   so the starter cannot yet declare the dependency and its README keeps the manual checklist
-  alongside the plan. Both close with the first release that includes this package.
-- **`testPlugin` is unused by any plan.** It validates a stored config against the real provider,
+  alongside the setup. Both close with the first release that includes this package.
+- **`testPlugin` is unused by any setup.** It validates a stored config against the real provider,
   which is a better check for "stripe configured" than comparing fields — but it is a network call
   to Stripe inside a `check`, run on every dry run. Worth deciding deliberately rather than by
   default.

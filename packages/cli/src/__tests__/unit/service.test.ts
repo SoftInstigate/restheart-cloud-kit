@@ -147,7 +147,7 @@ describe('service client', () => {
   });
 
   it('resolves fromEnv on the way out, like the admin client does', async () => {
-    // The admin client is not the only place a plan can want a secret — a user
+    // The admin client is not the only place a setup can want a secret — a user
     // document has a password. A marker that got here unresolved would be
     // written as an object, and only its `toJSON` guard would say so.
     const { admin, calls } = harness({ 'PUT /users/robot': { status: 201 } });

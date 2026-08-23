@@ -35,14 +35,14 @@ the access token is delivered in SPA and server-rendered apps.
 
 **[`@restheart-cloud/cli`](./packages/cli/README.md)** [![npm](https://img.shields.io/npm/v/@restheart-cloud/cli)](https://www.npmjs.com/package/@restheart-cloud/cli)  
 The other half of forking a starter: the service it talks to. Collections, indexes, ACL
-permissions and plugin configuration as a plan committed to git, applied idempotently — so the
+permissions and plugin configuration as a setup file committed to git, applied idempotently — so the
 README checklist becomes one command, and a `--dry-run` in CI tells you what a service is missing
 before a deploy claims it worked.
 
 ```bash
 npm i -g @restheart-cloud/cli                # the `rhc` command
-npm i -D @restheart-cloud/cli                # the library, for a project's plan file
-npx @restheart-cloud/cli apply --plan ./rh-plan.ts --srv ea820b   # a pipeline
+npm i -D @restheart-cloud/cli                # the library, for a project's setup file
+npx @restheart-cloud/cli setup --srv ea820b   # a pipeline
 ```
 
 Not an adapter: it runs in Node rather than a browser, holds no reactive state, and authenticates

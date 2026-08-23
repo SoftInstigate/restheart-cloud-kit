@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { definePlan, runPlan, step, type ProgressEvent } from '../../plan.js';
+import { defineSetup, runSetup, step, type ProgressEvent } from '../../setup.js';
 import type { AdminClient } from '../../admin.js';
 import type { ServiceClient } from '../../service.js';
 import { fromEnv, MissingEnvError } from '../../env.js';
@@ -7,12 +7,12 @@ import { fromEnv, MissingEnvError } from '../../env.js';
 const admin = {} as AdminClient;
 const service = {} as ServiceClient;
 
-const run = (steps: Parameters<typeof definePlan>[1], dryRun = false, onProgress?: (e: ProgressEvent) => void) =>
-  runPlan(definePlan('Test', steps), { admin, srvId: 'ea820b', service, dryRun, ...(onProgress ? { onProgress } : {}) });
+const run = (steps: Parameters<typeof defineSetup>[1], dryRun = false, onProgress?: (e: ProgressEvent) => void) =>
+  runSetup(defineSetup('Test', steps), { admin, srvId: 'ea820b', service, dryRun, ...(onProgress ? { onProgress } : {}) });
 
-const states = (report: Awaited<ReturnType<typeof runPlan>>) => report.steps.map(s => s.state);
+const states = (report: Awaited<ReturnType<typeof runSetup>>) => report.steps.map(s => s.state);
 
-describe('runPlan', () => {
+describe('runSetup', () => {
   it('leaves a satisfied step alone', async () => {
     const apply = vi.fn();
     const report = await run([step('already there', { check: () => true, apply })]);
@@ -154,16 +154,16 @@ describe('runPlan', () => {
 });
 
 /**
- * The properties a real plan is written to have, against a target that
+ * The properties a real setup is written to have, against a target that
  * remembers what was done to it.
  *
- * Deliberately synthetic. A concrete plan — the ecommerce one — belongs to the
+ * Deliberately synthetic. A concrete setup — the ecommerce one — belongs to the
  * application it configures and lives in that starter's repo; what has to hold
- * *here* is that the runner gives any such plan idempotence and an honest dry
+ * *here* is that the runner gives any such setup idempotence and an honest dry
  * run, and a fake target shows that without tying this suite to one app's
  * collection names.
  */
-describe('a multi-step plan against a stateful target', () => {
+describe('a multi-step setup against a stateful target', () => {
   /** Six things that must exist, none of which do yet. */
   function target() {
     const done = new Set<string>();
@@ -183,15 +183,15 @@ describe('a multi-step plan against a stateful target', () => {
 
   it('configures an empty target, then does nothing at all the second time', async () => {
     const t = target();
-    const plan = definePlan('Six', t.steps);
+    const setup = defineSetup('Six', t.steps);
     const opts = { admin, service, srvId: 'ea820b' };
 
-    const first = await runPlan(plan, opts);
+    const first = await runSetup(setup, opts);
     expect(first.steps.map(s => s.state)).toEqual(Array(6).fill('applied'));
     expect(first.ok).toBe(true);
     expect(t.writes).toHaveLength(6);
 
-    const second = await runPlan(plan, opts);
+    const second = await runSetup(setup, opts);
     expect(second.steps.map(s => s.state)).toEqual(Array(6).fill('satisfied'));
     expect(second.ok).toBe(true);
     // The point of the whole exercise: a re-run is not a cheaper run, it is no
@@ -203,7 +203,7 @@ describe('a multi-step plan against a stateful target', () => {
     const t = target();
     t.done.add('collection');
 
-    const report = await runPlan(definePlan('Six', t.steps), {
+    const report = await runSetup(defineSetup('Six', t.steps), {
       admin,
       service,
       srvId: 'ea820b',
@@ -222,7 +222,7 @@ describe('a multi-step plan against a stateful target', () => {
     t.done.add('collection');
     t.done.add('plugin');
 
-    const report = await runPlan(definePlan('Six', t.steps), { admin, service, srvId: 'ea820b' });
+    const report = await runSetup(defineSetup('Six', t.steps), { admin, service, srvId: 'ea820b' });
 
     expect(report.steps.map(s => s.state)).toEqual([
       'satisfied', 'applied', 'satisfied', 'applied', 'applied', 'applied',

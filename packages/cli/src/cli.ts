@@ -1,28 +1,42 @@
 #!/usr/bin/env node
 import { createInterface } from 'node:readline';
 import { pathToFileURL } from 'node:url';
+import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createAdminClient } from './admin.js';
-import { runPlan, type Plan, type PlanReport, type ProgressEvent } from './plan.js';
+import { runSetup, type Setup, type SetupReport, type ProgressEvent } from './setup.js';
 
 const DEFAULT_API = 'https://cloud-api.restheart.com';
+
+/**
+ * Looked for in the working directory when `--file` is not given.
+ *
+ * Conventional rather than configurable on purpose: `rhc setup --srv ea820b`
+ * is the command people type dozens of times, and a flag that is always the
+ * same value is a flag worth not typing. `.ts` first because that is what a
+ * setup is normally written in — it wants the types.
+ */
+const DEFAULT_FILES = ['rhc.setup.ts', 'rhc.setup.mts', 'rhc.setup.js', 'rhc.setup.mjs'];
 
 const USAGE = `
 rhc — the RESTHeart Cloud CLI
 
-  rhc apply --plan ./rh-plan.ts --srv ea820b
-  rhc apply --plan ./rh-plan.ts --srv ea820b --dry-run
+  rhc setup --srv ea820b
+  rhc setup --srv ea820b --dry-run
 
   npm i -g @restheart-cloud/cli   for a terminal
-  npx @restheart-cloud/cli apply  for a pipeline
+  npx @restheart-cloud/cli setup  for a pipeline
 
 Commands
-  apply           Apply a configuration plan to a service.
+  setup           Bring a service to the state your setup file describes.
+                  Every step is a check and an apply, so running it against a
+                  service already set up writes nothing.
 
 Options
-  --plan <file>   A module exporting a plan (default export, or \`plan\`).
+  --file <path>   A module exporting a setup (default export, or \`setup\`).
                   A function export is called with no arguments.
-  --srv <id>      The service to configure.
+                  Defaults to ./${DEFAULT_FILES[0]}.
+  --srv <id>      The service to set up.
   --dry-run       Run every check, apply nothing, write nothing.
   --api <url>     Admin node (default ${DEFAULT_API}).
   --json          Emit the report as JSON instead of a step list.
@@ -40,12 +54,12 @@ Exit codes
 `;
 
 /** The commands this version answers to. `login` and `new` are specced, not built. */
-const COMMANDS = ['apply'] as const;
+const COMMANDS = ['setup'] as const;
 type Command = (typeof COMMANDS)[number];
 
 interface Args {
   command?: Command;
-  plan?: string;
+  file?: string;
   srv?: string;
   api: string;
   dryRun: boolean;
@@ -70,7 +84,7 @@ function parseArgs(argv: string[]): Args {
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     switch (a) {
-      case '--plan': args.plan = argv[++i]; break;
+      case '--file': args.file = argv[++i]; break;
       case '--srv': args.srv = argv[++i]; break;
       case '--api': args.api = argv[++i] ?? DEFAULT_API; break;
       case '--dry-run': args.dryRun = true; break;
@@ -79,7 +93,7 @@ function parseArgs(argv: string[]): Args {
       case '-h': args.help = true; break;
       default:
         // Rather than ignore it: a misspelled --dry-run that silently applied
-        // the plan is the worst failure this tool could have.
+        // the setup is the worst failure this tool could have.
         throw new Error(`unknown option: ${a}`);
     }
   }
@@ -87,13 +101,29 @@ function parseArgs(argv: string[]): Args {
 }
 
 /**
- * Load a plan from a module path.
+ * The setup file to load: what `--file` named, or the first conventional name
+ * present in the working directory.
+ */
+function resolveFile(explicit?: string): string {
+  if (explicit !== undefined) return explicit;
+  const found = DEFAULT_FILES.find(f => existsSync(resolve(process.cwd(), f)));
+  if (found === undefined) {
+    throw new Error(
+      `no setup file found. Expected ./${DEFAULT_FILES[0]} in the working directory, ` +
+        'or a path in --file.'
+    );
+  }
+  return found;
+}
+
+/**
+ * Load a setup from a module path.
  *
- * A `.ts` plan needs a runtime that can load one — Node 22.18 and later strip
+ * A `.ts` setup needs a runtime that can load one — Node 22.18 and later strip
  * types on their own, and anything earlier wants `tsx`. Saying so beats an
  * `Unknown file extension` stack trace.
  */
-async function loadPlan(file: string): Promise<Plan> {
+async function loadSetup(file: string): Promise<Setup> {
   const url = pathToFileURL(resolve(process.cwd(), file)).href;
   let mod: Record<string, unknown>;
   try {
@@ -102,19 +132,19 @@ async function loadPlan(file: string): Promise<Plan> {
     const message = err instanceof Error ? err.message : String(err);
     if (/Unknown file extension|Cannot find module/.test(message) && /\.tsx?$/.test(file)) {
       throw new Error(
-        `${message}\n\nA TypeScript plan needs a runtime that can load one: Node 22.18+, or \`npx tsx\`.`
+        `${message}\n\nA TypeScript setup needs a runtime that can load one: Node 22.18+, or \`npx tsx\`.`
       );
     }
     throw err;
   }
 
-  const exported = mod['default'] ?? mod['plan'];
-  const plan = typeof exported === 'function' ? (exported as () => Plan)() : exported;
+  const exported = mod['default'] ?? mod['setup'];
+  const setup = typeof exported === 'function' ? (exported as () => Setup)() : exported;
 
-  if (!plan || typeof plan !== 'object' || !Array.isArray((plan as Plan).steps)) {
-    throw new Error(`${file} does not export a plan (default export, or \`plan\`)`);
+  if (!setup || typeof setup !== 'object' || !Array.isArray((setup as Setup).steps)) {
+    throw new Error(`${file} does not export a setup (default export, or \`setup\`)`);
   }
-  return plan as Plan;
+  return setup as Setup;
 }
 
 async function prompt(question: string, silent = false): Promise<string> {
@@ -167,11 +197,11 @@ function render(e: ProgressEvent): void {
   process.stdout.write(`${counter} ${GLYPH[e.state] ?? ' '} ${e.step}${suffix}\n`);
 }
 
-function summarise(report: PlanReport): void {
+function summarise(report: SetupReport): void {
   const counts = new Map<string, number>();
   for (const s of report.steps) counts.set(s.state, (counts.get(s.state) ?? 0) + 1);
   const parts = [...counts].map(([state, n]) => `${n} ${state}`);
-  process.stdout.write(`\n${report.plan} on ${report.srvId}: ${parts.join(', ')}\n`);
+  process.stdout.write(`\n${report.name} on ${report.srvId}: ${parts.join(', ')}\n`);
 
   if (report.dryRun && report.steps.some(s => s.state === 'missing')) {
     process.stdout.write('Dry run — nothing was written. Re-run without --dry-run to apply.\n');
@@ -183,24 +213,24 @@ async function main(): Promise<number> {
 
   if (args.help || args.command === undefined) {
     // No command is not an error worth a non-zero exit only when it was asked
-    // for: `rhc` alone should show what it can do, `rhc --plan x` should not
-    // silently guess that `apply` was meant.
+    // for: `rhc` alone should show what it can do, `rhc --srv x` should not
+    // silently guess that `setup` was meant.
     const asked = args.help || process.argv.length <= 2;
     (asked ? process.stdout : process.stderr).write(USAGE);
     return asked ? 0 : 1;
   }
-  if (!args.plan || !args.srv) {
-    process.stderr.write(`--plan and --srv are both required.\n${USAGE}`);
+  if (!args.srv) {
+    process.stderr.write(`--srv is required.\n${USAGE}`);
     return 1;
   }
 
-  const plan = await loadPlan(args.plan);
+  const setup = await loadSetup(resolveFile(args.file));
   const { email, password } = await credentials();
 
   const admin = createAdminClient({ apiBaseUrl: args.api });
   await admin.login(email, password);
 
-  const report = await runPlan(plan, {
+  const report = await runSetup(setup, {
     admin,
     srvId: args.srv,
     dryRun: args.dryRun,

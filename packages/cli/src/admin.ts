@@ -37,7 +37,7 @@ export interface AdminClient {
    * A plugin's `config_schema`, or `null` when the catalog does not carry one.
    *
    * Reachable for an *uninstalled* plugin too, because `GET /plugins-mgmt/{srvId}`
-   * returns the whole catalog under `available` — which is what lets a plan be
+   * returns the whole catalog under `available` — which is what lets a setup be
    * validated before a run rather than four steps into it.
    */
   configSchema(srvId: string, pluginId: string): Promise<ConfigSchema | null>;

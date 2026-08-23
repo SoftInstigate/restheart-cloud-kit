@@ -6,7 +6,7 @@ import { isApiError } from './http.js';
 /**
  * What a step is handed.
  *
- * Both clients, not just the service one: a real plan configures plugins, and
+ * Both clients, not just the service one: a real setup configures plugins, and
  * install, config and init are admin-node operations. `srvId` rides along so a
  * step body never has to close over the value the runner was given.
  */
@@ -24,7 +24,7 @@ export interface Step {
   apply(ctx: StepContext): unknown | Promise<unknown>;
 }
 
-export interface Plan {
+export interface Setup {
   name: string;
   steps: Step[];
 }
@@ -55,8 +55,9 @@ export interface StepResult {
   durationMs: number;
 }
 
-export interface PlanReport {
-  plan: string;
+export interface SetupReport {
+  /** The setup's name, as `defineSetup` was given it. */
+  name: string;
   srvId: string;
   dryRun: boolean;
   steps: StepResult[];
@@ -82,7 +83,7 @@ export interface RunOptions {
   dryRun?: boolean;
   /** Where progress goes. The CLI subscribes to this; so could a local page. */
   onProgress?: (event: ProgressEvent) => void;
-  /** For a plan that shares a service client with something else. */
+  /** For a setup that shares a service client with something else. */
   service?: ServiceClient;
 }
 
@@ -94,13 +95,13 @@ export function step(
   return { name, ...halves };
 }
 
-/** Declare a plan: a name, and steps in the order they depend on each other. */
-export function definePlan(name: string, steps: Step[]): Plan {
+/** Declare a setup: a name, and steps in the order they depend on each other. */
+export function defineSetup(name: string, steps: Step[]): Setup {
   return { name, steps };
 }
 
 /**
- * Run a plan against a service.
+ * Set a service up.
  *
  * Sequential, and a failure stops the rest. That is not caution, it is what
  * configuration is like: there is no index before its collection and no plugin
@@ -110,23 +111,23 @@ export function definePlan(name: string, steps: Step[]): Plan {
  * A dry run is the exception — it runs every check, because the point of asking
  * what is missing is to be told all of it at once.
  */
-export async function runPlan(plan: Plan, opts: RunOptions): Promise<PlanReport> {
+export async function runSetup(setup: Setup, opts: RunOptions): Promise<SetupReport> {
   const { admin, srvId, dryRun = false, onProgress } = opts;
   const ctx: StepContext = {
     admin,
     srvId,
     // Lazy all the way down — the client mints no token until a step asks it
-    // to, so a plan of nothing but plugin steps never touches the service node.
+    // to, so a setup of nothing but plugin steps never touches the service node.
     service: opts.service ?? createServiceClient(admin, srvId),
   };
 
   const results: StepResult[] = [];
-  const total = plan.steps.length;
+  const total = setup.steps.length;
   let halted = false;
 
   const emit = (e: ProgressEvent) => onProgress?.(e);
 
-  for (const [i, s] of plan.steps.entries()) {
+  for (const [i, s] of setup.steps.entries()) {
     const index = i + 1;
 
     if (halted) {
@@ -172,7 +173,7 @@ export async function runPlan(plan: Plan, opts: RunOptions): Promise<PlanReport>
   }
 
   return {
-    plan: plan.name,
+    name: setup.name,
     srvId,
     dryRun,
     steps: results,

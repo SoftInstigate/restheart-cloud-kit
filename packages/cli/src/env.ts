@@ -1,9 +1,9 @@
 /**
- * Secrets in a plan that lives in git.
+ * Secrets in a setup that lives in git.
  *
- * A plan file is committed alongside the code it configures, and a step that
+ * A setup file is committed alongside the code it configures, and a step that
  * configures the `stripe` plugin needs a live secret key. `fromEnv` is how the
- * plan names one without holding it: the plan carries a marker, and the marker
+ * setup names one without holding it: the setup carries a marker, and the marker
  * becomes a value in exactly one place — while the admin client serialises the
  * request body that carries it.
  *
@@ -14,7 +14,7 @@
  * }),
  * ```
  *
- * The value is never returned to the plan, never reaches the run report, and a
+ * The value is never returned to the setup, never reaches the run report, and a
  * dry run never resolves one at all, because a dry run runs no `apply`.
  */
 
@@ -55,7 +55,7 @@ export function fromEnv(name: string): string {
     toJSON: () => {
       throw new Error(
         `fromEnv(${name}) reached JSON serialisation unresolved — ` +
-          'this is a bug in @restheart-cloud/cli, not in your plan'
+          'this is a bug in @restheart-cloud/cli, not in your setup'
       );
     },
   };
@@ -81,7 +81,7 @@ export function defaultEnv(): EnvSource {
 }
 
 /**
- * Thrown when a plan references a variable the environment does not have.
+ * Thrown when a setup references a variable the environment does not have.
  *
  * Names the variable — which is not a secret — rather than sending `undefined`
  * and collecting a rejection from the provider three steps later, which reads

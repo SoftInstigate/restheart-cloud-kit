@@ -1,6 +1,6 @@
 # @restheart-cloud/cli
 
-Configure a RESTHeart Cloud service from a plan committed to git.
+Set up a RESTHeart Cloud service from a file committed to git.
 
 A developer who forks a starter gets working code and an unconfigured service. What follows is
 clicking: create the catalog collection, add an index, write the ACL permission that lets a guest
@@ -11,10 +11,10 @@ quiet — a missing anonymous `GET /catalog` permission shows up as *an empty sh
 This package makes it a file:
 
 ```ts
-// rh-plan.ts
-import { definePlan, step } from '@restheart-cloud/cli';
+// rhc.setup.ts
+import { defineSetup, step } from '@restheart-cloud/cli';
 
-export default definePlan('Shop', [
+export default defineSetup('Shop', [
   step('catalog collection', {
     check: ({ service }) => service.collectionExists('catalog'),
     apply: ({ service }) => service.createCollection('catalog'),
@@ -31,7 +31,7 @@ export default definePlan('Shop', [
 ```
 
 ```bash
-npx @restheart-cloud/cli apply --plan ./rh-plan.ts --srv ea820b
+npx @restheart-cloud/cli setup --srv ea820b
 ```
 
 ```
@@ -47,12 +47,12 @@ Ecommerce on ea820b: 1 satisfied, 5 applied
 
 Run it again and every line is `·` — satisfied, nothing written.
 
-That output is [`rh-plan.ts` in the ecommerce starter][starter-plan] — a real plan for a real app,
-which lives in that repo rather than in this one. This package ships the surface a plan is written
-against; a plan belongs to the application it configures, and changes in the same commit as the
+That output is [`rhc.setup.ts` in the ecommerce starter][starter-setup] — a real setup for a real app,
+which lives in that repo rather than in this one. This package ships the surface a setup is written
+against; a setup belongs to the application it configures, and changes in the same commit as the
 code that depends on it.
 
-[starter-plan]: https://github.com/SoftInstigate/restheart-cloud-starter-ecommerce/blob/main/rh-plan.ts
+[starter-setup]: https://github.com/SoftInstigate/restheart-cloud-starter-ecommerce/blob/main/rhc.setup.ts
 
 ## Installing
 
@@ -60,21 +60,21 @@ Two install shapes, because there are two things here and they are used at diffe
 
 ```bash
 npm i -g @restheart-cloud/cli    # the `rhc` command, for a terminal
-npm i -D @restheart-cloud/cli    # the library, for a project whose plan file imports it
+npm i -D @restheart-cloud/cli    # the library, for a project whose setup file imports it
 ```
 
-A plan file imports `definePlan`, `step` and `fromEnv`, so a project that has one
+A setup file imports `defineSetup`, `step` and `fromEnv`, so a project that has one
 wants the local dependency — a global install is not on Node's resolution path and the import
 would not resolve. The `rhc` command is account-level and outlives any one project, so it wants
 the global one. Installing both is normal here, the same way `vite` is both a bin and the module
 `defineConfig` comes from.
 
-In a pipeline, neither: `npx @restheart-cloud/cli apply …` and nothing to keep installed.
+In a pipeline, neither: `npx @restheart-cloud/cli setup …` and nothing to keep installed.
 
 The two copies do not conflict. `fromEnv` markers are matched with `Symbol.for`, which is the
-global symbol registry rather than a per-module identity, and a `Plan` is plain data —
+global symbol registry rather than a per-module identity, and a `Setup` is plain data —
 `{ name, steps: [{ name, check, apply }] }`, no `instanceof`, no shared class. So the `rhc` you
-have installed can run a plan built against a different version of the library. That is a
+have installed can run a setup built against a different version of the library. That is a
 property to preserve, not an accident: a `Symbol()` in place of `Symbol.for` would break it
 silently.
 
@@ -98,9 +98,9 @@ The unit is not an operation, it is a **step**: a `check` that answers satisfied
 `apply` that makes it so.
 
 ```ts
-import { definePlan, step } from '@restheart-cloud/cli';
+import { defineSetup, step } from '@restheart-cloud/cli';
 
-export default definePlan('Blog', [
+export default defineSetup('Blog', [
   step('posts collection', {
     check: ({ service }) => service.collectionExists('posts'),
     apply: ({ service }) => service.createCollection('posts'),
@@ -133,7 +133,7 @@ not halt: it changed nothing, and being told all of what is missing is the point
 
 ## Secrets
 
-A plan lives in git. `fromEnv` is how it names a secret without holding one:
+A setup lives in git. `fromEnv` is how it names a secret without holding one:
 
 ```ts
 step('stripe configured', {
@@ -169,7 +169,7 @@ over the real key. `REDACTED` and `isRedacted()` are exported so you can *recogn
 in this package ever produces one.
 
 A blank or absent secret is **not** redacted, because "not configured" is information you need,
-and turning it into bullets would erase it. That distinction is what lets a plan re-run with no
+and turning it into bullets would erase it. That distinction is what lets a setup re-run with no
 secrets in the environment at all: a stored key comes back as bullets, a check written as
 `isRedacted(v) || v !== ''` passes, and the apply that would have read `STRIPE_SECRET_KEY` never
 runs.
@@ -183,7 +183,7 @@ environment variables is already shaped like a CI job.
 
 ```yaml
 # .github/workflows/deploy.yml
-- run: npx @restheart-cloud/cli apply --plan ./rh-plan.ts --srv ea820b
+- run: npx @restheart-cloud/cli setup --srv ea820b
   env:
     RH_CLOUD_EMAIL: ${{ secrets.RH_CLOUD_EMAIL }}
     RH_CLOUD_PASSWORD: ${{ secrets.RH_CLOUD_PASSWORD }}
@@ -195,7 +195,7 @@ environment variables is already shaped like a CI job.
 # bitbucket-pipelines.yml
 - step:
     script:
-      - npx @restheart-cloud/cli apply --plan ./rh-plan.ts --srv ea820b
+      - npx @restheart-cloud/cli setup --srv ea820b
     # RH_CLOUD_*, STRIPE_* as repository or deployment variables
 ```
 
@@ -215,11 +215,12 @@ misconfigured Stripe key fails the pipeline before it can report success.
 ## CLI
 
 ```
-rhc apply --plan <file> --srv <id> [options]
+rhc setup --srv <id> [options]
 
---plan <file>   A module exporting a plan (default export, or `plan`).
+--file <path>   A module exporting a setup (default export, or `setup`).
                 A function export is called with no arguments.
---srv <id>      The service to configure.
+                Defaults to ./rhc.setup.ts in the working directory.
+--srv <id>      The service to set up.
 --dry-run       Run every check, apply nothing, write nothing.
 --api <url>     Admin node (default https://cloud-api.restheart.com).
 --json          Emit the report as JSON instead of a step list.
@@ -230,10 +231,10 @@ service creation from the terminal — are specified in
 [`specs/todo/provisioning.md`](../../specs/todo/provisioning.md) and not built. The subcommand is
 there from the first release so that adding them is not a breaking change.
 
-Provisioning will deliberately not be reachable from a plan: a pipeline re-runs a plan on every
+Provisioning will deliberately not be reachable from a setup: a pipeline re-runs a setup on every
 merge, and a step that could create a *shared* service would start a purchase per merge.
 
-A `.ts` plan needs a runtime that can load one — Node 22.18+ strips types on its own, anything
+A `.ts` setup needs a runtime that can load one — Node 22.18+ strips types on its own, anything
 earlier wants `npx tsx`.
 
 ## API
@@ -274,9 +275,9 @@ A check answers `false` on `404` and throws on anything else — a `403` means t
 the thing, which is not the same as the thing not being there, and swallowing it would report
 "missing", apply, and fail again.
 
-### `runPlan(plan, { admin, srvId, dryRun?, onProgress? })`
+### `runSetup(setup, { admin, srvId, dryRun?, onProgress? })`
 
-Returns a `PlanReport`. Progress is a callback, not `console.log` — the CLI subscribes to it, and
+Returns a `SetupReport`. Progress is a callback, not `console.log` — the CLI subscribes to it, and
 so could a local page.
 
 ## Out of scope

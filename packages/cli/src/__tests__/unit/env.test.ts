@@ -22,7 +22,7 @@ describe('fromEnv', () => {
     });
   });
 
-  it('does not mutate the plan it was given', () => {
+  it('does not mutate the setup it was given', () => {
     const config = { 'secret-key': fromEnv('K') };
     resolveEnvRefs(config, { K: 'v' });
     expect(isEnvRef(config['secret-key'])).toBe(true);

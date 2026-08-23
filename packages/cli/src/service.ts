@@ -62,7 +62,7 @@ export function createServiceClient(admin: AdminClient, srvId: string): ServiceC
     if (cached && Date.now() < cached.expiresAt - RENEW_MARGIN_MS) {
       return { token: cached.token, url: cached.url };
     }
-    // Steps run in sequence, but a plan is free to fan out inside one `apply`.
+    // Steps run in sequence, but a setup is free to fan out inside one `apply`.
     // Sharing the in-flight mint keeps that from becoming a burst of identical
     // `/jwt` calls the moment a token turns over.
     if (inFlight) return inFlight;
@@ -91,7 +91,7 @@ export function createServiceClient(admin: AdminClient, srvId: string): ServiceC
   /**
    * Serialise a body, resolving `fromEnv` markers on the way out.
    *
-   * The admin client is not the only place a plan can want a secret: a user
+   * The admin client is not the only place a setup can want a secret: a user
    * document has a password, a permission can carry a token. Without this a
    * marker would reach `JSON.stringify` and, but for its `toJSON` guard, be
    * written as `{"name":"…"}` — an object where the secret should be, with no

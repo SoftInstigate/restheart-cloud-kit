@@ -8,29 +8,29 @@
 ## Why
 
 `configuration.md` configures a service that exists, and says so twice: provisioning is out of
-scope, billing is out of scope. Both exclusions were right *for a plan runner*. Neither is a reason
+scope, billing is out of scope. Both exclusions were right *for a setup runner*. Neither is a reason
 not to have the command.
 
-The gap is small and obvious in use. You have a plan in git, you have a CLI that applies it, and
+The gap is small and obvious in use. You have a setup file in git, you have a CLI that applies it, and
 the first thing you must do is leave the terminal, open a browser, click through a wizard, and come
-back with a six-character id to paste into a flag. The plan describes a service; nothing describes
+back with a six-character id to paste into a flag. The setup describes a service; nothing describes
 how you got one.
 
 ## The dominant constraint
 
 **Provisioning does not go in CI.** Not "not yet" — not at all.
 
-A plan file is committed, and a pipeline re-runs it on every merge. A step that could create a
+A setup file is committed, and a pipeline re-runs it on every merge. A step that could create a
 service would create one per merge, and a step that could create a *shared* service would start a
 purchase per merge. That is not a bug to be guarded against with a flag; it is the wrong thing to
 be reachable from that direction at all.
 
-So provisioning is **a command, not a step**. It is not callable from `runPlan`, no plan can reach
-it, and it refuses to run without a terminal. The plan runner keeps exactly the property it has
+So provisioning is **a command, not a step**. It is not callable from `runSetup`, no setup can reach
+it, and it refuses to run without a terminal. The setup runner keeps exactly the property it has
 today — a run that changes nothing it was not told to change, and can be a deploy gate.
 
 This also dissolves the hard problem from the earlier design sketch. If provisioning were a step,
-`srvId` would stop being an input to `runPlan` and become an output produced mid-run, with every
+`srvId` would stop being an input to `runSetup` and become an output produced mid-run, with every
 later step depending on a value that did not exist when the run started. As a command it is just:
 create, print the id, and the id goes into the next command.
 
@@ -40,18 +40,18 @@ create, print the id, and the id goes into the next command.
 rhc login                       # once a day
 rhc new free   --name shop      # a service, immediately
 rhc new shared --name shop      # a service, after you pay for it in a browser
-rhc apply --plan ./rh-plan.ts --srv ea820b
+rhc setup --srv ea820b
 ```
 
-`rhc` and the `apply` subcommand are **already in place** — the package was renamed from
+`rhc` and the `setup` subcommand are **already in place** — the package was renamed from
 `kit-config` to `@restheart-cloud/cli` and the subcommand introduced before the first publish, so
-that adding `login` and `new` is not a breaking change. `apply` is what the flag-only invocation
-became; its flags are unchanged.
+that adding `login` and `new` is not a breaking change. `setup` is what the flag-only invocation
+became, and it defaults to `./rhc.setup.ts` so the common call is just `rhc setup --srv <id>`.
 
-Same package. `login`, `new` and `apply` share the admin client, the session and the error
+Same package. `login`, `new` and `setup` share the admin client, the session and the error
 handling, and splitting them would duplicate all three to buy a smaller npm page. The package is
-installed globally for `rhc` and locally for a project's plan file — two shapes for two audiences,
-which works because a `Plan` is plain data and `fromEnv` matches with `Symbol.for`, so the two
+installed globally for `rhc` and locally for a project's setup file — two shapes for two audiences,
+which works because a `Setup` is plain data and `fromEnv` matches with `Symbol.for`, so the two
 copies interoperate.
 
 ## Task 1 — the session
@@ -73,8 +73,8 @@ developer's stored session must never be what a CI run silently falls back to, n
 An expired token is not an error to decorate — it is `run rhc login`. The exit is non-zero and the
 message says that and nothing else.
 
-**Acceptance:** `rhc login` then `rhc apply` with no environment variables set works; the same
-`apply` with `RH_CLOUD_*` set uses those and not the file; a session file older than its token's
+**Acceptance:** `rhc login` then `rhc setup` with no environment variables set works; the same
+`setup` with `RH_CLOUD_*` set uses those and not the file; a session file older than its token's
 `exp` produces "session expired, run rhc login" rather than a `401`.
 
 ## Task 2 — `rhc new free`
@@ -97,7 +97,7 @@ region works without a package release.
 answers `403`, which reads as a permissions problem. The command has to say *"you are at your free
 service limit (2, plus 2 per paid service)"*, because that is a sentence the user can act on.
 
-**Acceptance:** creates a service and prints its id, its URL, and the `rhc apply --srv <id>` line
+**Acceptance:** creates a service and prints its id, its URL, and the `rhc setup --srv <id>` line
 to run next; over quota, exits non-zero with the limit explained rather than a `403`.
 
 ## Task 3 — `rhc new shared`
@@ -149,5 +149,5 @@ one that cannot be tested without spending money.
   a running service want a confirmation design of their own, not a fourth subcommand added by
   momentum.
 - **Dedicated services.** No region registry entry, no defined CLI path. The console's job.
-- **A plan step that provisions.** See the dominant constraint. If this is ever revisited, revisit
+- **A setup step that provisions.** See the dominant constraint. If this is ever revisited, revisit
   the constraint first and in writing.

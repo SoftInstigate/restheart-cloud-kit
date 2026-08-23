@@ -125,7 +125,7 @@ describe('admin client', () => {
     await admin.updatePluginConfig('ea820b', 'stripe', config);
 
     expect(calls[0]!.body).toEqual({ 'secret-key': 'sk_test_real', 'success-url': 'https://x.example' });
-    // The plan still holds a marker, not the secret.
+    // The setup still holds a marker, not the secret.
     expect(String(config['secret-key'])).toBe('fromEnv(STRIPE_SECRET_KEY)');
   });
 
