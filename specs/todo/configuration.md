@@ -200,8 +200,14 @@ plugin steps — install, config, init — are admin-node operations, and a plan
 the service node could not express them. `srvId` rides along so a step body never has to close
 over the value the runner was given.
 
-Each step resolves to `satisfied` (check passed, nothing done), `applied`, `failed` or `skipped`
-(a dependency failed). `dryRun` runs checks only — the "what am I missing" answer.
+Each step resolves to `satisfied` (check passed, nothing done), `applied`, `missing`, `failed` or
+`skipped` (a dependency failed). `dryRun` runs checks only — the "what am I missing" answer, and
+`missing` is what it answers with: a step that is merely undone is not a step that went wrong, and
+reporting it as `failed` would make a dry run indistinguishable from a broken one.
+
+A dry run also does not halt on an unsatisfied step, where a real run does: it changed nothing, so
+nothing downstream is any less answerable than it was, and being told all of what is missing is
+the entire point.
 
 The runner re-checks after applying, so a step that silently did nothing is reported as failed
 rather than green. Steps run in order and a failure stops what depends on it, because configuration
@@ -334,11 +340,26 @@ it is cheaper to change that shape before a CLI is built on top of it.
 - **Editing arbitrary RESTHeart configuration.** Only plugin config, which is what
   `/plugins-mgmt/.../config` covers.
 
-## Open question
+## Settled while building Task 1
 
-`GET /plugins-mgmt/{srvId}` returns installed *and* available plugins, and `GET /plugins` returns
-the marketplace catalog with `config_schema`. Whether a plugin's schema is reachable without the
-marketplace call — and whether an uninstalled plugin's schema is visible at all — decides if
-`definePlan` can validate a config block before the run starts, or only after installing. Worth
-settling in Task 1, because "your stripe config was wrong" is much more useful before a run than
-four steps into it.
+**A plugin's schema is reachable before it is installed.** `handleListServicePlugins` builds
+`available` by reading the whole `plugins` catalog collection, so `GET /plugins-mgmt/{srvId}`
+already returns every plugin's `config_schema` — installed or not. `configSchema()` reads it from
+there, one call, and a plan can be validated before the run rather than four steps into it.
+
+**`install` takes no configuration.** `handleInstallPlugin` builds the initial config itself and
+ignores the request body, so configuring a plugin is always a second step. That is the better
+shape anyway: install and configure are separately checkable, and only the second one carries a
+secret. Installing an already-installed plugin answers `409`, which is exactly why
+`isPluginInstalled` exists.
+
+**`PATCH .../config` takes the config document itself**, not `{ config: … }`. `docs/API_REFERENCE.md`
+on the server says otherwise and is stale; `handleUpdateConfig` reads `request.getContent()`
+directly.
+
+**The service URL is not always `*.restheart.com`.** `SrvJwtService` returns
+`http://{srvId}.{node}.cloud.local:8081` in a local integration environment, which the core's
+`apiFetch` would reject — its `*.restheart.com` guard is a browser-safety check, and the service
+URL is server-issued rather than caller-chosen. The admin client uses `apiFetch` (where the guard
+is free and real); the service client uses a small internal `request()` that produces the same
+`ApiError` shape.

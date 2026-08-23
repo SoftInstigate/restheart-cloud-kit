@@ -1,0 +1,147 @@
+import { describe, it, expect, vi } from 'vitest';
+import { createServiceClient } from '../../service.js';
+import type { AdminClient } from '../../admin.js';
+
+/** A JWT whose payload says when it expires. Only `exp` is ever read. */
+function jwt(expiresInMs: number): string {
+  const payload = Buffer.from(
+    JSON.stringify({ exp: Math.floor((Date.now() + expiresInMs) / 1000) })
+  ).toString('base64url');
+  return `header.${payload}.signature`;
+}
+
+interface Call {
+  path: string;
+  method: string;
+  auth: string | null;
+  body: unknown;
+}
+
+function harness(routes: Record<string, { status: number; body?: unknown }>) {
+  const calls: Call[] = [];
+  const transport = async (url: string, init?: RequestInit): Promise<Response> => {
+    const method = init?.method ?? 'GET';
+    const path = new URL(url).pathname;
+    calls.push({
+      path,
+      method,
+      auth: new Headers(init?.headers).get('Authorization'),
+      body: init?.body ? JSON.parse(init.body as string) : undefined,
+    });
+    const route = routes[`${method} ${path}`] ?? { status: 404, body: { message: 'not found' } };
+    return new Response(route.body === undefined ? null : JSON.stringify(route.body), {
+      status: route.status,
+    });
+  };
+
+  const serviceToken = vi.fn(async () => ({
+    token: jwt(15 * 60_000),
+    url: 'https://ea820b.eu-central-free-1.restheart.com',
+    node: 'ea820b.eu-central-free-1.restheart.com',
+  }));
+
+  const admin = { config: { apiBaseUrl: 'https://cloud-api.restheart.com', transport }, serviceToken } as unknown as AdminClient;
+  return { calls, admin, serviceToken };
+}
+
+describe('service client', () => {
+  it('mints a token once and reuses it', async () => {
+    const { admin, serviceToken, calls } = harness({
+      'GET /catalog': { status: 200, body: { _id: 'catalog' } },
+      'GET /orders': { status: 200, body: { _id: 'orders' } },
+    });
+    const service = createServiceClient(admin, 'ea820b');
+
+    await service.collectionExists('catalog');
+    await service.collectionExists('orders');
+
+    expect(serviceToken).toHaveBeenCalledTimes(1);
+    expect(calls.every(c => c.auth?.startsWith('Bearer '))).toBe(true);
+  });
+
+  it('renews a token that is about to expire, without the caller knowing', async () => {
+    // Fifteen minutes is the admin node's TTL, and a run that installs a plugin
+    // and waits for its init can outlive it. A token inside the renewal margin
+    // is spent.
+    const { admin, serviceToken } = harness({ 'GET /catalog': { status: 200, body: {} } });
+    serviceToken.mockImplementation(async () => ({
+      token: jwt(30_000),
+      url: 'https://ea820b.eu-central-free-1.restheart.com',
+      node: 'ea820b.eu-central-free-1.restheart.com',
+    }));
+    const service = createServiceClient(admin, 'ea820b');
+
+    await service.collectionExists('catalog');
+    await service.collectionExists('catalog');
+
+    expect(serviceToken).toHaveBeenCalledTimes(2);
+  });
+
+  it('shares one mint between calls that start together', async () => {
+    const { admin, serviceToken } = harness({ 'GET /catalog': { status: 200, body: {} } });
+    const service = createServiceClient(admin, 'ea820b');
+
+    await Promise.all([
+      service.collectionExists('catalog'),
+      service.collectionExists('catalog'),
+      service.collectionExists('catalog'),
+    ]);
+
+    expect(serviceToken).toHaveBeenCalledTimes(1);
+  });
+
+  it('answers a check with false on 404 and throws on anything else', async () => {
+    const { admin } = harness({
+      'GET /catalog': { status: 200, body: {} },
+      'GET /secret': { status: 403, body: { message: 'forbidden' } },
+    });
+    const service = createServiceClient(admin, 'ea820b');
+
+    expect(await service.collectionExists('catalog')).toBe(true);
+    expect(await service.collectionExists('missing')).toBe(false);
+    // A 403 means the token cannot see it, which is not the same as it not
+    // being there — swallowing it would report "missing", apply, and fail again.
+    await expect(service.collectionExists('secret')).rejects.toMatchObject({ status: 403 });
+  });
+
+  it('finds an index in the collection listing', async () => {
+    const { admin } = harness({
+      'GET /catalog/_indexes': {
+        status: 200,
+        body: [{ _id: '_id_' }, { _id: 'sku_unique' }],
+      },
+    });
+    const service = createServiceClient(admin, 'ea820b');
+
+    expect(await service.indexExists('catalog', 'sku_unique')).toBe(true);
+    expect(await service.indexExists('catalog', 'name_text')).toBe(false);
+    // No collection, no index.
+    expect(await service.indexExists('orders', 'anything')).toBe(false);
+  });
+
+  it('writes through the paths RESTHeart expects', async () => {
+    const { admin, calls } = harness({
+      'PUT /catalog': { status: 201 },
+      'PUT /catalog/_indexes/sku_unique': { status: 201 },
+      'PUT /acl/catalog-read-anon': { status: 201 },
+      'PUT /users/robot': { status: 201 },
+      'PUT /_schemas/orders': { status: 201 },
+    });
+    const service = createServiceClient(admin, 'ea820b');
+
+    await service.createCollection('catalog', { description: 'products' });
+    await service.createIndex('catalog', 'sku_unique', { sku: 1 }, { unique: true });
+    await service.putPermission('catalog-read-anon', { roles: ['$unauthenticated'] });
+    await service.createUser('robot', { roles: ['worker'] });
+    await service.putSchema('orders', { type: 'object' });
+
+    expect(calls.map(c => `${c.method} ${c.path}`)).toEqual([
+      'PUT /catalog',
+      'PUT /catalog/_indexes/sku_unique',
+      'PUT /acl/catalog-read-anon',
+      'PUT /users/robot',
+      'PUT /_schemas/orders',
+    ]);
+    expect(calls[1]!.body).toEqual({ keys: { sku: 1 }, ops: { unique: true } });
+  });
+});
