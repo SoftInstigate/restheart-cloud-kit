@@ -24,6 +24,25 @@ export interface AdminClient {
   /** Authenticate as the RESTHeart Cloud account. Must precede every other call. */
   login(email: string, password: string): Promise<UserInfo>;
 
+  /**
+   * Authenticate with a personal access token instead — what `rhc` does.
+   *
+   * No round trip: a token *is* the credential, where an email and a password
+   * are only the means of getting one. Nothing is verified here; call
+   * {@link verifyToken} for that.
+   */
+  useToken(token: string): void;
+
+  /**
+   * A cheap authenticated read, to find out whether the current credential
+   * works before doing anything that matters.
+   *
+   * `GET /plugins` on purpose: it is the least a `cli` token is granted, so a
+   * token that fails here fails at everything, and one that passes has cleared
+   * both the authenticator and the ACL rather than only the first of the two.
+   */
+  verifyToken(): Promise<void>;
+
   /** The marketplace catalog — `GET /plugins`. Includes each plugin's `config_schema`. */
   pluginCatalog(): Promise<CatalogPlugin[]>;
 
@@ -135,6 +154,14 @@ export function createAdminClient(config: AdminClientConfig): AdminClient {
     env,
 
     login: (email, password) => login(cfg, email, password),
+
+    useToken: (t: string) => {
+      token = t;
+    },
+
+    async verifyToken() {
+      await json<CatalogPlugin[]>('/plugins');
+    },
 
     pluginCatalog: () => json<CatalogPlugin[]>('/plugins'),
 

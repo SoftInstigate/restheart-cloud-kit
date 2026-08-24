@@ -3,8 +3,17 @@ import { createInterface } from 'node:readline';
 import { pathToFileURL } from 'node:url';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { createAdminClient } from './admin.js';
+import { createAdminClient, type AdminClient } from './admin.js';
+import { isApiError } from './http.js';
 import { runSetup, type Setup, type SetupReport, type ProgressEvent } from './setup.js';
+import {
+  TOKEN_VAR,
+  clearSession,
+  resolveToken,
+  sessionPath,
+  writeSession,
+  type ResolvedToken,
+} from './session.js';
 
 const DEFAULT_API = 'https://cloud-api.restheart.com';
 
@@ -18,9 +27,18 @@ const DEFAULT_API = 'https://cloud-api.restheart.com';
  */
 const DEFAULT_FILES = ['rhc.setup.ts', 'rhc.setup.mts', 'rhc.setup.js', 'rhc.setup.mjs'];
 
+/**
+ * What a personal access token starts with.
+ *
+ * Advisory only — it is server configuration, and this copy of it is used to
+ * warn, never to refuse. See {@link warnIfNotAPat}.
+ */
+const PAT_PREFIX = 'rhc_live_';
+
 const USAGE = `
 rhc — the RESTHeart Cloud CLI
 
+  rhc login
   rhc setup --srv ea820b
   rhc setup --srv ea820b --dry-run
 
@@ -28,6 +46,9 @@ rhc — the RESTHeart Cloud CLI
   npx @restheart-cloud/cli setup  for a pipeline
 
 Commands
+  login           Store a personal access token for later commands.
+                  Issue one at cloud.restheart.com, under your profile.
+  logout          Forget the stored token.
   setup           Bring a service to the state your setup file describes.
                   Every step is a check and an apply, so running it against a
                   service already set up writes nothing.
@@ -43,9 +64,16 @@ Options
   --help
 
 Credentials
-  RH_CLOUD_EMAIL and RH_CLOUD_PASSWORD, or a prompt when the terminal is
-  interactive. Never a flag — a password in a flag is a password in the shell
-  history, and in the process list of every other user on the machine.
+  A personal access token, and never a password — the CLI has no way to accept
+  one. A token carries the \`cli\` role rather than yours: it configures services
+  and cannot buy one, and it is revoked by itself, without touching anything
+  else the account is used for.
+
+  ${TOKEN_VAR}    in a pipeline. Always wins over a stored session.
+  rhc login           in a terminal. Stored 0600 under ~/.config/restheart.
+
+  Never a flag: a credential in a flag is a credential in the shell history,
+  and in the process list of every other user on the machine.
 
 Exit codes
   0  every step satisfied or applied
@@ -53,8 +81,8 @@ Exit codes
   2  a dry run found work outstanding — configuration drift, not an error
 `;
 
-/** The commands this version answers to. `login` and `new` are specced, not built. */
-const COMMANDS = ['setup'] as const;
+/** The commands this version answers to. `new` is specced, not built. */
+const COMMANDS = ['login', 'logout', 'setup'] as const;
 type Command = (typeof COMMANDS)[number];
 
 interface Args {
@@ -151,7 +179,7 @@ async function prompt(question: string, silent = false): Promise<string> {
   const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: true });
   if (silent) {
     // Echo nothing at all rather than asterisks: an onlooker counting
-    // characters learns the password's length, which is worth something.
+    // characters learns the credential's length, which is worth something.
     const out = rl as unknown as { output: NodeJS.WriteStream; _writeToOutput?: (s: string) => void };
     out._writeToOutput = () => {};
   }
@@ -164,22 +192,134 @@ async function prompt(question: string, silent = false): Promise<string> {
   }
 }
 
-async function credentials(): Promise<{ email: string; password: string }> {
-  const email = process.env['RH_CLOUD_EMAIL'];
-  const password = process.env['RH_CLOUD_PASSWORD'];
-  if (email && password) return { email, password };
+/**
+ * What to say when the credential is not accepted.
+ *
+ * A bare `401` is true and useless. There are only two reasons a token that was
+ * good is refused — it was revoked, or it expired — and neither is a thing the
+ * user can debug from a status code. The cure differs by where the token came
+ * from: a pipeline has no `rhc login` to run.
+ */
+function credentialError(source: ResolvedToken['source']): string {
+  return source === 'env'
+    ? `The token in ${TOKEN_VAR} was revoked or has expired. Issue a new one at ` +
+        'cloud.restheart.com and update it in your secret store.'
+    : 'Your session was revoked or has expired. Run `rhc login`.';
+}
 
-  if (!process.stdin.isTTY) {
+/** Turn anything thrown into one line worth printing. */
+function describe(err: unknown): string {
+  if (isApiError(err)) {
+    return err.message ? `${err.message} (HTTP ${err.status})` : `HTTP ${err.status}`;
+  }
+  return err instanceof Error ? err.message : String(err);
+}
+
+function warnIfNotAPat(token: string): void {
+  if (!token.startsWith(PAT_PREFIX)) {
+    process.stderr.write(
+      `Warning: this does not look like a personal access token (they start with ${PAT_PREFIX}).\n` +
+        'It authenticated, so something accepted it — but a service admin token, for instance,\n' +
+        'lives fifteen minutes, and storing one here means it stops working before you use it.\n'
+    );
+  }
+}
+
+/**
+ * The token every command but `login` runs on.
+ *
+ * Refuses rather than guesses: there is no interactive fallback here, because a
+ * `setup` that stops to ask for a credential is a `setup` that hangs a pipeline
+ * until it times out.
+ */
+function requireToken(): ResolvedToken {
+  const resolved = resolveToken();
+  if (resolved) return resolved;
+
+  if (process.env['RH_CLOUD_PASSWORD'] !== undefined || process.env['RH_CLOUD_EMAIL'] !== undefined) {
     throw new Error(
-      'RH_CLOUD_EMAIL and RH_CLOUD_PASSWORD are not set, and there is no terminal to ask.\n' +
-        'In a pipeline, set them from your platform\'s secret store.'
+      'RH_CLOUD_EMAIL and RH_CLOUD_PASSWORD are no longer used. They were the account password, ' +
+        'which reaches billing and every service and cannot be revoked without changing it ' +
+        `everywhere.\nIssue a personal access token at cloud.restheart.com and set ${TOKEN_VAR}, ` +
+        'or run `rhc login`.'
     );
   }
 
-  return {
-    email: email ?? (await prompt('RESTHeart Cloud email: ')),
-    password: password ?? (await prompt('Password: ', true)),
-  };
+  throw new Error(
+    process.stdin.isTTY
+      ? 'Not logged in. Run `rhc login`.'
+      : `${TOKEN_VAR} is not set, and there is no terminal to ask.\n` +
+          "In a pipeline, set it from your platform's secret store."
+  );
+}
+
+// ── commands ────────────────────────────────────────────────────────────────
+
+/**
+ * Store a token, having first checked that it works.
+ *
+ * The verification is the point. Writing an unchecked credential to disk moves
+ * the failure to the next command, where it arrives as a `401` in the middle of
+ * something the user cared about instead of at the moment they could still
+ * paste the right thing.
+ */
+async function cmdLogin(args: Args): Promise<number> {
+  const fromEnv = process.env[TOKEN_VAR]?.trim();
+
+  if (!fromEnv && !process.stdin.isTTY) {
+    process.stderr.write(
+      `${TOKEN_VAR} is not set, and there is no terminal to ask.\n` +
+        'In a pipeline, set it from your secret store — there is no need to run `rhc login` at all.\n'
+    );
+    return 1;
+  }
+
+  const token =
+    fromEnv ||
+    (await prompt('Personal access token (issue one at cloud.restheart.com): ', true)).trim();
+
+  if (!token) {
+    process.stderr.write('No token given.\n');
+    return 1;
+  }
+
+  const admin = createAdminClient({ apiBaseUrl: args.api });
+  admin.useToken(token);
+
+  try {
+    await admin.verifyToken();
+  } catch (err) {
+    if (isApiError(err) && (err.status === 401 || err.status === 403)) {
+      process.stderr.write(
+        'That token was not accepted. It may have been revoked, it may have expired, ' +
+          'or it may be a token for a different RESTHeart Cloud.\n'
+      );
+    } else {
+      process.stderr.write(`Could not reach ${args.api}: ${describe(err)}\n`);
+    }
+    return 1;
+  }
+
+  warnIfNotAPat(token);
+
+  const path = writeSession({ token, api: args.api });
+  process.stdout.write(`Logged in to ${args.api}.\nToken stored in ${path} (mode 0600).\n`);
+  return 0;
+}
+
+function cmdLogout(): number {
+  const removed = clearSession();
+  process.stdout.write(
+    removed ? `Logged out. Removed ${sessionPath()}.\n` : 'Not logged in; nothing to remove.\n'
+  );
+  // Revoking is a separate act, and this command cannot do it: the token is
+  // gone from this machine, not from the account.
+  if (removed) {
+    process.stdout.write(
+      'The token still exists — revoke it at cloud.restheart.com if it should stop working.\n'
+    );
+  }
+  return 0;
 }
 
 const GLYPH: Record<string, string> = {
@@ -208,27 +348,36 @@ function summarise(report: SetupReport): void {
   }
 }
 
-async function main(): Promise<number> {
-  const args = parseArgs(process.argv.slice(2));
-
-  if (args.help || args.command === undefined) {
-    // No command is not an error worth a non-zero exit only when it was asked
-    // for: `rhc` alone should show what it can do, `rhc --srv x` should not
-    // silently guess that `setup` was meant.
-    const asked = args.help || process.argv.length <= 2;
-    (asked ? process.stdout : process.stderr).write(USAGE);
-    return asked ? 0 : 1;
-  }
+async function cmdSetup(args: Args): Promise<number> {
   if (!args.srv) {
     process.stderr.write(`--srv is required.\n${USAGE}`);
     return 1;
   }
 
   const setup = await loadSetup(resolveFile(args.file));
-  const { email, password } = await credentials();
+  const credential = requireToken();
 
-  const admin = createAdminClient({ apiBaseUrl: args.api });
-  await admin.login(email, password);
+  // A stored token was verified against one admin node and means nothing to
+  // another. Sending it anyway would be a production credential offered to
+  // whatever host --api happened to name.
+  if (credential.source === 'file' && credential.api !== undefined && credential.api !== args.api) {
+    throw new Error(
+      `Your stored session is for ${credential.api}, not ${args.api}.\n` +
+        `Run \`rhc login --api ${args.api}\`, or set ${TOKEN_VAR}.`
+    );
+  }
+
+  const admin: AdminClient = createAdminClient({ apiBaseUrl: args.api });
+  admin.useToken(credential.token);
+
+  try {
+    await admin.verifyToken();
+  } catch (err) {
+    if (isApiError(err) && (err.status === 401 || err.status === 403)) {
+      throw new Error(credentialError(credential.source));
+    }
+    throw err;
+  }
 
   const report = await runSetup(setup, {
     admin,
@@ -248,10 +397,29 @@ async function main(): Promise<number> {
   return 0;
 }
 
+async function main(): Promise<number> {
+  const args = parseArgs(process.argv.slice(2));
+
+  if (args.help || args.command === undefined) {
+    // No command is not an error worth a non-zero exit only when it was asked
+    // for: `rhc` alone should show what it can do, `rhc --srv x` should not
+    // silently guess that `setup` was meant.
+    const asked = args.help || process.argv.length <= 2;
+    (asked ? process.stdout : process.stderr).write(USAGE);
+    return asked ? 0 : 1;
+  }
+
+  switch (args.command) {
+    case 'login': return cmdLogin(args);
+    case 'logout': return cmdLogout();
+    case 'setup': return cmdSetup(args);
+  }
+}
+
 main().then(
   code => process.exit(code),
   err => {
-    process.stderr.write(`${err instanceof Error ? err.message : String(err)}\n`);
+    process.stderr.write(`${describe(err)}\n`);
     process.exit(1);
   }
 );

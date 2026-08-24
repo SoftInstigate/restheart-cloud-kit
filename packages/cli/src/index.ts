@@ -20,6 +20,16 @@ export type { ServiceClient, Document, IndexKeys } from './service.js';
 
 export { isApiError } from './http.js';
 
+export {
+  TOKEN_VAR,
+  sessionPath,
+  readSession,
+  writeSession,
+  clearSession,
+  resolveToken,
+} from './session.js';
+export type { Session, TokenSource, ResolvedToken } from './session.js';
+
 export { step, defineSetup, runSetup } from './setup.js';
 export type {
   Step,

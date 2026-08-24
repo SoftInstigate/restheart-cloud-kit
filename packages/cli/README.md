@@ -174,30 +174,42 @@ secrets in the environment at all: a stored key comes back as bullets, a check w
 `isRedacted(v) || v !== ''` passes, and the apply that would have read `STRIPE_SECRET_KEY` never
 runs.
 
+## Logging in
+
+The credential is a **personal access token**. Issue one at
+[cloud.restheart.com](https://cloud.restheart.com), under your profile.
+
+```bash
+rhc login                     # prompts, stores 0600 under ~/.config/restheart
+rhc setup --srv ea820b
+rhc logout                    # forgets it here; revoke it in the console
+```
+
+The CLI has no way to accept a password, and that is the design rather than a gap. If you signed up
+with Google or GitHub you have no password to give it — the OAuth flow returns no token, only an
+httpOnly cookie, so nothing outside a browser can complete it. And an account password is the wrong
+thing to hand a pipeline in any case: it reaches billing and every service you own, and revoking it
+means changing it everywhere it is used.
+
+A token is narrower on both counts. It carries a derived `cli` role instead of yours, so it
+configures services and **cannot buy or cancel one**, touch your account, or manage your team — and
+that is enforced by the server's access rules, not by this CLI choosing to behave. And you revoke
+one token by itself, without disturbing anything else the account is used for.
+
 ## From a pipeline
 
-Credentials come from `RH_CLOUD_EMAIL` and `RH_CLOUD_PASSWORD`, or from a prompt when the terminal
-is interactive — never from a flag, which would put a password in the shell history and in the
-process list of every other user on the machine. A run that authenticates itself and needs only
-environment variables is already shaped like a CI job.
+Set `RH_CLOUD_TOKEN` from your platform's secret store. There is no `rhc login` step: the variable
+**always wins over a stored session**, in that direction and with no condition attached, so a CI run
+can never quietly fall back to a session left behind on a shared runner.
 
-> **Two known limitations, both closing in the same change.** A password is the wrong credential
-> here, in two ways. If you signed up with Google or GitHub you have no password, so this does not
-> work for you at all — and there is no workaround, because the OAuth flow returns no token, only
-> an httpOnly cookie. And the password this asks for is the *account* password: it reaches billing
-> and every service you own, and revoking it means changing it everywhere it is used.
->
-> The replacement is a personal access token carrying a role that cannot spend money — tracked in
-> [restheart#699](https://github.com/SoftInstigate/restheart/issues/699) and
-> [#700](https://github.com/SoftInstigate/restheart/issues/700) (milestone 9.8.0). Until then,
-> prefer a dedicated account for CI over your own.
+Never a flag — a credential in a flag is a credential in the shell history, and in the process list
+of every other user on the machine.
 
 ```yaml
 # .github/workflows/deploy.yml
 - run: npx @restheart-cloud/cli setup --srv ea820b
   env:
-    RH_CLOUD_EMAIL: ${{ secrets.RH_CLOUD_EMAIL }}
-    RH_CLOUD_PASSWORD: ${{ secrets.RH_CLOUD_PASSWORD }}
+    RH_CLOUD_TOKEN: ${{ secrets.RH_CLOUD_TOKEN }}
     STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
     STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
 ```
@@ -207,8 +219,12 @@ environment variables is already shaped like a CI job.
 - step:
     script:
       - npx @restheart-cloud/cli setup --srv ea820b
-    # RH_CLOUD_*, STRIPE_* as repository or deployment variables
+    # RH_CLOUD_TOKEN, STRIPE_* as repository or deployment variables
 ```
+
+A revoked or expired token is reported as exactly that rather than as a bare `401`, and the message
+differs by where the token came from: a pipeline is told to update its secret store, a terminal is
+told to run `rhc login`.
 
 Both platforms mask a registered secret in their own logs, but that is their safety net and not
 this package's: the progress callback emits a step's name and state and nothing else, so there is
@@ -226,6 +242,8 @@ misconfigured Stripe key fails the pipeline before it can report success.
 ## CLI
 
 ```
+rhc login  [--api <url>]
+rhc logout
 rhc setup --srv <id> [options]
 
 --file <path>   A module exporting a setup (default export, or `setup`).
@@ -237,10 +255,15 @@ rhc setup --srv <id> [options]
 --json          Emit the report as JSON instead of a step list.
 ```
 
-`apply` is the only command today. `rhc login` and `rhc new free|shared` — a stored session and
-service creation from the terminal — are specified in
-[`specs/todo/provisioning.md`](../../specs/todo/provisioning.md) and not built. The subcommand is
-there from the first release so that adding them is not a breaking change.
+`rhc login` checks the token against the admin node before storing it. Writing an unverified
+credential to disk only moves the failure to the next command, where it lands as a `401` in the
+middle of something you cared about instead of while you can still paste the right thing. The
+stored session records which admin node the token was verified against, and a `--api` that
+disagrees is refused rather than sent — otherwise a production credential would be offered to
+whatever host happened to be named.
+
+`rhc new free|shared` — creating a service from the terminal — is specified in
+[`specs/todo/provisioning.md`](../../specs/todo/provisioning.md) and not built.
 
 Provisioning will deliberately not be reachable from a setup: a pipeline re-runs a setup on every
 merge, and a step that could create a *shared* service would start a purchase per merge.

@@ -54,12 +54,22 @@ installed globally for `rhc` and locally for a project's setup file — two shap
 which works because a `Setup` is plain data and `fromEnv` matches with `Symbol.for`, so the two
 copies interoperate.
 
-## Task 1 — the session
+## Task 1 — the session ✅ done
 
-**File:** `packages/cli/src/session.ts`
-**Depends on:** personal access tokens — `restheart-cloud-server/specs/todo/personal-access-tokens.md`,
-which depends in turn on [restheart#699](https://github.com/SoftInstigate/restheart/issues/699) and
-[#700](https://github.com/SoftInstigate/restheart/issues/700), milestone 9.8.0.
+**File:** `packages/cli/src/session.ts`, plus `login`/`logout` in `cli.ts` and `useToken`/
+`verifyToken` on the admin client.
+**Depends on:** personal access tokens — `restheart-cloud-server/specs/done/personal-access-tokens.md`,
+which depended in turn on [restheart#699](https://github.com/SoftInstigate/restheart/issues/699) and
+[#700](https://github.com/SoftInstigate/restheart/issues/700), milestone 9.8.0. Both shipped.
+
+Verified against the live integration environment: `rhc login` with `RH_CLOUD_TOKEN`, the stored
+session driving `rhc setup`, a token revoked mid-session producing "Your session was revoked or has
+expired. Run `rhc login`." within the authenticator's cache TTL, and a session stored for one admin
+node refusing to be sent to another.
+
+The password path is **gone**, not deprecated: `RH_CLOUD_EMAIL`/`RH_CLOUD_PASSWORD` now produce a
+message naming what replaced them, because failing with "not logged in" would have been true and
+unhelpful for anyone upgrading.
 
 **This task was specified as email and password, and that was wrong.** A user who signed up with
 Google has no password, so `rhc login` would simply not work for them — and there is no client-side
@@ -147,13 +157,24 @@ starts a Checkout session non-interactively; a timeout does not claim failure.
 
 ## Task 4 — the tiers
 
-`GET /srv-tiers` (server spec linked above) becomes `admin.srvTiers()`, and is what `new` reads for
-both the region list and the `price_id`. A tier with an empty `regions` — `dedicated` today — is
-not creatable from here and says so, pointing at the console.
+`GET /srv-tiers` **ships** — `restheart-cloud-server/specs/done/srv-tiers-endpoint.md`, readable by
+`user`, `owner` and `cli`. It becomes `admin.srvTiers()`, and is what `new` reads for both the
+region list and the `price_id`. `dedicated` is returned with an empty `regions`, which is how a
+client learns it is not creatable from here and should point at the console.
 
-Until that endpoint ships, `rhc new free` works and `rhc new shared` reports that it needs a newer
-admin node. That is a better intermediate state than a hardcoded price id, which is a thing that
-works right up until it silently does not.
+Still to build on this side: the `admin.srvTiers()` method itself.
+
+### Known blocker for Task 2, found while testing
+
+**`POST /graphql/cloud` with `{ me { orgs { _id name } } }` returns `me: null` under a personal
+access token.** Not a permissions failure — `cliCanExecuteGQLRequests` grants the path and the call
+answers `200`. `Query.me` matches `_id` against `@user._id` or `@user.sub`, and
+`MongoApiKeyAuthenticator` builds its account with an *empty* properties document
+(`new MongoRealmAccount(..., new BsonDocument())`), so both are null and nothing matches.
+
+Task 2's org selection depends on this query, so it cannot work until the authenticator carries the
+principal in the account properties. The fix belongs in `restheart` and needs a snapshot rebuild.
+Worth noting that the failure is silent — a `200` with `null` data, not an error.
 
 ## Order
 
