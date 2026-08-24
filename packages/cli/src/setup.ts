@@ -127,6 +127,32 @@ export async function runSetup(setup: Setup, opts: RunOptions): Promise<SetupRep
 
   const emit = (e: ProgressEvent) => onProgress?.(e);
 
+  /**
+   * The re-check after an apply, allowed a moment to become true.
+   *
+   * An apply and its check do not always speak to the same process. Installing
+   * or initialising a plugin runs on the **admin node**, which writes to the
+   * tenant's database directly; the check then asks the **service node**, which
+   * caches collection metadata for one second by default
+   * (`local-cache-ttl`). So a step that genuinely worked can be observed as
+   * not-yet-done, and the run halts on a service that is in fact correct — as
+   * `stripe collections and indexes initialised` did.
+   *
+   * A first check with no delay keeps the common case free, and the retries are
+   * short: this waits out a propagation lag, and is emphatically not a way to
+   * turn a wrong step into a passing one. Three seconds is well past a
+   * one-second cache and nowhere near long enough to paper over a real failure.
+   */
+  const recheck = async (s: Step, c: StepContext): Promise<boolean> => {
+    const delays = [0, 300, 700, 2000];
+    for (const [attempt, delay] of delays.entries()) {
+      if (delay > 0) await new Promise(r => setTimeout(r, delay));
+      if (await s.check(c)) return true;
+      if (attempt === delays.length - 1) return false;
+    }
+    return false;
+  };
+
   for (const [i, s] of setup.steps.entries()) {
     const index = i + 1;
 
@@ -154,7 +180,7 @@ export async function runSetup(setup: Setup, opts: RunOptions): Promise<SetupRep
         // anything — a PUT the server answered 200 to and ignored, a config
         // write that landed on the wrong plugin — would otherwise be reported
         // green, and the run would carry on building on top of it.
-        state = (await s.check(ctx)) ? 'applied' : 'failed';
+        state = (await recheck(s, ctx)) ? 'applied' : 'failed';
         if (state === 'failed') error = 'applied, but the check still fails';
       }
     } catch (err) {

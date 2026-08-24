@@ -38,6 +38,8 @@ describe('runSetup', () => {
   });
 
   it('reports an apply that silently did nothing as failed, not green', async () => {
+    // Slow on purpose: the re-check retries for about three seconds before
+    // giving up, which is what the test below relies on.
     const report = await run([
       step('does nothing', { check: () => false, apply: () => undefined }),
     ]);
@@ -45,6 +47,35 @@ describe('runSetup', () => {
     expect(states(report)).toEqual(['failed']);
     expect(report.steps[0]!.error).toBe('applied, but the check still fails');
     expect(report.ok).toBe(false);
+  });
+
+  it('waits for an apply whose effect the check cannot see yet', async () => {
+    // The apply and the check do not always speak to the same process. Plugin
+    // install and init run on the admin node, which writes to the tenant's
+    // database; the check then asks the service node, which caches collection
+    // metadata for a second. A step that genuinely worked was reported failed,
+    // and the run halted on a service that was in fact correct.
+    let visible = false;
+    let checks = 0;
+
+    const report = await run([
+      step('collections the service node has not noticed yet', {
+        check: () => {
+          checks += 1;
+          return visible;
+        },
+        apply: () => {
+          // Late, as the cache expiring is late.
+          setTimeout(() => {
+            visible = true;
+          }, 400);
+        },
+      }),
+    ]);
+
+    expect(states(report)).toEqual(['applied']);
+    // The first check, the immediate re-check, and at least one retry.
+    expect(checks).toBeGreaterThanOrEqual(3);
   });
 
   it('stops the rest when a step fails, because configuration has dependencies', async () => {
