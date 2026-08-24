@@ -175,16 +175,39 @@ async function loadSetup(file: string): Promise<Setup> {
   return setup as Setup;
 }
 
+/**
+ * Ask a question, optionally without echoing the answer.
+ *
+ * A hidden prompt is the convention for a credential — `gh`, `npm` and `docker`
+ * all do it — but a terminal that shows nothing at all is indistinguishable
+ * from a terminal that has hung. **So a hidden prompt must say that it is
+ * hidden**, in the question itself; a caller passing `silent` without saying so
+ * is handing the reader a puzzle.
+ */
 async function prompt(question: string, silent = false): Promise<string> {
+  // Written here rather than passed to `rl.question`, and that is the whole
+  // trick: `_writeToOutput` below silences *everything* readline emits, the
+  // prompt included. Leaving readline to draw it produced a blank line with a
+  // cursor parked where the text should have been — a prompt you cannot read,
+  // asking for input that does not echo, which looks exactly like a hung
+  // terminal. Drawing it ourselves and handing readline an empty question keeps
+  // the two concerns apart: we own the prompt, readline owns the echo.
+  if (silent) process.stdout.write(question);
+
   const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: true });
+
   if (silent) {
-    // Echo nothing at all rather than asterisks: an onlooker counting
-    // characters learns the credential's length, which is worth something.
+    // Nothing at all rather than bullets. For a password this hides the length,
+    // which is worth a little; for a token it is worth nothing, since the shape
+    // is fixed and public. It stays because the prompt now says the input is
+    // hidden, which is the reassurance that was actually missing, and because a
+    // masked paste of fifty characters is its own kind of noise.
     const out = rl as unknown as { output: NodeJS.WriteStream; _writeToOutput?: (s: string) => void };
     out._writeToOutput = () => {};
   }
+
   try {
-    const answer = await new Promise<string>(res => rl.question(question, res));
+    const answer = await new Promise<string>(res => rl.question(silent ? '' : question, res));
     if (silent) process.stdout.write('\n');
     return answer;
   } finally {
@@ -274,9 +297,15 @@ async function cmdLogin(args: Args): Promise<number> {
     return 1;
   }
 
+  if (!fromEnv) {
+    // Where to get one, on its own line — so the prompt itself stays short
+    // enough that the note about the hidden input is the last thing read
+    // before the cursor.
+    process.stdout.write('Issue a personal access token at cloud.restheart.com, under your profile.\n');
+  }
+
   const token =
-    fromEnv ||
-    (await prompt('Personal access token (issue one at cloud.restheart.com): ', true)).trim();
+    fromEnv || (await prompt('Token (input is hidden — paste it and press enter): ', true)).trim();
 
   if (!token) {
     process.stderr.write('No token given.\n');
