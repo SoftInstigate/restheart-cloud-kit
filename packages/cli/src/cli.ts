@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { createInterface } from 'node:readline';
 import { pathToFileURL } from 'node:url';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { createAdminClient, type AdminClient } from './admin.js';
 import { isApiError } from './http.js';
@@ -16,6 +16,26 @@ import {
 } from './session.js';
 
 const DEFAULT_API = 'https://cloud-api.restheart.com';
+
+/**
+ * This package's version, read from its own `package.json`.
+ *
+ * Read at run time rather than baked in at build: the release workflow sets the
+ * version with `npm pkg set` just before publishing, so anything captured when
+ * `tsc` ran would be the placeholder `0.0.0` for ever. Which is also what it
+ * reports from a checkout, correctly — a linked build is not a release.
+ *
+ * Resolved from this module rather than the working directory, or `rhc` run
+ * inside any other project would report that project's version.
+ */
+function version(): string {
+  try {
+    const pkg = new URL('../package.json', import.meta.url);
+    return (JSON.parse(readFileSync(pkg, 'utf8')) as { version?: string }).version ?? 'unknown';
+  } catch {
+    return 'unknown';
+  }
+}
 
 /**
  * Looked for in the working directory when `--file` is not given.
@@ -61,6 +81,7 @@ Options
   --dry-run       Run every check, apply nothing, write nothing.
   --api <url>     Admin node (default ${DEFAULT_API}).
   --json          Emit the report as JSON instead of a step list.
+  --version, -v   Print the version and exit.
   --help
 
 Credentials
@@ -93,10 +114,11 @@ interface Args {
   dryRun: boolean;
   json: boolean;
   help: boolean;
+  version: boolean;
 }
 
 function parseArgs(argv: string[]): Args {
-  const args: Args = { api: DEFAULT_API, dryRun: false, json: false, help: false };
+  const args: Args = { api: DEFAULT_API, dryRun: false, json: false, help: false, version: false };
 
   // The first bare word is the command. Taken before the option loop so an
   // unknown one is rejected as a command rather than as a stray option.
@@ -119,6 +141,8 @@ function parseArgs(argv: string[]): Args {
       case '--json': args.json = true; break;
       case '--help':
       case '-h': args.help = true; break;
+      case '--version':
+      case '-v': args.version = true; break;
       default:
         // Rather than ignore it: a misspelled --dry-run that silently applied
         // the setup is the worst failure this tool could have.
@@ -412,6 +436,31 @@ function summarise(report: SetupReport): void {
   if (report.dryRun && report.steps.some(s => s.state === 'missing')) {
     process.stdout.write('Dry run — nothing was written. Re-run without --dry-run to apply.\n');
   }
+
+  // Repeated at the end because that is where it will be read. A run of twenty
+  // steps scrolls, and the one line naming the variables is the line that tells
+  // you what to do — it should not be the one that went past.
+  //
+  // `fromEnv` resolves inside `apply`, so this cannot be checked before the run
+  // starts: whether a variable is needed at all depends on what the service
+  // already holds. Which is also why earlier steps may have applied by the time
+  // this appears, and why it says so.
+  const missing = new Set<string>();
+  for (const step of report.steps) {
+    const m = /^missing (.+)$/.exec(step.error ?? '');
+    if (m) m[1].split(', ').forEach(name => missing.add(name));
+  }
+
+  if (missing.size > 0) {
+    const applied = report.steps.filter(s => s.state === 'applied').length;
+    process.stdout.write(
+      `\nMissing environment variable${missing.size > 1 ? 's' : ''}: ${[...missing].join(', ')}\n` +
+        'Set them and run again — in a pipeline, from your secret store.\n' +
+        (applied > 0
+          ? `${applied} step${applied > 1 ? 's' : ''} had already been applied; re-running is safe.\n`
+          : '')
+    );
+  }
 }
 
 async function cmdSetup(args: Args): Promise<number> {
@@ -465,6 +514,13 @@ async function cmdSetup(args: Args): Promise<number> {
 
 async function main(): Promise<number> {
   const args = parseArgs(process.argv.slice(2));
+
+  // Before everything else, including the command check: `rhc -v` has to answer
+  // on a machine where nothing is set up yet, which is most of when it is asked.
+  if (args.version) {
+    process.stdout.write(`${version()}\n`);
+    return 0;
+  }
 
   if (args.help || args.command === undefined) {
     // No command is not an error worth a non-zero exit only when it was asked
