@@ -182,6 +182,19 @@ async function loadSetup(file: string): Promise<Setup> {
       );
     }
 
+    // `imported from` means the setup file loaded and one of *its* imports did
+    // not resolve. Answering that with "install tsx" is a wrong diagnosis that
+    // sends the reader to fix a runtime that was working — the runtime got far
+    // enough to read the file and follow its imports.
+    const relative = /Cannot find module '([^']+)' imported from/.exec(message);
+    if (relative) {
+      throw new Error(
+        `${file} imports ${relative[1]}, which does not resolve.\n\n` +
+          'A relative import needs its extension here — `./config.ts`, not `./config`.\n' +
+          'Node resolves the setup file as a real ES module, and does not guess extensions.\n'
+      );
+    }
+
     if (/Unknown file extension|Cannot find module/.test(message) && /\.tsx?$/.test(file)) {
       throw new Error(
         `${message}\n\nA TypeScript setup needs a runtime that can load one: Node 22.18+, or \`npx tsx\`.`
