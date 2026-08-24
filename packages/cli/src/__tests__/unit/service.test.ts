@@ -22,7 +22,12 @@ function harness(routes: Record<string, { status: number; body?: unknown }>) {
   const calls: Call[] = [];
   const transport = async (url: string, init?: RequestInit): Promise<Response> => {
     const method = init?.method ?? 'GET';
-    const path = new URL(url).pathname;
+    // Query string included, deliberately. It used to be `pathname` alone,
+    // which made the harness blind to `?wm=upsert` — the difference between
+    // creating a document and getting a 404 — and let a test assert the wrong
+    // URLs while passing.
+    const u = new URL(url);
+    const path = `${u.pathname}${u.search}`;
     calls.push({
       path,
       method,
@@ -121,12 +126,22 @@ describe('service client', () => {
   });
 
   it('writes through the paths RESTHeart expects', async () => {
+    // Documents carry ?wm=upsert; collections and indexes do not.
+    //
+    // RESTHeart's default write mode is `update`, and updating a document that
+    // is not there answers 404 rather than creating it — so without upsert
+    // every permission, user and schema step failed on exactly the service a
+    // setup exists to configure: one where they are not there yet. Verified
+    // against a live node, not inferred.
+    //
+    // Collections and indexes create on their own, so adding it there too would
+    // be cargo cult.
     const { admin, calls } = harness({
       'PUT /catalog': { status: 201 },
       'PUT /catalog/_indexes/sku_unique': { status: 201 },
-      'PUT /acl/catalog-read-anon': { status: 201 },
-      'PUT /users/robot': { status: 201 },
-      'PUT /_schemas/orders': { status: 201 },
+      'PUT /acl/catalog-read-anon?wm=upsert': { status: 201 },
+      'PUT /users/robot?wm=upsert': { status: 201 },
+      'PUT /_schemas/orders?wm=upsert': { status: 201 },
     });
     const service = createServiceClient(admin, 'ea820b');
 
@@ -139,18 +154,32 @@ describe('service client', () => {
     expect(calls.map(c => `${c.method} ${c.path}`)).toEqual([
       'PUT /catalog',
       'PUT /catalog/_indexes/sku_unique',
-      'PUT /acl/catalog-read-anon',
-      'PUT /users/robot',
-      'PUT /_schemas/orders',
+      'PUT /acl/catalog-read-anon?wm=upsert',
+      'PUT /users/robot?wm=upsert',
+      'PUT /_schemas/orders?wm=upsert',
     ]);
     expect(calls[1]!.body).toEqual({ keys: { sku: 1 }, ops: { unique: true } });
+  });
+
+  it('re-running a document write is not an error', async () => {
+    // The property upsert buys, and the one a setup depends on: a step whose
+    // check is wrong, or a setup run twice, must not fail the second time.
+    const { admin, calls } = harness({
+      'PUT /acl/catalog-read-anon?wm=upsert': { status: 200 },
+    });
+    const service = createServiceClient(admin, 'ea820b');
+
+    await service.putPermission('catalog-read-anon', { roles: ['$unauthenticated'] });
+    await service.putPermission('catalog-read-anon', { roles: ['$unauthenticated'] });
+
+    expect(calls.filter(c => c.method === 'PUT')).toHaveLength(2);
   });
 
   it('resolves fromEnv on the way out, like the admin client does', async () => {
     // The admin client is not the only place a setup can want a secret — a user
     // document has a password. A marker that got here unresolved would be
     // written as an object, and only its `toJSON` guard would say so.
-    const { admin, calls } = harness({ 'PUT /users/robot': { status: 201 } });
+    const { admin, calls } = harness({ 'PUT /users/robot?wm=upsert': { status: 201 } });
     (admin as unknown as { env: Record<string, string> }).env = { ROBOT_PASSWORD: 'hunter2' };
     const service = createServiceClient(admin, 'ea820b');
 
@@ -160,7 +189,7 @@ describe('service client', () => {
   });
 
   it('fails naming the variable rather than writing an object', async () => {
-    const { admin, calls } = harness({ 'PUT /users/robot': { status: 201 } });
+    const { admin, calls } = harness({ 'PUT /users/robot?wm=upsert': { status: 201 } });
     (admin as unknown as { env: Record<string, string> }).env = {};
     const service = createServiceClient(admin, 'ea820b');
 

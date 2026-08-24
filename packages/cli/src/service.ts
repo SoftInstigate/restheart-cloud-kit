@@ -103,6 +103,24 @@ export function createServiceClient(admin: AdminClient, srvId: string): ServiceC
 
   const seg = (s: string) => encodeURIComponent(s);
 
+  /**
+   * `PUT` on a **document** creates it only with `?wm=upsert`.
+   *
+   * Without it RESTHeart's write mode is `update`, and an update of something
+   * that is not there answers `404` — not "created". So every step that puts a
+   * permission, a user or a schema failed on a service where it did not already
+   * exist, which is precisely the service a setup is run against.
+   *
+   * It is also exactly what a setup wants semantically: a step is a check and an
+   * apply, and a re-run must be able to write the same document again without
+   * failing. `upsert` is the idempotent verb.
+   *
+   * Collections and indexes do **not** need this — `PUT /{coll}` and
+   * `PUT /{coll}/_indexes/{id}` create on their own — so it is applied here per
+   * call rather than globally, where it would be a lie about the other two.
+   */
+  const upsert = (path: string) => `${path}?wm=upsert`;
+
   return {
     srvId,
 
@@ -139,19 +157,19 @@ export function createServiceClient(admin: AdminClient, srvId: string): ServiceC
     permissionExists: (id) => existsOr404(() => send(`/acl/${seg(id)}`)),
 
     async putPermission(id, doc) {
-      await send(`/acl/${seg(id)}`, { method: 'PUT', body: body(doc) });
+      await send(upsert(`/acl/${seg(id)}`), { method: 'PUT', body: body(doc) });
     },
 
     userExists: (id) => existsOr404(() => send(`/users/${seg(id)}`)),
 
     async createUser(id, doc) {
-      await send(`/users/${seg(id)}`, { method: 'PUT', body: body(doc) });
+      await send(upsert(`/users/${seg(id)}`), { method: 'PUT', body: body(doc) });
     },
 
     schemaExists: (coll) => existsOr404(() => send(`/_schemas/${seg(coll)}`)),
 
     async putSchema(coll, schema) {
-      await send(`/_schemas/${seg(coll)}`, { method: 'PUT', body: body(schema) });
+      await send(upsert(`/_schemas/${seg(coll)}`), { method: 'PUT', body: body(schema) });
     },
 
     fetch: send,
