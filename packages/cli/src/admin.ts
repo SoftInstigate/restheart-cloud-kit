@@ -98,6 +98,22 @@ export interface AdminClient {
   /** A service-admin JWT and the service's URL — `GET /srvs-mgmt/{srvId}/jwt`. */
   serviceToken(srvId: string): Promise<ServiceToken>;
 
+  /**
+   * An escape hatch for what the methods above do not cover — the same one
+   * {@link ServiceClient.fetch} is, on the other side.
+   *
+   * The admin node has endpoints this client has no reason to wrap one at a
+   * time: `/auth-config/{srvId}`, for instance, which is what sets a service's
+   * JWT claims. Path is admin-node-relative, and the response is whatever the
+   * node returned — a non-2xx throws an `ApiError`, like everything else here.
+   *
+   * Note that not every admin endpoint is reachable with a personal access
+   * token: most are gated on the `cli` role by an ACL document. The ones that
+   * authorise on *owning the service* rather than on a role — `/srvs-mgmt/…/jwt`
+   * and `/auth-config/…` — are, which is what makes them usable from a setup.
+   */
+  fetch(path: string, init?: RequestInit): Promise<Response>;
+
   /** The `AuthConfig` this client speaks through. The service client derives from it. */
   readonly config: AuthConfig;
   /** Where this client resolves `fromEnv` markers from. */
@@ -214,5 +230,7 @@ export function createAdminClient(config: AdminClientConfig): AdminClient {
 
     serviceToken: (srvId) =>
       json<ServiceToken>(`/srvs-mgmt/${encodeURIComponent(srvId)}/jwt`),
+
+    fetch: (path, init) => apiFetch(cfg, path, init),
   };
 }
