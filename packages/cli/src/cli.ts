@@ -2,7 +2,7 @@
 import { createInterface } from 'node:readline';
 import { pathToFileURL } from 'node:url';
 import { existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { createAdminClient, type AdminClient } from './admin.js';
 import { isApiError } from './http.js';
 import { runSetup, type Setup, type SetupReport, type ProgressEvent } from './setup.js';
@@ -147,9 +147,18 @@ function resolveFile(explicit?: string): string {
 /**
  * Load a setup from a module path.
  *
- * A `.ts` setup needs a runtime that can load one — Node 22.18 and later strip
- * types on their own, and anything earlier wants `tsx`. Saying so beats an
- * `Unknown file extension` stack trace.
+ * Two failures here have a cure the reader cannot guess from Node's own words,
+ * and both are more likely with `--file`, which points at a project that is not
+ * the working directory:
+ *
+ * - **the setup file's own imports do not resolve.** A setup imports
+ *   `defineSetup` and `step` from this package, and a bare specifier resolves
+ *   from the *importing file's* directory — not from where `rhc` lives. A global
+ *   install is not on that path, so the project needs its own copy. That is the
+ *   documented shape (global for the command, local for the file), which makes
+ *   it a setup instruction rather than a bug — but only if it is said.
+ * - **the runtime cannot load TypeScript.** Node 22.18 and later strip types on
+ *   their own; anything earlier wants `tsx`.
  */
 async function loadSetup(file: string): Promise<Setup> {
   const url = pathToFileURL(resolve(process.cwd(), file)).href;
@@ -158,6 +167,21 @@ async function loadSetup(file: string): Promise<Setup> {
     mod = (await import(url)) as Record<string, unknown>;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
+
+    // `Cannot find package 'x' imported from y` — Node's wording for a bare
+    // specifier it could not resolve. Distinct from `Cannot find module`, which
+    // is the file itself, so it is matched separately and answered differently.
+    const missing = /Cannot find package '([^']+)' imported from/.exec(message);
+    if (missing) {
+      const pkg = missing[1];
+      throw new Error(
+        `${file} imports ${pkg}, which is not installed in that project.\n\n` +
+          'A setup file resolves its imports from its own directory, so a global `rhc` does not\n' +
+          `satisfy them. In ${dirname(resolve(process.cwd(), file))}:\n\n` +
+          `  npm i -D ${pkg}\n`
+      );
+    }
+
     if (/Unknown file extension|Cannot find module/.test(message) && /\.tsx?$/.test(file)) {
       throw new Error(
         `${message}\n\nA TypeScript setup needs a runtime that can load one: Node 22.18+, or \`npx tsx\`.`
