@@ -1,6 +1,16 @@
 # Gli starter configurati da `rhc`, e la documentazione che li racconta
 
-**Status:** in corso. **Repo:** i tre starter, `restheart-website`.
+**Status:** Fatto. **Date:** 2026-08-24. **Repo:** i tre starter, `restheart-website`.
+
+Tutti e tre i punti sono chiusi. Il seed è un passo del setup e lo script standalone è stato
+cancellato; i README dei tre starter puntano ai package pubblicati; le tre pagine nuove e le
+riscritture stanno sul branch `docs/cloud-tokens-cli-stripe` di `restheart-website`, non ancora
+mergiato per il vincolo di sequenza in fondo — che **resta valido**.
+
+Cose fatte oltre il piano, mentre lo si eseguiva: il gate dei consensi è diventato un setup file
+sui branch `feat/consents-gate` dei due starter di auth e nell'ecommerce (con i percorsi pubblici
+esclusi), il blog post è stato riscritto sulla via scriptata, e il README dell'ecommerce è stato
+ridotto a una guida di due minuti con il resto spostato in `NOTES.md`.
 **Related:** [`provisioning.md`](./provisioning.md), [`configuration.md`](./configuration.md).
 
 Gli starter hanno tutti e tre un `rhc.setup.ts`. Quel che resta è il contorno: far sparire i
