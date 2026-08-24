@@ -125,6 +125,12 @@ export function createAdminClient(config: AdminClientConfig): AdminClient {
   const env = envSource ?? defaultEnv();
 
   const cfg: AuthConfig = {
+    // Silences the core's `[apiFetch] … → 401` on stderr: this package reports
+    // failures itself, in sentences, and a raw line immediately before one of
+    // them is noise — worse in CI, where it puts full URLs in the log. A caller
+    // that supplies its own handler keeps it; `onError` observes rather than
+    // swallows, so no error is lost by taking this seam.
+    onError: () => {},
     ...authConfig,
     getToken: () => token,
     setToken: (t: string) => {

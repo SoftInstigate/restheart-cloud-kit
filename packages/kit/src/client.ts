@@ -198,7 +198,16 @@ export async function apiFetch(
       // ignore parse errors
     }
     const err: ApiError = { status: res.status, message };
-    console.error(`[apiFetch] ${init?.method ?? 'GET'} ${url} → ${res.status} ${res.statusText}`, body ?? '');
+    // Logged only when nobody is listening. In a browser with no `onError` this
+    // is often the only trace a failed call leaves, and it is worth having. When
+    // a caller has registered a handler it has said it is watching, and a second
+    // report is noise — in a CLI it lands on stderr immediately before the
+    // message the tool wrote for the user, and in CI it puts full URLs in the
+    // log. `onError` observes rather than swallows, so nothing is lost either
+    // way: the error is thrown regardless.
+    if (!config.onError) {
+      console.error(`[apiFetch] ${init?.method ?? 'GET'} ${url} → ${res.status} ${res.statusText}`, body ?? '');
+    }
     config.onError?.(err);
     throw err;
   }

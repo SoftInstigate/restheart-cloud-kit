@@ -77,6 +77,44 @@ describe('onError', () => {
   });
 });
 
+describe('console logging on failure', () => {
+  it('E4 logs a non-2xx when nobody registered onError', async () => {
+    // In a browser with no handler this line is often the only trace a failed
+    // call leaves, and it is worth having.
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const config: AuthConfig = {
+      apiBaseUrl,
+      transport: async () => new Response('{}', { status: 500 }),
+    };
+
+    await expect(apiFetch(config, '/demo')).rejects.toMatchObject({ status: 500 });
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(String(spy.mock.calls[0][0])).toContain('[apiFetch]');
+    spy.mockRestore();
+  });
+
+  it('E5 stays quiet when a handler is listening', async () => {
+    // A caller with an onError has said it is watching, and a second report is
+    // noise: in a CLI it lands on stderr right before the sentence the tool
+    // wrote for the user, and in CI it puts full URLs in the log. Nothing is
+    // lost — onError observes rather than swallows, and the error still throws.
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const onError = vi.fn();
+    const config: AuthConfig = {
+      apiBaseUrl,
+      onError,
+      transport: async () => new Response('{}', { status: 500 }),
+    };
+
+    await expect(apiFetch(config, '/demo')).rejects.toMatchObject({ status: 500 });
+
+    expect(spy).not.toHaveBeenCalled();
+    expect(onError).toHaveBeenCalledTimes(1);
+    spy.mockRestore();
+  });
+});
+
 describe('getTokenClaims', () => {
   it('C1 reads the subject, which is the user id', () => {
     setToken(jwt({ sub: 'someone@example.com', exp: inAnHour }));
