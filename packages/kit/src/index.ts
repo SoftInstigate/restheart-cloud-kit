@@ -20,5 +20,5 @@ export {
 } from './payments.js';
 export type { WaitOptions } from './payments.js';
 export { getCatalog, createOrder, getOrder, waitForOrder, readOrderRef, clearOrderRef } from './orders.js';
-export type { OrderRef } from './orders.js';
+export type { OrderRef, CatalogQuery } from './orders.js';
 export { formatPrice } from './money.js';

@@ -10,6 +10,7 @@ import type {
   Subscription,
   UserInfo,
   WaitOptions,
+  CatalogQuery,
 } from '@restheart-cloud/kit';
 
 /**
@@ -62,7 +63,7 @@ export interface RhPaymentsStore {
   /** Revoke a seat licence. */
   revokeLicense(userId: string): Promise<void>;
   /** Read the product catalog. */
-  getCatalog(opts?: { collection?: string; pagesize?: number; page?: number }): Promise<CatalogItem[]>;
+  getCatalog(opts?: CatalogQuery): Promise<CatalogItem[]>;
   /**
    * Create an order and start Checkout.
    *

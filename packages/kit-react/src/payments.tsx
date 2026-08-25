@@ -12,6 +12,7 @@ import * as kit from '@restheart-cloud/kit';
 import type {
   AuthConfig,
   CatalogItem,
+  CatalogQuery,
   GrantLicenseResult,
   Licenses,
   Order,
@@ -72,7 +73,7 @@ export interface RhPayments {
   /** Revoke a seat licence. */
   revokeLicense(userId: string): Promise<void>;
   /** Read the product catalog. */
-  getCatalog(opts?: { collection?: string; pagesize?: number; page?: number }): Promise<CatalogItem[]>;
+  getCatalog(opts?: CatalogQuery): Promise<CatalogItem[]>;
   /**
    * Create an order and start Checkout.
    *
@@ -206,7 +207,7 @@ export function RhPaymentsProvider({ config, children }: RhPaymentsProviderProps
     []
   );
   const getCatalog = useCallback(
-    (opts?: { collection?: string; pagesize?: number; page?: number }) =>
+    (opts?: CatalogQuery) =>
       kit.getCatalog(configRef.current, opts),
     []
   );

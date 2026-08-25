@@ -26,14 +26,44 @@ const DEFAULT_CATALOG_COLLECTION = 'catalog';
  * @param collection Defaults to `'catalog'` — pass the configured
  *                    `products.catalog-collection` if the service renamed it.
  */
+/** What {@link getCatalog} accepts. Exported so the adapters state one shape. */
+export interface CatalogQuery {
+    collection?: string;
+    pagesize?: number;
+    page?: number;
+    /**
+     * A MongoDB query, as an object. Serialised to the `filter` query
+     * parameter.
+     *
+     * Here rather than in the caller because a paged list cannot be filtered
+     * afterwards: narrowing a page you already have searches the page, not the
+     * catalog, and answers "no results" for a product on the next one. A shop
+     * with categories or a search box needs the server to do it.
+     *
+     * ```ts
+     * getCatalog(config, { filter: { category: 'desk' } });
+     * getCatalog(config, { filter: { name: { $regex: 'mug', $options: 'i' } } });
+     * ```
+     *
+     * Whatever this asks for, the ACL still decides what comes back: a
+     * permission's `readFilter` is applied on top, so a filter cannot reach
+     * documents the caller was never allowed to see.
+     */
+    filter?: Record<string, unknown>;
+    /** Sort spec, e.g. `'-_id'` for newest first. */
+    sort?: string;
+}
+
 export async function getCatalog(
   config: AuthConfig,
-  opts?: { collection?: string; pagesize?: number; page?: number }
+  opts?: CatalogQuery
 ): Promise<CatalogItem[]> {
   const collection = opts?.collection ?? DEFAULT_CATALOG_COLLECTION;
   const params = new URLSearchParams();
   if (opts?.pagesize !== undefined) params.set('pagesize', String(opts.pagesize));
   if (opts?.page !== undefined) params.set('page', String(opts.page));
+  if (opts?.filter !== undefined) params.set('filter', JSON.stringify(opts.filter));
+  if (opts?.sort !== undefined) params.set('sort', opts.sort);
   const qs = params.toString();
 
   const res = await apiFetch(config, `/${collection}${qs ? `?${qs}` : ''}`);

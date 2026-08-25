@@ -9,6 +9,7 @@ import type {
   Plan,
   Subscription,
   WaitOptions,
+  CatalogQuery,
 } from '@restheart-cloud/kit';
 import * as kit from '@restheart-cloud/kit';
 import { RH_AUTH_CONFIG } from './tokens.js';
@@ -129,7 +130,7 @@ export class RhPaymentsService {
   }
 
   /** Read the product catalog. */
-  getCatalog(opts?: { collection?: string; pagesize?: number; page?: number }): Observable<CatalogItem[]> {
+  getCatalog(opts?: CatalogQuery): Observable<CatalogItem[]> {
     return from(kit.getCatalog(this.config, opts));
   }
 
