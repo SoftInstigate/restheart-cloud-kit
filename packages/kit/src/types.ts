@@ -333,6 +333,8 @@ export interface Order {
   amount_total: number;
   amount_refunded: number;
   shipping_address?: {
+    /** The recipient. Stripe collects it with the address, and a parcel needs somebody to hand it to. */
+    name?: string;
     line1?: string;
     line2?: string;
     city?: string;
