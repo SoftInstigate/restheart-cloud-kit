@@ -79,9 +79,11 @@ Options
                   Defaults to ./${DEFAULT_FILES[0]}.
   --srv <id>      The service to set up.
   --dry-run       Run every check, apply nothing, write nothing.
-  --force         Apply every step without asking its check first. For a change
-                  the check cannot see — an edited permission under the id it
-                  already had. Re-applies content too: a seed step seeds again.
+  --force <name>  Apply the steps whose name contains <name> without asking
+                  their check first — for a change the check cannot see, such as
+                  an edited permission under the id it already had. Repeatable.
+                  Bare --force takes every step, which is usually wrong: an
+                  apply written to run once may not survive running twice.
   --api <url>     Admin node (default ${DEFAULT_API}).
   --json          Emit the report as JSON instead of a step list.
   --version, -v   Print the version and exit.
@@ -115,7 +117,7 @@ interface Args {
   srv?: string;
   api: string;
   dryRun: boolean;
-  force: boolean;
+  force: boolean | string[];
   json: boolean;
   help: boolean;
   version: boolean;
@@ -142,7 +144,18 @@ function parseArgs(argv: string[]): Args {
       case '--srv': args.srv = argv[++i]; break;
       case '--api': args.api = argv[++i] ?? DEFAULT_API; break;
       case '--dry-run': args.dryRun = true; break;
-      case '--force': args.force = true; break;
+      case '--force': {
+        // A value only if the next argument is not another option. `--force`
+        // last on the line, or before `--srv`, means all of them.
+        const next = argv[i + 1];
+        if (next !== undefined && !next.startsWith('-')) {
+          i++;
+          args.force = Array.isArray(args.force) ? [...args.force, next] : [next];
+        } else {
+          args.force = true;
+        }
+        break;
+      }
       case '--json': args.json = true; break;
       case '--help':
       case '-h': args.help = true; break;

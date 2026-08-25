@@ -86,18 +86,23 @@ export interface RunOptions {
   /** For a setup that shares a service client with something else. */
   service?: ServiceClient;
   /**
-   * Apply every step without asking its `check` first.
+   * Steps to apply without asking their `check` first.
    *
    * For when a step's desired state changed in the file and its check cannot
    * see it — a permission whose body was edited under the id it already had, a
    * schema rewritten under the same name. Such a check answers "does it exist",
-   * and the honest fix is to deepen it; this is what you reach for meanwhile,
-   * or once, to push a change through.
+   * and the honest fix is to deepen it; this is what you reach for meanwhile.
    *
-   * It re-applies **everything**, content included: a step that seeds sample
-   * data will seed it again over whatever is there now.
+   * **Name the steps.** `true` forces all of them, and that is usually the
+   * wrong tool: an apply written to run once may not survive running twice —
+   * installing a plugin answers `409` the second time — and a step that seeds
+   * sample data will seed it again over whatever is there now. A check exists
+   * partly to keep those from happening.
+   *
+   * Matching is by step name, case-insensitively, on a substring: `'catalog'`
+   * reaches "guests may read the catalog".
    */
-  force?: boolean;
+  force?: boolean | string[];
 }
 
 /** Declare a step. A pair of halves, because idempotency is not an afterthought. */
@@ -126,6 +131,13 @@ export function defineSetup(name: string, steps: Step[]): Setup {
  */
 export async function runSetup(setup: Setup, opts: RunOptions): Promise<SetupReport> {
   const { admin, srvId, dryRun = false, force = false, onProgress } = opts;
+
+  /** Whether this step was named by `force` — or all of them were. */
+  const forced = (name: string): boolean => {
+    if (force === true) return true;
+    if (!Array.isArray(force)) return false;
+    return force.some(f => name.toLowerCase().includes(f.toLowerCase()));
+  };
   const ctx: StepContext = {
     admin,
     srvId,
@@ -186,7 +198,7 @@ export async function runSetup(setup: Setup, opts: RunOptions): Promise<SetupRep
       // `force` skips the question, never the verification: the apply still has
       // to survive the re-check below, so a forced step that did not work is
       // reported failed like any other.
-      if (!force && (await s.check(ctx))) {
+      if (!forced(s.name) && (await s.check(ctx))) {
         state = 'satisfied';
       } else if (dryRun) {
         state = 'missing';
