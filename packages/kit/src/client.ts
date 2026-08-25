@@ -193,7 +193,13 @@ export async function apiFetch(
     try {
       body = await res.json();
       const b = body as Record<string, unknown>;
-      message = (b['message'] ?? b['msg'] ?? message) as string;
+      // `error` too, and it is not an afterthought: RESTHeart's MongoDB API says
+      // `message`, and the Cloud admin node's own services say `error`. Reading
+      // only the first threw away every explanation the second ever gave —
+      // "400 Bad Request" in place of "Live Stripe keys require a Shared or
+      // Dedicated plan", which is the difference between a fix and an
+      // afternoon. The CLI's service-side client already read all three.
+      message = (b['message'] ?? b['msg'] ?? b['error'] ?? message) as string;
     } catch {
       // ignore parse errors
     }
