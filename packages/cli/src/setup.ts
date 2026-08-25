@@ -85,6 +85,19 @@ export interface RunOptions {
   onProgress?: (event: ProgressEvent) => void;
   /** For a setup that shares a service client with something else. */
   service?: ServiceClient;
+  /**
+   * Apply every step without asking its `check` first.
+   *
+   * For when a step's desired state changed in the file and its check cannot
+   * see it — a permission whose body was edited under the id it already had, a
+   * schema rewritten under the same name. Such a check answers "does it exist",
+   * and the honest fix is to deepen it; this is what you reach for meanwhile,
+   * or once, to push a change through.
+   *
+   * It re-applies **everything**, content included: a step that seeds sample
+   * data will seed it again over whatever is there now.
+   */
+  force?: boolean;
 }
 
 /** Declare a step. A pair of halves, because idempotency is not an afterthought. */
@@ -112,7 +125,7 @@ export function defineSetup(name: string, steps: Step[]): Setup {
  * what is missing is to be told all of it at once.
  */
 export async function runSetup(setup: Setup, opts: RunOptions): Promise<SetupReport> {
-  const { admin, srvId, dryRun = false, onProgress } = opts;
+  const { admin, srvId, dryRun = false, force = false, onProgress } = opts;
   const ctx: StepContext = {
     admin,
     srvId,
@@ -170,7 +183,10 @@ export async function runSetup(setup: Setup, opts: RunOptions): Promise<SetupRep
     let error: string | undefined;
 
     try {
-      if (await s.check(ctx)) {
+      // `force` skips the question, never the verification: the apply still has
+      // to survive the re-check below, so a forced step that did not work is
+      // reported failed like any other.
+      if (!force && (await s.check(ctx))) {
         state = 'satisfied';
       } else if (dryRun) {
         state = 'missing';

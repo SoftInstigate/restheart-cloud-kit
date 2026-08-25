@@ -7,8 +7,21 @@ import { fromEnv, MissingEnvError } from '../../env.js';
 const admin = {} as AdminClient;
 const service = {} as ServiceClient;
 
-const run = (steps: Parameters<typeof defineSetup>[1], dryRun = false, onProgress?: (e: ProgressEvent) => void) =>
-  runSetup(defineSetup('Test', steps), { admin, srvId: 'ea820b', service, dryRun, ...(onProgress ? { onProgress } : {}) });
+interface RunOpts {
+  dryRun?: boolean;
+  force?: boolean;
+  onProgress?: (e: ProgressEvent) => void;
+}
+
+const run = (steps: Parameters<typeof defineSetup>[1], opts: RunOpts = {}) =>
+  runSetup(defineSetup('Test', steps), {
+    admin,
+    srvId: 'ea820b',
+    service,
+    dryRun: opts.dryRun ?? false,
+    force: opts.force ?? false,
+    ...(opts.onProgress ? { onProgress: opts.onProgress } : {}),
+  });
 
 const states = (report: Awaited<ReturnType<typeof runSetup>>) => report.steps.map(s => s.state);
 
@@ -78,6 +91,29 @@ describe('runSetup', () => {
     expect(checks).toBeGreaterThanOrEqual(3);
   });
 
+  it('applies a satisfied step when forced, and still verifies it', async () => {
+    // The escape hatch for a change the check cannot see: an edited permission
+    // under the id it already had, a schema rewritten under the same name.
+    const applied = vi.fn();
+    const report = await run(
+      [step('already so', { check: () => true, apply: applied })],
+      { force: true }
+    );
+
+    expect(applied).toHaveBeenCalledTimes(1);
+    expect(states(report)).toEqual(['applied']);
+  });
+
+  it('forcing does not turn a broken step green', async () => {
+    // Skipping the question is not skipping the answer: the re-check still runs.
+    const report = await run(
+      [step('does nothing', { check: () => false, apply: () => undefined })],
+      { force: true }
+    );
+
+    expect(states(report)).toEqual(['failed']);
+  });
+
   it('stops the rest when a step fails, because configuration has dependencies', async () => {
     const third = vi.fn(() => true);
     const report = await run([
@@ -106,7 +142,7 @@ describe('runSetup', () => {
         step('index', { check: () => false, apply: applies[1]! }),
         step('permission', { check: () => false, apply: applies[2]! }),
       ],
-      true
+      { dryRun: true }
     );
 
     expect(states(report)).toEqual(['satisfied', 'missing', 'missing']);
@@ -128,7 +164,7 @@ describe('runSetup', () => {
           },
         }),
       ],
-      true
+      { dryRun: true }
     );
 
     expect(states(report)).toEqual(['missing']);
@@ -143,8 +179,7 @@ describe('runSetup', () => {
         step('stripe configured', { check: () => true, apply: () => undefined }),
         step('never runs', { check: () => false, apply: () => { throw new Error('boom'); } }),
       ],
-      false,
-      e => events.push(e)
+      { onProgress: e => events.push(e) }
     );
 
     expect(events).toEqual([

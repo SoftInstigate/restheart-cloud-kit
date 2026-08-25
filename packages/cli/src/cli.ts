@@ -79,6 +79,9 @@ Options
                   Defaults to ./${DEFAULT_FILES[0]}.
   --srv <id>      The service to set up.
   --dry-run       Run every check, apply nothing, write nothing.
+  --force         Apply every step without asking its check first. For a change
+                  the check cannot see — an edited permission under the id it
+                  already had. Re-applies content too: a seed step seeds again.
   --api <url>     Admin node (default ${DEFAULT_API}).
   --json          Emit the report as JSON instead of a step list.
   --version, -v   Print the version and exit.
@@ -112,13 +115,14 @@ interface Args {
   srv?: string;
   api: string;
   dryRun: boolean;
+  force: boolean;
   json: boolean;
   help: boolean;
   version: boolean;
 }
 
 function parseArgs(argv: string[]): Args {
-  const args: Args = { api: DEFAULT_API, dryRun: false, json: false, help: false, version: false };
+  const args: Args = { api: DEFAULT_API, dryRun: false, force: false, json: false, help: false, version: false };
 
   // The first bare word is the command. Taken before the option loop so an
   // unknown one is rejected as a command rather than as a stray option.
@@ -138,6 +142,7 @@ function parseArgs(argv: string[]): Args {
       case '--srv': args.srv = argv[++i]; break;
       case '--api': args.api = argv[++i] ?? DEFAULT_API; break;
       case '--dry-run': args.dryRun = true; break;
+      case '--force': args.force = true; break;
       case '--json': args.json = true; break;
       case '--help':
       case '-h': args.help = true; break;
@@ -494,10 +499,17 @@ async function cmdSetup(args: Args): Promise<number> {
     throw err;
   }
 
+  if (args.force && args.dryRun) {
+    // Not an error worth failing on, but they pull opposite ways: a dry run
+    // asks what is missing, and forcing declares everything missing.
+    process.stderr.write('--force has no effect with --dry-run; every step is reported missing.\n');
+  }
+
   const report = await runSetup(setup, {
     admin,
     srvId: args.srv,
     dryRun: args.dryRun,
+    force: args.force,
     // Nothing but a name and a state reaches this — a step that configures a
     // plugin has a secret in its arguments, and this output is the thing most
     // likely to end up in a CI log.
