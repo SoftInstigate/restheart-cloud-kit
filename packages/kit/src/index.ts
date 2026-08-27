@@ -21,4 +21,16 @@ export {
 export type { WaitOptions } from './payments.js';
 export { getCatalog, createOrder, getOrder, waitForOrder, readOrderRef, clearOrderRef } from './orders.js';
 export type { OrderRef, CatalogQuery } from './orders.js';
+export {
+  addToCart,
+  setCartQuantity,
+  removeFromCart,
+  cartTotals,
+  toOrderItems,
+  loadCart,
+  saveCart,
+  clearStoredCart,
+  DEFAULT_CART_STORAGE_KEY,
+} from './cart.js';
+export type { CartLine, CartItem, CartTotals } from './cart.js';
 export { formatPrice } from './money.js';

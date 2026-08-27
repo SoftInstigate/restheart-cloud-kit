@@ -1,8 +1,21 @@
 import { InjectionToken } from '@angular/core';
 import { HttpContextToken } from '@angular/common/http';
 import type { AuthConfig } from '@restheart-cloud/kit';
+import { DEFAULT_CART_STORAGE_KEY } from '@restheart-cloud/kit';
 
 export const RH_AUTH_CONFIG = new InjectionToken<AuthConfig>('RH_AUTH_CONFIG');
+
+/**
+ * Where {@link import('./cart.service.js').RhCartService | RhCartService} keeps
+ * the cart in `localStorage`. Defaults to `'rh-cart'`.
+ *
+ * Worth providing when two of your apps share an origin, which is one
+ * deployment decision away from happening by accident.
+ */
+export const RH_CART_STORAGE_KEY = new InjectionToken<string>('RH_CART_STORAGE_KEY', {
+  providedIn: 'root',
+  factory: () => DEFAULT_CART_STORAGE_KEY,
+});
 
 /**
  * Marks a request as originating from the kit rather than from application
