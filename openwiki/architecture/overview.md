@@ -1,8 +1,39 @@
 ---
 type: Architecture
 title: Architecture Overview
-description: Technical architecture of the RESTHeart Cloud Kit monorepo, including package structure, layering, and design principles.
-tags: [architecture, monorepo, design, layering]
+description: Technical architecture of the RESTHeart Cloud Kit monorepo, including package structure, layering, payments subsystem, CLI tooling, and design principles.
+tags: [architecture, monorepo, design, layering, payments, cli]
+verified:
+  - by: openwiki/0.4.3
+    at: 2026-08-28T16:48:53.239Z
+sources:
+  - id: openwiki-source-e7a0b8cb7be6a8386aa66fdb
+    resource: repo://docs/ADAPTER_CONTRACT.md
+  - id: openwiki-source-f11db6d857f6461980bb57f5
+    resource: repo://docs/ADAPTERS.md
+  - id: openwiki-source-92450a7065eb85e0f30b5461
+    resource: repo://packages/cli/package.json
+  - id: openwiki-source-00e0515d90d8146f27d18530
+    resource: repo://packages/cli/src/admin.ts
+  - id: openwiki-source-0f6c3b29b19e31f6c5db5771
+    resource: repo://packages/cli/src/cli.ts
+  - id: openwiki-source-d51443378cd41839c1e791c6
+    resource: repo://packages/cli/src/service.ts
+  - id: openwiki-source-7730d08fdb3c285db4f02c01
+    resource: repo://packages/cli/src/session.ts
+  - id: openwiki-source-adaf11e7b024654cc8e44e29
+    resource: repo://packages/cli/src/setup.ts
+  - id: openwiki-source-7dbc4364bd37edb52c104a4d
+    resource: repo://packages/kit/src/cart.ts
+  - id: openwiki-source-dc6fb97d2a3901aa8aa09a70
+    resource: repo://packages/kit/src/index.ts
+  - id: openwiki-source-346f417d59a26ce09dba770f
+    resource: repo://packages/kit/src/orders.ts
+  - id: openwiki-source-9aeb2b476e021464e50a1e8f
+    resource: repo://packages/kit/src/payments.ts
+  - id: openwiki-source-42dfd0defa8189243ef19509
+    resource: repo://packages/kit/src/types.ts
+generated: { by: "openwiki/0.4.3", at: "2026-08-28T16:48:53.239Z" }
 ---
 
 # Architecture Overview
@@ -23,6 +54,10 @@ restheart-cloud-kit/
 │   │   │   ├── consents.ts     # Consents gating (acceptConsents)
 │   │   │   ├── profile.ts      # User profile and document updates
 │   │   │   ├── team.ts         # Team management
+│   │   │   ├── payments.ts     # Subscriptions, checkout, billing portal, licences
+│   │   │   ├── orders.ts       # Catalog, orders, waitForOrder
+│   │   │   ├── cart.ts         # Client-side cart (pure functions, no network)
+│   │   │   ├── money.ts        # formatPrice utility
 │   │   │   ├── types.ts        # TypeScript interfaces (generic UserInfo<E>)
 │   │   │   └── index.ts        # Public API exports
 │   │   └── __tests__/
@@ -58,23 +93,37 @@ restheart-cloud-kit/
 │   │   ├── vitest.config.ts
 │   │   └── package.json
 │   │
-│   └── kit-vue/                # @restheart-cloud/kit-vue (Vue)
+│   ├── kit-vue/                # @restheart-cloud/kit-vue (Vue)
+│   │   ├── src/
+│   │   │   ├── create.ts       # Vue plugin creation
+│   │   │   ├── store.ts        # Reactive state (refs)
+│   │   │   ├── use-auth.ts     # useAuth composable
+│   │   │   ├── guards.ts       # Navigation guards
+│   │   │   ├── __tests__/      # SPA unit tests
+│   │   │   ├── nuxt/           # /nuxt subpath (Nuxt SSR)
+│   │   │   │   ├── middleware.ts
+│   │   │   │   ├── handler.ts
+│   │   │   │   ├── actions.ts
+│   │   │   │   ├── session.ts
+│   │   │   │   ├── cookies.ts
+│   │   │   │   ├── client.ts    # Fragment→cookie bridge
+│   │   │   │   └── __tests__/  # SSR unit tests
+│   │   │   └── index.ts
+│   │   ├── vitest.config.ts
+│   │   └── package.json
+│   │
+│   └── cli/                    # @restheart-cloud/cli (rhc)
 │       ├── src/
-│       │   ├── create.ts       # Vue plugin creation
-│       │   ├── store.ts        # Reactive state (refs)
-│       │   ├── use-auth.ts     # useAuth composable
-│       │   ├── guards.ts       # Navigation guards
-│       │   ├── __tests__/      # SPA unit tests
-│       │   ├── nuxt/           # /nuxt subpath (Nuxt SSR)
-│       │   │   ├── middleware.ts
-│       │   │   ├── handler.ts
-│       │   │   ├── actions.ts
-│       │   │   ├── session.ts
-│       │   │   ├── cookies.ts
-│       │   │   ├── client.ts    # Fragment→cookie bridge
-│       │   │   └── __tests__/  # SSR unit tests
-│       │   └── index.ts
-│       ├── vitest.config.ts
+│       │   ├── cli.ts          # CLI entrypoint (rhc login, rhc setup)
+│       │   ├── admin.ts        # Admin-node client (createAdminClient)
+│       │   ├── service.ts      # Service-node client (createServiceClient)
+│       │   ├── setup.ts        # Setup runner (step, defineSetup, runSetup)
+│       │   ├── session.ts      # Token persistence (~/.config/restheart)
+│       │   ├── env.ts          # fromEnv secret resolution
+│       │   ├── http.ts         # Low-level HTTP helpers
+│       │   ├── types.ts        # Plugin, config, and mutation types
+│       │   ├── index.ts        # Library API exports
+│       │   └── __tests__/      # Unit tests
 │       └── package.json
 │
 ├── docs/
@@ -113,7 +162,10 @@ The monorepo follows a strict layered architecture:
 - Password management: `forgotPassword`, `resetPassword`
 - Profile updates: `updateProfile`, `updateUser`, `changePassword`
 - Consents: `acceptConsents`
-- Utilities: `isValidApiBaseUrl`
+- Payments (subscriptions): `getPlans`, `getSubscription`, `createCheckoutSession`, `openBillingPortal`, `getLicenses`, `grantLicense`, `revokeLicense`, `waitForSubscription`
+- Payments (orders): `getCatalog`, `createOrder`, `getOrder`, `waitForOrder`, `readOrderRef`, `clearOrderRef`
+- Cart: `addToCart`, `setCartQuantity`, `removeFromCart`, `cartTotals`, `toOrderItems`, `loadCart`, `saveCart`, `clearStoredCart`
+- Utilities: `isValidApiBaseUrl`, `formatPrice`
 
 ### Layer 2: Framework Adapters
 
@@ -135,6 +187,21 @@ The monorepo follows a strict layered architecture:
 - Never reimplements API calls or token logic
 
 **Test contract**: All adapters implement the shared checklist in `docs/ADAPTER_CONTRACT.md`. Tests mock `@restheart-cloud/kit` and assert only the wiring.
+
+### Layer 3: CLI (`@restheart-cloud/cli`)
+
+**Purpose**: Infrastructure-as-code tooling for configuring RESTHeart Cloud services
+
+**Characteristics**:
+- Depends on `@restheart-cloud/kit` for `apiFetch`, `login`, and token utilities
+- Runs in Node.js, not in a browser — the admin node's `originVetoer` rejects browser-origin requests
+- Ships the `rhc` binary for terminal and CI use
+- Not a framework adapter — it is a standalone operational tool
+
+**Key abstractions**:
+- `AdminClient` — authenticates against the admin node (`cloud-api.restheart.com`), manages plugins, mints service tokens
+- `ServiceClient` — authenticates against a service node, manages collections, indexes, permissions, users, and schemas; token is cached and renewed automatically
+- `Setup` / `Step` — declarative, idempotent configuration: each step has a `check` (is it already done?) and an `apply` (make it so); `runSetup` executes them sequentially, halting on failure
 
 ## Design Principles
 
@@ -214,9 +281,14 @@ Special handling:
                                        ▼
                          @restheart-cloud/kit
                               (core, zero deps)
+                                       ▲
+                                       │
+                                       │
+                            @restheart-cloud/cli
+                              (rhc, Node.js)
 ```
 
-All adapters depend on `kit` at exact version `0.0.0` in development to prevent npm from resolving from the registry. The release workflow rewrites this to the tag version before publishing.
+All adapters and the CLI depend on `kit` at exact version `0.0.0` in development to prevent npm from resolving from the registry. The release workflow rewrites this to the tag version before publishing.
 
 ## Authentication Flow Architecture
 
@@ -275,6 +347,98 @@ User ─── switchTeam() ───▶ POST /auth/switch-team?delivery=...
                                     ▼
                           Session refreshed (user info + teams)
 ```
+
+## Payments Architecture
+
+The payments subsystem covers two distinct commerce models, both backed by Stripe but using Stripe-hosted pages exclusively — no Stripe.js is loaded client-side.
+
+### Two Payment Modes
+
+**Subscriptions** (`payments.ts`) — recurring billing tied to a team. The team subscribes to a plan, and the subscription governs access via the `@subscription` ACL variable resolved server-side on every request. Seat licences control how many team members may use the service.
+
+**Products and orders** (`orders.ts`) — one-time purchases. A buyer (authenticated or guest) builds a cart, creates an order, and checks out. The order's `status` is moved forward by Stripe's webhook, never by the client redirect.
+
+### Stripe Integration Model
+
+All Stripe interaction happens through Stripe-hosted pages. The kit never embeds Stripe Elements or loads Stripe.js:
+
+- `createCheckoutSession` returns a `url` — the caller redirects with `window.location.href = url`
+- `openBillingPortal` returns a `url` the same way
+- `createOrder` returns a `checkout_url` for the same redirect pattern
+
+Prices are resolved server-side from the service's own catalog (`catalogItem.unit_amount`), so a tampered client-side price changes what the buyer sees and nothing about what they are charged.
+
+### Webhook Race Condition
+
+Stripe sends the buyer back to the `successUrl` over the browser and reports the payment over a separate server-to-server webhook, with no ordering guarantee between the two. A page that calls `getSubscription` or `getOrder` the moment it mounts can read stale state — not a bug, just too early.
+
+The fix is the `waitForSubscription` / `waitForOrder` polling pattern:
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant Kit
+    participant RESTHeart
+    participant Stripe
+
+    Browser->>Kit: createCheckoutSession(config, plan, interval)
+    Kit->>RESTHeart: POST /stripe/checkout
+    RESTHeart->>Stripe: Create Checkout Session
+    Stripe-->>RESTHeart: session.url
+    RESTHeart-->>Kit: { url }
+    Kit-->>Browser: { url }
+    Browser->>Stripe: redirect to hosted Checkout
+    Stripe-->>Browser: redirect to successUrl
+
+    Note over Browser,Stripe: No ordering guarantee between redirect and webhook
+
+    Browser->>Kit: waitForSubscription(config, predicate)
+    loop Poll until predicate or timeout
+        Kit->>RESTHeart: GET /stripe/subscription
+        RESTHeart-->>Kit: Subscription
+        alt predicate(subscription) is true
+            Kit-->>Browser: Subscription
+        else predicate is false and deadline not reached
+            Kit->>Kit: sleep(intervalMs)
+        else deadline reached
+            Kit-->>Browser: WaitTimeoutError
+        end
+    end
+
+    Stripe->>RESTHeart: webhook (payment_intent.succeeded)
+    RESTHeart->>RESTHeart: update subscription in database
+```
+
+*The webhook race: the browser redirect and the Stripe webhook arrive in either order; polling bridges the gap.*
+
+Both `waitForSubscription` and `waitForOrder`:
+- Run the first check immediately (no initial delay — the common case is that the webhook already landed)
+- Accept a caller-supplied predicate so the caller states exactly what it is waiting for
+- Throw `WaitTimeoutError` (not `ApiError`) on timeout, keeping "payment failed" and "haven't heard back yet" distinguishable
+- Support `AbortSignal` for cancellation
+
+### No Token Renewal for Payments
+
+Unlike `acceptConsents`, `switchTeam`, and `updateProfile`, a subscription change does **not** trigger a token renewal. The `@subscription` ACL variable is resolved server-side from the database on every request, cached only for the life of that request (`SubscriptionVarResolver`). An upgrade is therefore effective immediately with no re-login.
+
+### Cart as a Pure Client-Side Data Structure
+
+The cart (`cart.ts`) is a list of `CartLine` objects that lives entirely in the caller's state — React state, a Vue ref, an Angular signal, or a plain variable. Nothing in the cart module talks to a server:
+
+- `addToCart`, `setCartQuantity`, `removeFromCart` are pure functions that return new arrays
+- `cartTotals` computes display-only totals
+- `toOrderItems` strips display fields (name, price, image) and passes only `productId`, `quantity`, and `metadata` (variant options) to `createOrder`
+- `loadCart` / `saveCart` / `clearStoredCart` persist to `localStorage` with defensive error handling
+
+Prices in the cart are display-only: the service reads `unit_amount` from its own catalog when it builds the Checkout session.
+
+### Payments in the Adapter Contract
+
+Adapter payments tests are covered by section E of `docs/ADAPTER_CONTRACT.md` (E1–E10). Key rules the adapters must share:
+
+- **Opt-in**: nothing touches `/stripe/*` unless `config.payments === true`
+- **Reload on the team, not on the user**: the subscription belongs to the team, so it loads on sign-in and reloads on `switchTeam`, but must not reload on `updateProfile` or `acceptConsents`
+- **`canManageBilling` is configurable**: it compares the user's team role against `config.ownershipRole` (default `'owner'`)
 
 ## Token Storage Architecture
 
@@ -426,18 +590,19 @@ git push origin 1.2.3
 │     • kit-ng: version=1.2.3                             │
 │     • kit-react: version=1.2.3                          │
 │     • kit-vue: version=1.2.3                            │
+│     • cli: version=1.2.3                                │
 │     • each adapter dependency: kit=1.2.3                │
 │  3. npm install (reify workspace)                       │
 │  4. Build all packages                                  │
 │  5. Run integration tests                               │
-│  6. Publish to npm (all four packages)                  │
+│  6. Publish to npm (all five packages)                  │
 └─────────────────────────────────────────────────────────┘
 ```
 
 ### Version Management
 
-- All packages (`kit`, `kit-ng`, `kit-react`, `kit-vue`) share the same version
-- Each adapter depends on `kit` at exact version
+- All packages (`kit`, `kit-ng`, `kit-react`, `kit-vue`, `cli`) share the same version
+- Each adapter and the CLI depend on `kit` at exact version
 - Workspace uses `0.0.0` in development
 - Release workflow rewrites versions before publishing
 - Single changelog for all packages
@@ -457,6 +622,16 @@ All framework adapters are implemented and unit-tested:
         └── @restheart-cloud/kit-vue    (Vue — composables, navigation guards)
                 └── /nuxt               (Nuxt — server middleware, handler, bridge)
 ```
+
+### Payments Surfaces
+
+Payments are a separate reactive surface from auth in every SPA adapter. A subscription is not a session, so it does not live on the auth store:
+
+- **Angular**: `RhPaymentsService` — owns `subscription`, `plan`, `isSubscribed`, `canManageBilling`, `seatsAvailable` and the methods that go with them
+- **React**: `usePayments()` under `RhPaymentsProvider`
+- **Vue**: `usePayments()` under `createRhPayments(config, rhAuth)`
+
+Each reads the user from the auth surface only to derive `canManageBilling`. The cart functions (`addToCart`, `cartTotals`, etc.) are pure kit exports that adapters wrap without reimplementing.
 
 ### Adding New Adapters
 
@@ -489,6 +664,4 @@ Future considerations:
 - HTTP-only cookie with CSRF protection
 - Refresh token rotation
 - Device-specific tokens
-- OAuth2/OIDC integration
-ens
 - OAuth2/OIDC integration

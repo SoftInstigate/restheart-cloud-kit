@@ -1,0 +1,244 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:ff1bd7a8e9aba84687ab0ea0a80426d25631c9279b1e25c74531a8d8676c018c",
+  "claims": [
+    {
+      "id": "claim_3973a271db7d44b6b55ce5452e57d993",
+      "statement": "The RESTHeart Cloud Kit monorepo contains five packages: @restheart-cloud/kit (framework-agnostic core), @restheart-cloud/cli (rhc command-line tool), @restheart-cloud/kit-ng (Angular adapter), @restheart-cloud/kit-react (React adapter with /next subpath), and @restheart-cloud/kit-vue (Vue adapter with /nuxt subpath).",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/package.json",
+          "version": "repo-file-v1:sha256:08bb2546a3b324bb438e7e95a8bf9acc237befc1688d2bf055e8d4dc6a109c85"
+        },
+        {
+          "resource": "repo://packages/kit/package.json",
+          "version": "repo-file-v1:sha256:918c666b70075d2e51d986917691eb07e2f45f4b807a73392f923eb0e1eb46e7"
+        },
+        {
+          "resource": "repo://packages/kit/src/index.ts",
+          "version": "repo-file-v1:sha256:b39b338894832a31d917234a39afb2b950198b72952b55a3cd0efeb3495427e0"
+        }
+      ]
+    },
+    {
+      "id": "claim_e0bc55dc4ea84bdbb474c97a9cefd3b6",
+      "statement": "The core kit exports payments functions (getPlans, getSubscription, createCheckoutSession, openBillingPortal, getLicenses, grantLicense, revokeLicense, waitForSubscription), e-commerce functions (getCatalog, createOrder, getOrder, waitForOrder, readOrderRef, clearOrderRef), cart functions (addToCart, setCartQuantity, removeFromCart, cartTotals, toOrderItems, loadCart, saveCart, clearStoredCart), and price formatting (formatPrice).",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/index.ts#L10-L36",
+          "version": "repo-lines-v1:sha256:aac4ea6a06fb2adaaae87340eb2d9745f9ccf5071eda715ffc77447b2c21f25d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExNzQ0MjkwOTg3MDNlNjM0Y2M2NjRlNDk3NWQxNGFjNDkxMjc0OWU1MTYyNGFiMWEzNTNiZTI0NzNmOWMxMGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlOGY0MDlhMjg0ZWU3MmUyNzA4MmZmN2VmNDJhZjNlNDg0M2YxZTgzZWU4NGM0MmYwYTI4MjRhMjk1MmUyMWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFjN2NhM2NhNmJhZDhhMzczZGMwNDlkOGY3MWJmZDIwYzQzZDA0Y2U4MjY3ZGIwZTAxZTM1ZDhjMjc1YTI3NmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a58cd7b757ee4fa3a5f740d9f228a24d",
+      "statement": "The payments subsystem is opt-in: setting payments: true in AuthConfig causes adapters to load the team's subscription on checkSession, login, and switchTeam, and expose subscription-related reactive state. When false or absent, no call to /stripe/* is ever made.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/types.ts#L82-L92",
+          "version": "repo-lines-v1:sha256:ea3adce503d00c28c68ab3f0ac350755ede895d80c0d13df0f3a60c75d6311e8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI1YWNiZWM2ZmI1ZGFiMDAwMGZkYjhlMTNhNTFhYjRiMzVjZmY2NDA0ZDEyNDlmZWMzNWI2NzJhMTg4NmZlMDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExNTA3NmIxNWZhYWIzMTViNTM5ZWMzYzQ1MmUyZmI4ZDNmM2UxNjk2OTJlZGYzNjI5Yjk4NmI0ZWJhM2EzNzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ5YTRkMzI1YmMzYTU3ZjMxNmMyN2I3MTk4Mjk3NDllZmZiYmM3YzdiNzI5NjQ0ZTM2OTllM2NjNDU2NmJjNzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIzYzg2NTk4ODQ3Njg3NjYzOTBkMGY0MWY0NDU2ZDg3OTBiYzY2ZjliNDVkMTM5YjY2MWU2OGU2MzNlNzllZjIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_26338d8fa5414771b69724da89347590",
+      "statement": "Subscription state is resolved server-side from the database on every request (via SubscriptionVarResolver), not from the JWT. An upgrade is effective immediately with no re-login and no renewToken call.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L5-L23",
+          "version": "repo-lines-v1:sha256:962eca90cb942c43ad576a8c123f01f6dbc178435aa4438d0a410873d5aeed90:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlNmU4YWY4Y2NiNDAyNmFjOWRmMTUyODU2MmNhYTNjM2MyOTU0NjcxODY2NDcwZTIzNzI3YjE2OTg2YzljZTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlN2ZjNmZhN2ZkMzBmODBmOWY1NWYzYjg2OWEzNThmNGIwMDY0MGMwMjgyNmY2YmRjNmRiZTI2MjI5YjU4ZGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjczN2Q0YWZkOTI3Yzc0MDI3NDg2YzVlNTM2NjY2ZjdmZjAwOTI3MGZlN2IzOTBjZDk1NTYwMTQzNjFlMzE1NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_52fd3fe6f7be4b61a6ada5816d8c17f1",
+      "statement": "The redirect back from Stripe Checkout races the webhook — a success page that calls getSubscription immediately may read the old plan. waitForSubscription and waitForOrder poll with a predicate until the condition is met, with the first check running immediately before any delay.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/orders.ts#L243-L285",
+          "version": "repo-lines-v1:sha256:5458109a38e68d24a3d1cfca5a24be6ac79737b70ff0e8563f627011937e73ed:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFiODgwZWNiOGM5Yjc3YWYzZDc1ZWI3ODEwZDNhNzQ2ZjI4YmNlMzQ1MDQxMDhmYzc4MDc3OWNlMDY3MTc5NGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L147-L194",
+          "version": "repo-lines-v1:sha256:44528766364a2069aa02ba422dc75b5febf04aeeb0508334f84ed71d24d7a1a5:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZhMTZjZjc0NmQyMzRkMmIxZWE2NmY3YThiZjMyMjhiNTMxYTRiZjI3NDJmOWM4OWJkNTAyMTU5NzRhZjE2YTMifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L17-L23",
+          "version": "repo-lines-v1:sha256:0120db994428daf1341e6f0e775da78618bd8050bf64bcd0974c5d33ea82100d:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjlhNTRiZDZmYTFkYmI0OTQzNzRmZTA4M2JlZGRmZDk4MmI5NDk4MmIwY2Q0ZDNjMjgzN2YxZmJmM2ZlMGUwNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWJhZjhjMTRmOGEwMTJhMTAyOTkzOWNkZmUxZjY0MGE4Y2Y0ZTBkMGQwOTE4YmQ5YjY5NmQ0OTY0MTZiYzQ3ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzM3ZDRhZmQ5MjdjNzQwMjc0ODZjNWU1MzY2NjZmN2ZmMDA5MjcwZmU3YjM5MGNkOTU1NjAxNDM2MWUzMTU1MSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c7fdade80c7542f2b482cf732f975faf",
+      "statement": "Cart functions (addToCart, setCartQuantity, removeFromCart, cartTotals, toOrderItems) are pure functions operating on arrays with no server calls. Prices in the cart are display-only — the service reads unit_amount from its own catalog when building the Checkout session.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/cart.ts#L1-L14",
+          "version": "repo-lines-v1:sha256:c4e5e661fdec90bc5926556d99a3c12b8331f62fae85614d189fee0a712c7895:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU2ZDhhNmI0NjQ3YzMyZGE0NmFiMDNkYmU4YmRmZTExM2JmMzkxYzlkNTk2MDUyZmM3YThjM2VlMTUwMmQ1OGEifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/cart.ts#L135-L141",
+          "version": "repo-lines-v1:sha256:f27ff10e4adb01cd196ce910db2fde30845ef1730bec38959196e286adbeba5d:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjg0YjlmMWU5NzhiYmNhYjQxOGE1Nzg4MjZiMWUxNzNkNzEyMGRhMzM0M2E0ODVlNDkwYjFmYzA4NjMxNzBlMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWFmN2FiMzJjMmU2OWQ2ZjhhYmJlYjg2ZGRlYmE3ZDkzNDRjNzQ0YzliODMyZjExNjhhZTcwMWRhMTMyYzBlYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmU0YmMwY2YzZWRiMjY1MzZkODFhYTNmYWRmZWVkYzQwNWFjMzI2MTJlNTNmZDg0NTgyNzVhZWY5NjhmZWVhMSJ9"
+        },
+        {
+          "resource": "repo://packages/kit/src/cart.ts#L73-L95",
+          "version": "repo-lines-v1:sha256:9868b5ff8513ba11d7500ef27fdd1b9b8b30c47f9917e2f9b407e5da06330f50:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlOGI4ZDE4ZmNkZDJiM2QzMjNjMTgzN2E2ZTBhMTg2YTgwOWRlOTg0YmNjNDNhODIzM2RlNDdiZDFhZjk4MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2YTBlMDA3ZDhjMGVhMjhkMmYwMDhjNjdhOWViMjczYTRkZGUxMzVjZDQ2ZTNlZGQ5NjlmMDI3ZTU0ZWExZTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNiYzUwYmNhYTk4MGEzZWU2Mzk1YmIwMmUyY2EzNjIzMDkwMGFjMmJjMmIwY2EwMTQxYzNiYjI0YzA1Mzg3ZDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fba77367b0d742b5aa33cf8d61aee2d9",
+      "statement": "getCatalog reads a MongoDB collection (configurable name, default 'catalog') with pagination, filtering, and sorting. Access is controlled by the deployment's own ACL; the kit does not add readFilter restrictions.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/orders.ts#L17-L71",
+          "version": "repo-lines-v1:sha256:5f6bbebb2e26c1cd440d268ba464c776736ce249c6034783c523c37d4be9aa0f:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI1MmNhZDdiNWNmMTBkNjhkZDBkOTE0Nzc0ZWI4YjhhMWJkZjE5YmRkMDE2NjMwNjFjNzM0NTY1YWViMjM0YjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYzEzYjc3YzZjZjJlNDc4ZWUyZDk0NDk4ZmYxZjM0OGI5ZmIwMDZkYWMxZjRkODhkMzM2YTI2NTk1ZTMxMmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ4NmZjMTkyMjYwOWI2M2EwNjZhOTA5ZDFhMWJjOWY5NjliMTViMjRlYmQxNDllYmYwYmFjMTAzZGIyOWM2OTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3e75f4a42f4440ca8a100ee11549831e",
+      "statement": "createOrder creates an order and starts Stripe Checkout. Prices are resolved server-side from catalogItem.unitAmount on the server — never from anything the client sends. Guest checkout is supported via an email parameter; the returned secret lets guests look up their order without a session.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/orders.ts#L126-L145",
+          "version": "repo-lines-v1:sha256:a0a4a10c5ea7b3930ce1791259ef8039502e79033671dcf33189d5476afb2122:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxNTI0OTE4ZmIyOGM3NDNiNTY3NDEzOWIxMTYyMjYxYmY2NWI2YTRkODE0MGE3MzA2NjFmOWU2Yjg0ZGNkZTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI4NWRiMjEyNjczZDIxZjdkN2ZiYTc1YjlhODA2N2UzZTRkYjZhZWU1MjU5NTdmYzhjZmNmOGU0ZDE1NjRjMGQifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/orders.ts#L73-L124",
+          "version": "repo-lines-v1:sha256:2cf47af577c0e29c53b109043105a2e0d0d9e9a057a7b4e71f20988e9c778f65:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyNzJkOGQxM2RhMTQ1NjI0Y2I3ZDMxN2Y5NDdiYzM1NDNhNzQyOWY3ZDc1MjBlN2I0NGI0ZDBkOGY0NjdhNTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY3Mzk1NDMzZDQwMzQxMDAxNzMwNzQyYjZmYWQyMDM3Y2JhNjQ2MDA3MzViNjIxMTEyM2M3ZDJlMjc2ZDE0MmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU2Y2E0NGIzMTBlMGUxZDc5OGEwMDZmNGQyODU1MGY2M2FlNzE5NGYyMzZkMjgwY2ZlMGJjMDc4OTQ5MTA2ZDMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_eb099f5a672f46b69328b6ba3a6845bf",
+      "statement": "readOrderRef reads the order reference from the Checkout return URL, checking the fragment first then the query string. The fragment is preferred because it never leaves the browser (absent from access logs, proxy logs, and Referer headers), which matters because the secret is a bearer credential.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/orders.ts#L147-L214",
+          "version": "repo-lines-v1:sha256:27252b29845fda5d254d2f0187ef567acdfd66c657dfc77a342635a4a0e10023:eyJzZWxlY3RlZExpbmVDb3VudCI6NjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhhMmFjNTBlNTExOTliYjllM2VjMTdjODNkNDE4MjNlYjBlZGRmODdiNTY1YWFmNDUyNjJiMDI2NmZjZTYyZjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMyOWY1ZTY2NmQ1ZGRjZmFmNDQ1OTJkMmQzYjc5MDdjZDRiZGMxY2EyMzhlZTVlMjhkYTVlMzhiMzQxNDBhNDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwMWQwOTQ5NjAwYmM0YWUyNjFlNjM3YWMzMjc5ZGM3MDI3MzcyZjAxNjRiZjUzYmFmN2FiZjRhM2Y3MDkyOTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_df8ca19135774fe09841798e1f0a4da6",
+      "statement": "The @restheart-cloud/cli package provides the rhc binary with three commands: login (store a PAT), logout (forget the stored token), and setup (bring a service to the state a setup file describes). Every step is check-then-apply, so running it against an already-configured service writes nothing.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/cli.ts#L110-L112",
+          "version": "repo-lines-v1:sha256:502d97c3d3836f8cf7c8e0c6a56b8b757f98b55eb6c530c0d22bbb8a23ca95bb:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWVhNzE5NThhOGJlNDVjODY3ZTg4NzlhMmVhZDkzNTA2NmI5NmYwYjU0MzNhOWZiM2U4ZGU5Yzk3OWZkY2YxMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGFhZjg1ODAzNjljNGE4YWIzMjg2ZDQ5MzVlZDM3ZTMzNzg5Mjc1YjllMDczN2IxOTdhMGI3NWQ0ZmI2ZjQ1NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2M0ZDE2YWFhYjRlZDliZDUwYzNiNzVkZGY0ZmZmOTM1NDMyNTlkODFlMTI2NDdiN2M0MDE4N2E1NzcwYTNkNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmVlNmU2YzRkZjllZTU1MDc5MWMzNDI3MzIwMTdiYTNhMTRmNjNhZDdlZTFjZDZhMTI1ZWJhMTViZjlmZGJjNyJ9"
+        },
+        {
+          "resource": "repo://packages/cli/src/cli.ts#L58-L108",
+          "version": "repo-lines-v1:sha256:89f7e5877f322376c174cbae58bd9ae5ca2c9c21bd3c15fc5dd21c06e0908285:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyZDBjYWNmNjJmN2M0MTFlMDg1MjYwMDNjOTlkZWZhNjU3NGYxYmFhNzU1NmJhMmI2ZGRjNjAxYzQxODgzYjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhZDI5NTI1MzZmYzYwMDBhZDkxNTY2YmQ5NTNmMjViYzk1OTYxMGU4MTFhNTI5YTliZWY4YjRmMDdjMWM4Y2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlhYWUyY2ZjY2UzYTgxNWZiYzk1NzhkMDZkMzEzN2Y1ODRiYmFmNThhMGFiYjQwZGNhMTQyN2E5M2UyMDczMTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiNjVkOGIwNTc0M2RiMzlhZWU5YzgxNzc5M2M1ZmMwYjE2YTM3NzE1MmM5OWU5MDk4MmFmZGNiMDYyODYyZDgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_baa6cce2f4d74e0f959cdde918561e1e",
+      "statement": "A CLI setup is declared with defineSetup (name + ordered steps) and each step with step (name + check + apply). The runner executes steps sequentially; a failure halts the rest. A dry run runs every check and applies nothing. After an apply, the runner re-checks with exponential backoff up to 15 seconds to handle admin-node/service-node cache lag.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/setup.ts#L108-L246",
+          "version": "repo-lines-v1:sha256:5e9c3c2f5a4f4bc312466076c355a39c0d82d1404bb32db5615aec3e3168155f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTM5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1NThkNDc3ZmFmMWM3YzRjZGI1YzM1ZWY1NWQ0YjZkZDFmMTFjN2ExMjBhNzBjOTNjNWM0ZThjYjQ1ZDFiYTk1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI4ZTlhNTUwMTU1OTViMWJjMjgyZDBmYzI0ZWUwNWY1YTYwNjkwMDM5ZTQ1YTZmYTY4YWEzNjAxMmRhMDY4MjcyIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiNGFmOTFmY2NlYzk5MWM0ZTEyYTFiYjA2NjQ0YjM3OTMzZDYwZDA5ZjhkMzg2NTJkNDBiNjlkYzI5Y2I4N2MxIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_8be778fe48b34cc6abfac2cea151d77c",
+      "statement": "fromEnv creates a typed string marker that stands for an environment variable name without holding its value. The value is resolved at apply time by the admin client when serializing the request body. A dry run never resolves one (no apply runs). toJSON throws to prevent unresolved markers from reaching the server as objects.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/env.ts#L1-L63",
+          "version": "repo-lines-v1:sha256:f3c8e5a36caa33ba0ec513fd7c40a46ef0384968cffb06eef6071d618920414f:eyJzZWxlY3RlZExpbmVDb3VudCI6NjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1YWFjYTNkZjJlYTYwNDZlNjZmMjA5NWU2ZWFiZmE0ZTUwZDVmODg4NTE3MWM2ODg4NTBhMmQzZGY1MmEyNzQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_85feae8736624c7f8084401de6c3c578",
+      "statement": "CLI credentials are personal access tokens (PATs) starting with 'rhc_live_', carrying the 'cli' role. They are stored 0600 under ~/.config/restheart by rhc login, or set via RH_CLOUD_TOKEN env var in pipelines. The env var always wins over a stored session. A credential is never accepted as a flag (to avoid shell history exposure).",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/cli.ts#L337-L356",
+          "version": "repo-lines-v1:sha256:89960f593d49180f1febad1d62503adf40708db71592912604948078281c6ce0:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1OTc1NzdhMWExOWFhYjMzOWYwM2ZjNDQ5NDIzYzVmNzdkZjcyZTYxODRlYTc0ZWU0NzRkNjM0ZjAyNDlkNGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM0Y2MxNjNkNWY3Njk4YTJiYTcxMTgzMGM2MzIyYTMxZDJkYjRmY2UwNTE2NDY1MzkyZGM0NmM3ZWI3ZjkwNGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk3NGFhNmUyMzg4NzE4N2FhZmUzYzY4ZTA1Y2FmZjZhODNlN2ZjNzYzNDA0M2JjOTUzNmY5ODM3YmNiNTNhZGYifQ"
+        },
+        {
+          "resource": "repo://packages/cli/src/cli.ts#L56-L57",
+          "version": "repo-lines-v1:sha256:0318b5c06417566da774a9ecfb6cfb76b797935bef5d3f79bddab9730226bbf7:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzFjNmNhMzc3YmZjNjRkOThkZGZlNmYxZWUzYWY3MjM1NTg3ZjU1ZDUzYjMwNTliOTBkMzhjZTZmMGZhYWQxMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGY3ODRmMDg4YjkwZmRiYjViNzFkY2I4MzE0NzczZDIwYjRkMDgxMzQxZTc2ODJmMjk1MjQyZGMxMGFiNmJlZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiM2YwYmQwYTE2ZDhhMzgxM2M3YzljMjM5NmFhMGNlMDYxMWUyZDIxY2RmOTIwMDE4Y2M3NGNmNzc5ZjY2NGYwYSJ9"
+        },
+        {
+          "resource": "repo://packages/cli/src/cli.ts#L92-L108",
+          "version": "repo-lines-v1:sha256:664b2475e1341c64efd0b9ab02975d4ef98be4cc0a8235c7aa2b1b964d9105ec:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkYmRhNDBlOTAyZDFjMTM2ODI0MDI2NjI5OTcxNjgyOTFjMGExMTBjNjYwZjhkZDMyOTU3ODM2ZjAwMTEwM2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhZDI5NTI1MzZmYzYwMDBhZDkxNTY2YmQ5NTNmMjViYzk1OTYxMGU4MTFhNTI5YTliZWY4YjRmMDdjMWM4Y2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU0NGQzODllNmI2Y2RhODQ2ODFhZjFiZjgzY2U1YzA5MzMxMDI5MjY5YzljNTJkMTVlMzgxY2I3ZThhNTY0MGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiNjVkOGIwNTc0M2RiMzlhZWU5YzgxNzc5M2M1ZmMwYjE2YTM3NzE1MmM5OWU5MDk4MmFmZGNiMDYyODYyZDgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_13188c62fe4046578f7d6c56e9dbe1da",
+      "statement": "The CLI setup runner emits ProgressEvent objects (step name, state, index, total) via an onProgress callback. The SetupReport includes per-step state (satisfied, applied, missing, failed, skipped), duration, and an ok flag. Exit code 0 means every step satisfied or applied, 1 means a step failed, 2 means a dry run found work outstanding.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/cli.ts#L104-L108",
+          "version": "repo-lines-v1:sha256:c17467a07bfc5d84c7fe7286e2ec82526934b599ae3766c805fe46b44fbb5b51:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTE1YTk0MzcyZTNhNDU2MTRhMjJjMDRlZjVlNDkyNTk4Y2FlNmRjZDQ3MGZiZjY3YTc5ZThmMzgzNmYyNTE3YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGFkMjk1MjUzNmZjNjAwMGFkOTE1NjZiZDk1M2YyNWJjOTU5NjEwZTgxMWE1MjlhOWJlZjhiNGYwN2MxYzhjZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmM0YjVjYzA4NDMwNmI3YWU1MDUyNjM3ZGEzMDExZDA0N2Q4NzJjMjVmMWRiYjVlYjlmYWQ5YTI1ZDcxYjkxZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWI2NWQ4YjA1NzQzZGIzOWFlZTljODE3NzkzYzVmYzBiMTZhMzc3MTUyYzk5ZTkwOTgyYWZkY2IwNjI4NjJkOCJ9"
+        },
+        {
+          "resource": "repo://packages/cli/src/setup.ts#L239-L246",
+          "version": "repo-lines-v1:sha256:353f55c0251e7416a7e4682921ac5c69bf06c7f4b8a690ab054b2cf34878bae3:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDk1ZmEwZjExMTdiNWVhNDA0MzQxNDBkZGUxYTM0MGM3MjBkZGJmMzI2MjEyZTE5MTgzOGQ0YjE1NmQzMTZiYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2UyYTBhYWMzMTY1MmEwOGI3MjcwNTRjZDlhNTI2NGJhYjM4NzEzYjE1MzgxMjQxYmNmNjMxZDUwNjk5MWE4OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjRhZjkxZmNjZWM5OTFjNGUxMmExYmIwNjY0NGIzNzkzM2Q2MGQwOWY4ZDM4NjUyZDQwYjY5ZGMyOWNiODdjMSJ9"
+        },
+        {
+          "resource": "repo://packages/cli/src/setup.ts#L32-L77",
+          "version": "repo-lines-v1:sha256:8a61d6e4634aa3b446467039df900b62689797f7f7eaf3ac86e871b1daaf0969:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNlYWYxMDE5NmNjMTI0MDc4ODMzMTBiYWYxM2M2Zjk1NjExOTVmMGYyYjY4ODAxYWQ1YzI2OGMwNjZlMGM0MzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNkMGQ2NmYzMjgxNzljYzQ2NzkzNjIyNTg5NDk5MzcxODMzN2JmYjM2OTQwMDdkODhiNzk3MTk2OGM1OWNmNWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVmZDc3NjRmOGZjM2QxOGZlMWFiZDk2YmE2N2M1YmExYzc5NTkwNmFmNDg1MTQ4OGFiMmU3YTFiNzZmNWNiOTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_be41b5045b1e4241b5e8d527d4615e35",
+      "statement": "The architecture follows a layered pattern: core kit (all network calls, token operations, business rules), framework adapters (reactive wrappers), SSR subpaths (server-side token management), and CLI (declarative service configuration, independent of the frontend kit). An adapter that reimplements an API call or token computation is a bug.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/package.json",
+          "version": "repo-file-v1:sha256:08bb2546a3b324bb438e7e95a8bf9acc237befc1688d2bf055e8d4dc6a109c85"
+        },
+        {
+          "resource": "repo://packages/cli/src/index.ts",
+          "version": "repo-file-v1:sha256:0917831eb60535f35123caa2233e3986b4ae6db7217cff4506d0477b632e6166"
+        },
+        {
+          "resource": "repo://packages/kit/src/index.ts",
+          "version": "repo-file-v1:sha256:b39b338894832a31d917234a39afb2b950198b72952b55a3cd0efeb3495427e0"
+        }
+      ]
+    },
+    {
+      "id": "claim_41bbdb160e6848b99a5eb9769956cae7",
+      "statement": "formatPrice converts minor-unit amounts (cents) to locale-aware display strings using Intl.NumberFormat. It handles all ISO 4217 currencies including zero-decimal ones like JPY.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/__tests__/unit/money.test.ts",
+          "version": "repo-file-v1:sha256:704077e3619f7bd90acd32e8a3e5c0ce8bfb51cac9704bdf0621bb98ca0272c5"
+        },
+        {
+          "resource": "repo://packages/kit/src/money.ts#L12-L22",
+          "version": "repo-lines-v1:sha256:cd5abc70f15ec809382ebabfcc6daadf9cf9bf382668bf6712f3e2f987608108:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQzMTNmNjc0ODNjYWVlOTZkMDIzOThmODI0M2IwNTE1YTY1YjliZTNiOTM5MDA2MmMwZjc1NDQwMmIyYTZhNmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYzYjU5YjkzMWZmY2E4Y2M5OTM2Y2FmODE4MjlkNDYwZjNkZTM3ZjQxNDQ0MTRjOWU1OWY0MjZlYmExZTA2YmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFhZTY4MmUxZGIwMWQ5NDg2ODIxMjNlYzI3ODNmNzFjMmZjM2Q0Njk5NzVjZDdhNGNiMDYwYWJhZDgxM2Q1NTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYzZGJiNDczNmYzZmY1ZTEyMmM4OTdhNjkzOTdhM2NmYzkxYWVhZjFjZjlhNTEwYmRhNmNiNDdjNDZkMzQ1M2QifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9500b9f2c90d44aa82d7c9e9a386fca8",
+      "statement": "The CLI's loadSetup function resolves the setup file from the working directory (conventional names: rhc.setup.ts, .mts, .js, .mjs) or from --file. It provides targeted error messages for missing packages (bare specifier resolution), missing relative imports (extension required), and TypeScript files on older Node (needs tsx or Node 22.18+).",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/cli.ts#L177-L255",
+          "version": "repo-lines-v1:sha256:ad6f5c3041049d0f9865d167c7fd2c90a1a7f854191d2e0863f7ffe1a6d882ec:eyJzZWxlY3RlZExpbmVDb3VudCI6NzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmYmM0OTk4MWZiZWJlZmRjMmYyZTRjZTIyZDI2NDVmNTA3NDExZGY4ZTczYjM2N2I4OTBjZTUzOTYwN2JkN2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJhYjE3M2RjNjI5ZWQ0NzcxNGUxOWNjYTNjZmJhNWQ1MDRlY2Y5MWI4NTVmNGYyNjhmYjNlMzM0YTgzZTgzYjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk0ZTEwZTU3NjUwODAwZGJmOWZiYjkxMzhmYzkyMDE4N2RlNmQzYzE4ZmFkMmVhZTdhN2QxNTZlNmM5ZDI3MTAifQ"
+        },
+        {
+          "resource": "repo://packages/cli/src/cli.ts#L47-L48",
+          "version": "repo-lines-v1:sha256:76bc42e7ffc5892840b84d7892a93a2efb1c62e780f3f5740fbb26ef8e4952b8:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWUyYTQ5YzdlOGUyYjUxMTQ0NTc4MDUzMGE4ZjNlYzQ5NzM4NDlhZGFjYjYwYWE4ZGMwZTk1NjYyNDg1NDU5NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODBiODA2MmI2Y2Q4ODI0OTc0ZWMyYjA1NGVhOWQ4ZjcxNDQ2NDEzODllZTRhMzljYmU4MzQ1NGRmMDU1NTAyNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjU2MDVjMTQwZDE2OTgyMjVlMThmYTIxMzY3OTM3MzI2YjZjNWIxOGM5Nzc1NWJhOGQzZjU5ZTg5NjhiOWQyMyJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.4.3",
+    "at": "2026-08-28T16:48:53.239Z"
+  }
+}
