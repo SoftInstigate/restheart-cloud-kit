@@ -13,6 +13,8 @@
  * framework packages wrap these; they do not reimplement them.
  */
 
+import type { OrderItem } from './orders.js';
+
 /** Where {@link loadCart} and {@link saveCart} keep the cart by default. */
 export const DEFAULT_CART_STORAGE_KEY = 'rh-cart';
 
@@ -120,12 +122,22 @@ export function cartTotals(lines: CartLine[]): CartTotals {
 /**
  * The cart as `createOrder` wants it.
  *
- * The service takes ids and quantities and nothing else: names, prices and
- * pictures are the shop's business, and sending them would invite the belief
- * that they matter.
+ * Names, prices and pictures stay behind: the service reads those from its own
+ * catalog, and sending them would invite the belief that they matter.
+ *
+ * The chosen options do travel, as the line's `metadata`. They are the one
+ * thing here the service cannot work out for itself — a reference like
+ * `tee-classic/yellow-l` says which row of the catalog was bought, but the
+ * seller reading the order wants "yellow, L" in fields, not decoded from an
+ * id. Without this the order, the Stripe dashboard and the confirmation email
+ * all say "Classic T-shirt" and leave out which one.
  */
-export function toOrderItems(lines: CartLine[]): { productId: string; quantity: number }[] {
-  return lines.map(({ productId, quantity }) => ({ productId, quantity }));
+export function toOrderItems(lines: CartLine[]): OrderItem[] {
+  return lines.map(({ productId, quantity, options }) => ({
+    productId,
+    quantity,
+    ...(options && Object.keys(options).length > 0 ? { metadata: options } : {}),
+  }));
 }
 
 /**

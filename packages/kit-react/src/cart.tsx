@@ -17,6 +17,7 @@ import {
   DEFAULT_CART_STORAGE_KEY,
   type CartItem,
   type CartLine,
+  type OrderItem,
 } from '@restheart-cloud/kit';
 
 /**
@@ -38,7 +39,7 @@ export interface RhCart {
   /** The first line's currency, or `'eur'` when empty. */
   currency: string;
   /** The cart as `createOrder` wants it. */
-  orderItems: { productId: string; quantity: number }[];
+  orderItems: OrderItem[];
 
   /** Adds an item, or increases the line already holding it. */
   add(item: CartItem, quantity?: number): void;

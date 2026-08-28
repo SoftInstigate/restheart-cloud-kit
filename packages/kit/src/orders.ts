@@ -87,9 +87,29 @@ export async function getCatalog(
  * @param collection Defaults to `'orders'` — pass the configured
  *                    `products.orders-collection` if the service renamed it.
  */
+/**
+ * One line of an order as the service takes it.
+ *
+ * `metadata` is the shop's own labels for this line — what a variant is, a
+ * gift message, an engraving. The service stores it on the order line and
+ * passes it to Stripe, where it shows on the dashboard, the receipt and the
+ * invoice; the keys are whatever the shop chose, since only the shop knows
+ * what they mean. At most 50 of them, keys under 40 characters and values
+ * under 500, which are Stripe's limits and so ours.
+ *
+ * It has to travel from the client because the service cannot infer it: a
+ * variant reference identifies which row of the catalog was bought, not which
+ * of its fields the seller wants to read on a packing slip.
+ */
+export interface OrderItem {
+  productId: string;
+  quantity: number;
+  metadata?: Record<string, string>;
+}
+
 export async function createOrder(
   config: AuthConfig,
-  items: { productId: string; quantity: number }[],
+  items: OrderItem[],
   email?: string,
   collection: string = DEFAULT_ORDERS_COLLECTION
 ): Promise<{ _id: { $oid: string }; checkout_url: string; secret: string }> {

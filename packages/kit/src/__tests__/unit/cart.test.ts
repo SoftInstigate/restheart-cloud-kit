@@ -97,11 +97,24 @@ describe('cartTotals', () => {
 });
 
 describe('toOrderItems', () => {
-  it('sends ids and quantities and nothing else', () => {
-    expect(toOrderItems([tee, mug])).toEqual([
-      { productId: 'tee-classic/yellow-l', quantity: 1 },
-      { productId: 'mug', quantity: 2 },
+  it('leaves names, prices and pictures behind', () => {
+    expect(toOrderItems([mug])).toEqual([{ productId: 'mug', quantity: 2 }]);
+  });
+
+  it('sends the chosen options, which the service cannot work out for itself', () => {
+    // Without this the order, the Stripe dashboard and the email all say
+    // "Classic T-shirt" and never say which one.
+    expect(toOrderItems([tee])).toEqual([
+      {
+        productId: 'tee-classic/yellow-l',
+        quantity: 1,
+        metadata: { colour: 'yellow', size: 'L' },
+      },
     ]);
+  });
+
+  it('omits metadata entirely for a line with no options', () => {
+    expect(toOrderItems([mug])[0]).not.toHaveProperty('metadata');
   });
 });
 
