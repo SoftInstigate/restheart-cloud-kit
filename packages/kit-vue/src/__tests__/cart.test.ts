@@ -35,10 +35,18 @@ describe('createRhCartStore', () => {
     expect(cart.subtotal.value).toBe(1450 * 2 + 2500);
   });
 
-  it('hands createOrder ids and quantities only', () => {
+  it('hands createOrder the chosen options too, not only ids and quantities', () => {
+    // Without the options the seller reads "Classic T-shirt" and never learns
+    // which one — the whole reason a variant is a thing.
     const cart = createRhCartStore();
     cart.add(tee, 2);
-    expect(cart.orderItems.value).toEqual([{ productId: 'tee-classic/yellow-l', quantity: 2 }]);
+    expect(cart.orderItems.value).toEqual([
+      {
+        productId: 'tee-classic/yellow-l',
+        quantity: 2,
+        metadata: { colour: 'yellow', size: 'L' },
+      },
+    ]);
   });
 
   it('survives a reload', () => {
