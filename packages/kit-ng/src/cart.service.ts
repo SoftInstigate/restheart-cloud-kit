@@ -1,4 +1,4 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, InjectionToken, computed, inject, signal } from '@angular/core';
 import {
   addToCart,
   cartTotals,
@@ -7,10 +7,25 @@ import {
   saveCart,
   setCartQuantity,
   toOrderItems,
+  DEFAULT_CART_STORAGE_KEY,
   type CartItem,
   type CartLine,
 } from '@restheart-cloud/kit';
-import { RH_CART_STORAGE_KEY } from './tokens.js';
+/**
+ * Where {@link RhCartService} keeps the cart in `localStorage`. Defaults to `'rh-cart'`.
+ *
+ * Worth providing when two of your apps share an origin, which is one deployment decision away
+ * from happening by accident.
+ *
+ * Declared here rather than in `tokens.ts`: that file is the authentication surface, and a cart
+ * needs no session. Importing the kit into it to reach one constant also dragged the kit's module
+ * into every spec that touches `RH_AUTH_CONFIG`, where it is auto-mocked — which shifted module
+ * initialisation enough to make two unrelated guard tests fail, in CI only.
+ */
+export const RH_CART_STORAGE_KEY = new InjectionToken<string>('RH_CART_STORAGE_KEY', {
+  providedIn: 'root',
+  factory: () => DEFAULT_CART_STORAGE_KEY,
+});
 
 /**
  * The shopping cart.

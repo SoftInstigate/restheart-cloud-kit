@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { TestBed } from '@angular/core/testing';
-import { RhCartService } from './cart.service';
-import { RH_CART_STORAGE_KEY } from './tokens';
+import { RhCartService, RH_CART_STORAGE_KEY } from './cart.service';
 
 // The cart logic itself is unit-tested in @restheart-cloud/kit. What is left
 // here is the service's own job: signals and localStorage staying in step.
