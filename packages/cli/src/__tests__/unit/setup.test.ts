@@ -51,8 +51,10 @@ describe('runSetup', () => {
   });
 
   it('reports an apply that silently did nothing as failed, not green', async () => {
-    // Slow on purpose: the re-check retries for about three seconds before
-    // giving up, which is what the test below relies on.
+    // Slow on purpose: the re-check retries for about fifteen seconds before
+    // giving up. An apply that did nothing does not start working at second
+    // fourteen, so the verdict is the same — it just takes the full window to
+    // reach it.
     const report = await run([
       step('does nothing', { check: () => false, apply: () => undefined }),
     ]);
@@ -60,7 +62,7 @@ describe('runSetup', () => {
     expect(states(report)).toEqual(['failed']);
     expect(report.steps[0]!.error).toBe('applied, but the check still fails');
     expect(report.ok).toBe(false);
-  });
+  }, 30_000);
 
   it('waits for an apply whose effect the check cannot see yet', async () => {
     // The apply and the check do not always speak to the same process. Plugin
@@ -91,6 +93,28 @@ describe('runSetup', () => {
     expect(checks).toBeGreaterThanOrEqual(3);
   });
 
+  it('waits out an init that takes seconds, not milliseconds', async () => {
+    // The case that made the window too short. `initPlugin` returns once the
+    // admin node has triggered the work, and the service node then creates
+    // collections, builds indexes and installs a schema — which took longer
+    // than the three seconds the retries allowed, so a service that had been
+    // set up correctly was reported as failed and the run halted.
+    let visible = false;
+
+    const report = await run([
+      step('stripe collections and indexes initialised', {
+        check: () => visible,
+        apply: () => {
+          setTimeout(() => {
+            visible = true;
+          }, 5000);
+        },
+      }),
+    ]);
+
+    expect(states(report)).toEqual(['applied']);
+  }, 30_000);
+
   it('applies a satisfied step when forced, and still verifies it', async () => {
     // The escape hatch for a change the check cannot see: an edited permission
     // under the id it already had, a schema rewritten under the same name.
@@ -112,7 +136,7 @@ describe('runSetup', () => {
     );
 
     expect(states(report)).toEqual(['failed']);
-  });
+  }, 30_000);
 
   it('stops the rest when a step fails, because configuration has dependencies', async () => {
     const third = vi.fn(() => true);

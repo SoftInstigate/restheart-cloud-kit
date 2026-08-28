@@ -163,13 +163,23 @@ export async function runSetup(setup: Setup, opts: RunOptions): Promise<SetupRep
    * not-yet-done, and the run halts on a service that is in fact correct — as
    * `stripe collections and indexes initialised` did.
    *
-   * A first check with no delay keeps the common case free, and the retries are
-   * short: this waits out a propagation lag, and is emphatically not a way to
-   * turn a wrong step into a passing one. Three seconds is well past a
-   * one-second cache and nowhere near long enough to paper over a real failure.
+   * The cache is not the whole lag, and sizing this to it was the mistake. An
+   * apply like `initPlugin` returns once the admin node has *triggered* the
+   * work; the service node then creates collections, builds indexes and
+   * installs a schema on its own time. Three seconds covered the cache and not
+   * the job, so `stripe collections and indexes initialised` still reported
+   * `applied, but the check still fails` on a service where it had in fact
+   * worked — and the run halted, telling someone their setup was broken when it
+   * was merely slow. Re-running showed the step satisfied, which is the shape
+   * of a false alarm and not of a failure.
+   *
+   * A first check with no delay keeps the common case free, and the backoff now
+   * ends at fifteen seconds. That is emphatically not a way to turn a wrong
+   * step into a passing one: an apply that did not work does not start working
+   * at second fourteen. It only buys a slow one the time to finish.
    */
   const recheck = async (s: Step, c: StepContext): Promise<boolean> => {
-    const delays = [0, 300, 700, 2000];
+    const delays = [0, 300, 700, 2000, 4000, 8000];
     for (const [attempt, delay] of delays.entries()) {
       if (delay > 0) await new Promise(r => setTimeout(r, delay));
       if (await s.check(c)) return true;
