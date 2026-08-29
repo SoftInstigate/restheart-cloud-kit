@@ -1,21 +1,58 @@
 ---
 type: Guide
 title: Testing Guide
-description: Integration testing guide for RESTHeart Cloud Kit. Covers test setup, environment configuration, running tests, and writing new tests.
-tags: [testing, integration, vitest, guide]
+description: Testing guide for RESTHeart Cloud Kit and CLI. Covers integration tests, kit unit tests, CLI unit tests, adapter unit tests, environment configuration, running tests, and writing new tests.
+tags: [testing, integration, unit, vitest, guide]
+verified:
+  - by: openwiki/0.4.3
+    at: 2026-08-28T16:48:53.239Z
+sources:
+  - id: openwiki-source-e7a0b8cb7be6a8386aa66fdb
+    resource: repo://docs/ADAPTER_CONTRACT.md
+  - id: openwiki-source-92450a7065eb85e0f30b5461
+    resource: repo://packages/cli/package.json
+  - id: openwiki-source-8bdaa310d96f188962daac0e
+    resource: repo://packages/cli/src/__tests__/unit/admin.test.ts
+  - id: openwiki-source-26c1f4520f822e9ae6ab9a1d
+    resource: repo://packages/cli/src/__tests__/unit/env.test.ts
+  - id: openwiki-source-342c2249f92e2ca7695bfc8a
+    resource: repo://packages/cli/src/__tests__/unit/service.test.ts
+  - id: openwiki-source-d8112324397071944e41ddcb
+    resource: repo://packages/cli/src/__tests__/unit/session.test.ts
+  - id: openwiki-source-f23f6013db8c2550129a8ee5
+    resource: repo://packages/cli/src/__tests__/unit/setup.test.ts
+  - id: openwiki-source-3736e25152650a4decd06697
+    resource: repo://packages/cli/vitest.unit.config.ts
+  - id: openwiki-source-46339ee0e97e6859bc5ea428
+    resource: repo://packages/kit/package.json
+  - id: openwiki-source-7a045df7165360917a5c3615
+    resource: repo://packages/kit/src/__tests__/unit/cart.test.ts
+  - id: openwiki-source-bc8947c7b01ad0de9e4423b7
+    resource: repo://packages/kit/src/__tests__/unit/client.test.ts
+  - id: openwiki-source-9f4235dd2715f5a55a0d1886
+    resource: repo://packages/kit/src/__tests__/unit/money.test.ts
+  - id: openwiki-source-8e84ec6588e149b9332902b1
+    resource: repo://packages/kit/src/__tests__/unit/orders.test.ts
+  - id: openwiki-source-42cff9bfe915d7b06dd5bd38
+    resource: repo://packages/kit/src/__tests__/unit/payments.test.ts
+  - id: openwiki-source-f5c174f35c5102ba81477e16
+    resource: repo://packages/kit/vitest.unit.config.ts
+generated: { by: "openwiki/0.4.3", at: "2026-08-28T16:48:53.239Z" }
 ---
 
 # Testing Guide
 
-This guide covers testing for RESTHeart Cloud Kit: core integration tests and adapter unit tests.
+This guide covers testing for RESTHeart Cloud Kit and CLI: core integration tests, kit unit tests, CLI unit tests, and adapter unit tests.
 
 ## Overview
 
-RESTHeart Cloud Kit has two test tiers:
+RESTHeart Cloud Kit has four test tiers:
 
 | Tier | What it tests | Backend needed | Runs on |
 |------|---------------|----------------|---------|
 | **Core integration** (`packages/kit`) | Auth flows, token lifecycle, teams, invites against live API | RESTHeart Cloud instance + secrets | Tags (release), manual trigger |
+| **Kit unit** (`packages/kit`) | Payments, orders, cart, client, money modules | None (mocks transport) | Every push and PR |
+| **CLI unit** (`packages/cli`) | Setup runner logic, env ref resolution, session management, admin client operations | None (mocks admin and service clients) | Every push and PR |
 | **Adapter unit** (`kit-react`, `kit-vue`, `kit-ng`) | Wiring: reactive state, guards, middleware, cookie bridge | None (mocks `@restheart-cloud/kit`) | Every push and PR |
 
 **Test Framework**: Vitest 4
@@ -364,6 +401,369 @@ it('works with cookies', async () => {
 });
 ```
 
+## Kit Unit Tests
+
+Kit unit tests run without a backend, testing the core modules: payments, orders, cart, client, and money. They use a custom transport function to mock HTTP requests, making them fast and deterministic.
+
+### Running Kit Unit Tests
+
+```bash
+# From monorepo root
+npm run test:unit -w packages/kit
+
+# From package directory
+cd packages/kit
+npm run test:unit
+```
+
+### Configuration
+
+File: `packages/kit/vitest.unit.config.ts`
+
+```typescript
+import { defineConfig } from 'vitest/config';
+
+// Kept apart from vitest.config.ts on purpose: that one drives the integration
+// suite, which needs a live service and the RH_TEST_* secrets the release
+// workflow provides. These run anywhere, with nothing configured.
+export default defineConfig({
+  test: {
+    include: ['src/__tests__/unit/**/*.test.ts'],
+    globals: false,
+    environment: 'node',
+  },
+});
+```
+
+**Key Settings**:
+- `include: ['src/__tests__/unit/**/*.test.ts']` — Runs only unit tests
+- `environment: 'node'` — Runs in Node.js environment
+- No backend or secrets required
+
+### Test Files
+
+#### payments.test.ts
+
+**Purpose**: Payment operations including license grants, checkout sessions, billing portal, and subscription polling.
+
+**Tests**:
+- `grantLicense` resolves "granted" on 201
+- `grantLicense` resolves "already-licensed" on 200
+- `grantLicense` rejects with status 409 when no seat is available
+- `grantLicense` rejects with status 404 when userId is not a member
+- `createCheckoutSession` resolves the checkout url on 201
+- `createCheckoutSession` rejects with status 409 for a team that already has an active subscription
+- `openBillingPortal` rejects with status 402 for a team with no Stripe customer yet
+- `waitForSubscription` resolves on the first check when the predicate is already true
+- `waitForSubscription` polls at the given interval until the predicate becomes true
+- `waitForSubscription` rejects with WaitTimeoutError when the condition never becomes true
+- `waitForSubscription` rejects immediately when the signal is already aborted
+- `waitForSubscription` rejects when the signal aborts while waiting between polls
+- `getSubscription` performs a plain GET with the session already applied
+
+#### orders.test.ts
+
+**Purpose**: Order operations including catalog reading, order creation, order retrieval, and order status polling.
+
+**Tests**:
+- `getCatalog` reads the default "catalog" collection when none is given
+- `getCatalog` reads the configured collection when the service renamed it
+- `getCatalog` forwards pagination as pagesize/page query params
+- `createOrder` posts to the default "orders" collection with items and no email for an authenticated buyer
+- `createOrder` includes email for a guest checkout
+- `createOrder` posts to the configured collection when the service renamed it
+- `getOrder` reads by id with no query string when no secret is given
+- `getOrder` appends the secret as a query param for a guest read
+- `waitForOrder` resolves immediately when the order has already left pending_payment
+- `waitForOrder` keeps polling while pending_payment, then resolves once the webhook lands
+- `waitForOrder` rejects with WaitTimeoutError when timeout occurs
+- `readOrderRef` reads the fragment — the placement that keeps the secret out of logs
+- `readOrderRef` reads the query string too, for deployments that put it there
+- `readOrderRef` prefers the fragment when a URL somehow carries both
+- `readOrderRef` returns the id alone when only {ORDER_ID} was interpolated
+- `readOrderRef` returns null when the placeholders were never configured
+- `readOrderRef` decodes percent-encoded values
+- `readOrderRef` returns null rather than throwing on a URL it cannot parse
+
+#### cart.test.ts
+
+**Purpose**: Cart operations including adding, removing, updating quantities, calculating totals, and localStorage persistence.
+
+**Tests**:
+- `addToCart` adds a line
+- `addToCart` increases the line already holding the item instead of adding a second
+- `addToCart` keeps a variant apart from its siblings
+- `addToCart` does not modify the array it was given
+- `addToCart` refuses to add less than one
+- `addToCart` leaves out empty options rather than storing an empty object
+- `setCartQuantity` sets it
+- `setCartQuantity` removes the line at zero
+- `removeFromCart` removes only the named line
+- `cartTotals` counts units, not lines
+- `cartTotals` sums minor units
+- `cartTotals` answers eur for an empty cart
+- `toOrderItems` leaves names, prices and pictures behind
+- `toOrderItems` sends the chosen options
+- `toOrderItems` omits metadata entirely for a line with no options
+- Storage round-trips a cart
+- Storage is empty when nothing was saved
+- Storage drops a line that is not one, and keeps the rest
+- Storage answers an empty cart for stored JSON that is not an array
+- Storage keeps two apps on one origin apart
+- Storage forgets on request
+- Storage does not throw when storage refuses to write
+
+#### client.test.ts
+
+**Purpose**: Client operations including error handling, token claims, and API fetch behavior.
+
+**Tests**:
+- `onError` reports a non-2xx and still throws it to the caller
+- `onError` reports a request that never reached the service as status 0
+- `onError` stays quiet on success
+- `onError` is optional — a config without it behaves as before
+- Console logging on failure logs a non-2xx when nobody registered onError
+- Console logging on failure stays quiet when a handler is listening
+- `getTokenClaims` reads the subject, which is the user id
+- `getTokenClaims` returns null with no token
+- `getTokenClaims` returns null rather than throwing on a malformed token
+
+#### money.test.ts
+
+**Purpose**: Price formatting with proper currency handling.
+
+**Tests**:
+- `formatPrice` divides a 2-decimal currency by 100
+- `formatPrice` does not divide a 0-decimal currency
+- `formatPrice` divides a 3-decimal currency by 1000
+- `formatPrice` accepts a lowercase currency code, as Stripe sends it
+
+### Writing Kit Unit Tests
+
+Kit unit tests use a custom transport function to mock HTTP requests:
+
+```typescript
+import { describe, it, expect } from 'vitest';
+import { someFunction } from '../../index';
+import type { AuthConfig } from '../../types';
+
+const apiBaseUrl = 'https://x.restheart.com';
+
+describe('someFunction', () => {
+  it('does something', async () => {
+    const config: AuthConfig = {
+      apiBaseUrl,
+      transport: async () => new Response(JSON.stringify({ /* mock response */ }), { status: 200 }),
+    };
+    
+    const result = await someFunction(config);
+    expect(result).toEqual(/* expected result */);
+  });
+});
+```
+
+**Key Patterns**:
+- Use `transport` in `AuthConfig` to mock HTTP responses
+- Use `vi.useFakeTimers()` for time-dependent tests (polling, timeouts)
+- Use `vi.fn()` to track function calls
+- Test both success and error cases
+- Test edge cases (empty inputs, malformed data)
+
+## CLI Unit Tests
+
+CLI unit tests mock the admin and service clients, testing setup runner logic, env ref resolution, session management, and admin client operations. They run without a backend or secrets.
+
+### Running CLI Unit Tests
+
+```bash
+# From monorepo root
+npm test -w packages/cli
+
+# From package directory
+cd packages/cli
+npm test
+```
+
+### Configuration
+
+File: `packages/cli/vitest.unit.config.ts`
+
+```typescript
+import { defineConfig } from 'vitest/config';
+
+// Everything here runs with no live service: the clients speak `fetch`, and a
+// test supplies its own through `AuthConfig.transport`. That is the whole point
+// of keeping the client layer isomorphic — see docs/ADAPTERS.md.
+export default defineConfig({
+  test: {
+    include: ['src/__tests__/unit/**/*.test.ts'],
+    globals: false,
+    environment: 'node',
+  },
+});
+```
+
+**Key Settings**:
+- `include: ['src/__tests__/unit/**/*.test.ts']` — Runs only unit tests
+- `environment: 'node'` — Runs in Node.js environment
+- No backend or secrets required
+
+### Test Files
+
+#### admin.test.ts
+
+**Purpose**: Admin client operations including plugin management, configuration, and environment variable resolution.
+
+**Tests**:
+- Admin client speaks to the endpoints the admin node exposes
+- Admin client reads a plugin schema from `available`, so an uninstalled plugin still has one
+- Admin client writes the redaction placeholder back untouched
+- Admin client resolves a fromEnv marker into the request body and nowhere else
+- Admin client fails naming the variable rather than sending undefined
+- Admin client keeps its token out of localStorage and out of other clients
+
+#### env.test.ts
+
+**Purpose**: Environment variable reference resolution and validation.
+
+**Tests**:
+- `fromEnv` carries the name, not a value
+- `fromEnv` resolves from the supplied environment, leaving everything else alone
+- `fromEnv` does not mutate the setup it was given
+- `fromEnv` names every missing variable at once, so a short pipeline learns all of them
+- `fromEnv` treats a declared-but-empty variable as missing
+- `fromEnv` refuses to be serialised unresolved
+
+#### service.test.ts
+
+**Purpose**: Service client operations including token management, collection/index operations, and document writes.
+
+**Tests**:
+- Service client mints a token once and reuses it
+- Service client renews a token that is about to expire, without the caller knowing
+- Service client shares one mint between calls that start together
+- Service client answers a check with false on 404 and throws on anything else
+- Service client finds an index in the collection listing
+- Service client writes through the paths RESTHeart expects
+- Service client re-running a document write is not an error
+- Service client resolves fromEnv on the way out, like the admin client does
+- Service client fails naming the variable rather than writing an object
+
+#### session.test.ts
+
+**Purpose**: Session management including file storage, token resolution, and session clearing.
+
+**Tests**:
+- `sessionPath` lives under XDG_CONFIG_HOME when it is set
+- `sessionPath` falls back to ~/.config
+- `writeSession` round-trips
+- `writeSession` is readable only by its owner
+- `writeSession` tightens the mode of a file that already existed
+- `readSession` reads a missing file as absent
+- `readSession` reads a corrupt file as absent rather than throwing
+- `readSession` reads a file missing either field as absent
+- `resolveToken` is null when there is neither a variable nor a file
+- `resolveToken` reads the stored session
+- `resolveToken` lets the environment win over the stored session, always
+- `resolveToken` ignores an empty variable, which is how an unset CI secret arrives
+- `resolveToken` trims the variable, because a secret store pastes a trailing newline
+- `clearSession` removes the file and says it did
+- `clearSession` says so when there was nothing to remove
+
+#### setup.test.ts
+
+**Purpose**: Setup runner logic including step execution, dry runs, force mode, and progress reporting.
+
+**Tests**:
+- `runSetup` leaves a satisfied step alone
+- `runSetup` applies an unsatisfied step and re-checks it
+- `runSetup` reports an apply that silently did nothing as failed, not green
+- `runSetup` waits for an apply whose effect the check cannot see yet
+- `runSetup` waits out an init that takes seconds, not milliseconds
+- `runSetup` applies a satisfied step when forced, and still verifies it
+- `runSetup` forcing does not turn a broken step green
+- `runSetup` stops the rest when a step fails, because configuration has dependencies
+- `runSetup` a dry run answers what is missing, all of it, and writes nothing
+- `runSetup` a dry run never resolves a fromEnv marker
+- `runSetup` emits a step name and state, and nothing that could carry a secret
+- `runSetup` reports a missing environment variable by name
+- `runSetup` hands each step both clients and the service id
+- A multi-step setup against a stateful target configures an empty target, then does nothing at all the second time
+- A multi-step setup against a stateful target a dry run reports every outstanding step, not just the first
+
+### Writing CLI Unit Tests
+
+CLI unit tests use mock clients to test the setup runner and client operations:
+
+```typescript
+import { describe, it, expect, vi } from 'vitest';
+import { createAdminClient } from '../../admin.js';
+import type { AdminClient } from '../../admin.js';
+
+interface Call {
+  url: string;
+  method: string;
+  body: unknown;
+}
+
+/** A transport that answers from a table and records what it was asked. */
+function stub(routes: Record<string, unknown>) {
+  const calls: Call[] = [];
+  const transport = async (url: string, init?: RequestInit): Promise<Response> => {
+    const method = init?.method ?? 'GET';
+    const path = new URL(url).pathname;
+    calls.push({
+      url: path,
+      method,
+      body: init?.body ? JSON.parse(init.body as string) : undefined,
+    });
+    const key = `${method} ${path}`;
+    const found = routes[key];
+    if (found === undefined) {
+      return new Response(JSON.stringify({ message: 'not stubbed' }), { status: 404 });
+    }
+    return new Response(JSON.stringify(found), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  };
+  return { calls, transport };
+}
+
+const base = 'https://cloud-api.restheart.com';
+
+describe('admin client', () => {
+  it('speaks to the endpoints the admin node exposes', async () => {
+    const { calls, transport } = stub({
+      'GET /plugins': [{ _id: 'stripe' }],
+      'POST /plugins-mgmt/ea820b/stripe/install': { success: true },
+      'POST /plugins-mgmt/ea820b/stripe/init': { created: 3 },
+      'DELETE /plugins-mgmt/ea820b/stripe': { success: true },
+    });
+    const admin = createAdminClient({ apiBaseUrl: base, transport });
+
+    await admin.pluginCatalog();
+    await admin.installPlugin('ea820b', 'stripe');
+    await admin.initPlugin('ea820b', 'stripe', 'products');
+    await admin.uninstallPlugin('ea820b', 'stripe');
+
+    expect(calls.map(c => `${c.method} ${c.url}`)).toEqual([
+      'GET /plugins',
+      'POST /plugins-mgmt/ea820b/stripe/install',
+      'POST /plugins-mgmt/ea820b/stripe/init',
+      'DELETE /plugins-mgmt/ea820b/stripe',
+    ]);
+  });
+});
+```
+
+**Key Patterns**:
+- Use a `stub` function to mock HTTP responses and record calls
+- Test both success and error cases
+- Test edge cases (missing variables, corrupt data)
+- Use `vi.fn()` to track function calls
+- Use temporary directories for file system tests
+
 ## Adapter Unit Tests
 
 Adapter tests mock `@restheart-cloud/kit` and assert only the **wiring**: which core call fires, and how the reactive state (signals / context / refs) and framework glue (guards, middleware, cookies) react.
@@ -391,6 +791,31 @@ All adapters implement the shared checklist in `docs/ADAPTER_CONTRACT.md`. The c
 | **B. Guards** (every SPA adapter) | authGuard unauthenticated/authenticated, publicGuard authenticated/unauthenticated | ✅ all three |
 | **C. Token lifecycle** | 401 clears session (kit-ng interceptor) | ✅ kit-ng |
 | **D. SSR extras** (next/nuxt subpaths) | Middleware refresh, protected paths, session routes, action token sinks, fragment bridge | ✅ D1–D9, D10 pending |
+| **E. Payments** (every SPA adapter) | Bootstrap without/with payments, login, switchTeam, logout, clearSession, canManageBilling, checkout 409, waitForSubscription, updateProfile/acceptConsents | ✅ all three |
+
+### Payments Test Contract (Section E)
+
+The payments test contract (E1–E10) covers the reactive client state for Stripe subscriptions:
+
+| # | Scenario | Expected |
+|---|---|---|
+| E1 | bootstrap without `payments` in config | no call to `/stripe/*`; `subscription=null`, `plan=null`, `isSubscribed=false`, `seatsAvailable=null` |
+| E2 | bootstrap with `payments`, session valid | loads `subscription` after user and teams |
+| E3 | `login` with `payments` | loads `subscription` in the same flow |
+| E4 | `switchTeam` | reloads `subscription` (the subscription belongs to the team) |
+| E5 | `logout` | clears `subscription` along with user and teams |
+| E6 | `clearSession` | clears `subscription` along with user and teams |
+| E7 | `canManageBilling` | `true` iff `user.team.role` equals the configured `ownershipRole` (default `'owner'`); a case with a custom `ownershipRole` must be covered |
+| E8 | `checkout` returning `409` | the error reaches the caller with `status: 409`, state does not change |
+| E9 | `waitForSubscription` resolves | updates `subscription` with the new value |
+| E10 | `updateProfile` / `acceptConsents` | **no** reload — both re-run `checkSession` and hand back a fresh user document, but the team has not changed. Key the reload on the team id, not on the user object's identity, or every profile edit re-reads the subscription |
+
+**Implementation Notes**:
+- E1–E6 test the reactive state lifecycle: when payments are enabled, subscription state is loaded/cleared alongside user and teams
+- E7 tests role-based access control for billing management
+- E8 tests error handling for duplicate checkout sessions
+- E9 tests the polling mechanism for subscription activation
+- E10 tests that profile/consent updates don't trigger unnecessary subscription reloads
 
 ### Test File Locations
 

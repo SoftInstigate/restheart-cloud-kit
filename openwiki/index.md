@@ -1,5 +1,5 @@
 ---
-okf_version: "0.1"
+okf_version: "0.2"
 ---
 
 # Files
@@ -9,6 +9,7 @@ okf_version: "0.1"
 # Directories
 
 - [architecture](architecture/)
+- [concepts](concepts/)
 - [contributing](contributing/)
 - [deployment](deployment/)
 - [packages](packages/)

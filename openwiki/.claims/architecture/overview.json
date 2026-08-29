@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:7aaf8075817ae6c67b8eeb8f32f65e3714758c38a3e58c121a2d300b7a49a4a2",
+  "claims": [
+    {
+      "id": "claim_6f93d57989544af49c8650048226eefb",
+      "statement": "The monorepo contains five packages: kit (core), kit-ng (Angular adapter), kit-react (React adapter with /next subpath), kit-vue (Vue adapter with /nuxt subpath), and cli (rhc infrastructure-as-code tooling). All share the same version and are released together.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/package.json",
+          "version": "repo-file-v1:sha256:08bb2546a3b324bb438e7e95a8bf9acc237befc1688d2bf055e8d4dc6a109c85"
+        },
+        {
+          "resource": "repo://packages/kit/src/index.ts",
+          "version": "repo-file-v1:sha256:b39b338894832a31d917234a39afb2b950198b72952b55a3cd0efeb3495427e0"
+        }
+      ]
+    },
+    {
+      "id": "claim_ae678a31e16d483f9c22394edd045724",
+      "statement": "The monorepo follows a strict layered architecture: Layer 1 is @restheart-cloud/kit (core, zero dependencies, framework-agnostic), Layer 2 is the framework adapters (kit-ng, kit-react, kit-vue) that depend on kit and add reactive wrappers, and Layer 3 is @restheart-cloud/cli which depends on kit for apiFetch and token utilities but is not an adapter.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/package.json#L35-L37",
+          "version": "repo-lines-v1:sha256:1224e1299300a630cadbb42da4929c1ede5f90a6fa9d82e62b74d829b72d7e34:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmEzYjQ2OWQ5ZTA5NzU3MjI0NjY2NzM0YzllZjdiMjU0ZDg4NTM0ZjVkNWJiNzA5ODk2MDgwNWM1NTNkYzMwNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmQ1NDlmZjYyYWUzZWUxMzEyZGFiNWRjZTI3MTY1YzdhMTgwYWY4NmE2NzE3MzZmNTI2NTQ0YThiMTAxZTZhMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGNiN2IxYzNjOTBiMzg0ZDE1MWViNjhhNTE3ZjZkNmMzYTU0YmIwZjlhY2QyYjhhZmQwMWRlYzY0MjBjNzMyZiJ9"
+        },
+        {
+          "resource": "repo://packages/cli/src/admin.ts#L1-L2",
+          "version": "repo-lines-v1:sha256:bd42a578b36eec44017c36029375a44d34e1289b209bb585a77dac7a9e3bcc9b:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWQ1MzI1YjA1OTEwNjU5MzZlNGJkMGQyNDBjMTRkNGZlODMzN2UyNWUyMWU4NzUyMjMwZGE1OTdmOWM3MzU4NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDI1Yjk4ZDBkYTQyNDEwN2ZhNGYxYWY3NjEwMTNlMTg0NzcyMTM5ODA0NzM5MDIwMTdhMDQ2ODk3YjcxMGM1ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjE1Y2QxODYxMjQxYzg3MTY3NzIxMGQ5OTMzZTY5ZDJiNDViODE2OTEwMjk5YjRiMjk3Y2MzM2EyZWM4NmYzYiJ9"
+        },
+        {
+          "resource": "repo://packages/kit/src/index.ts",
+          "version": "repo-file-v1:sha256:b39b338894832a31d917234a39afb2b950198b72952b55a3cd0efeb3495427e0"
+        }
+      ]
+    },
+    {
+      "id": "claim_38249586080a411984b27433f956e7ff",
+      "statement": "The CLI's AdminClient authenticates against the admin node (cloud-api.restheart.com), manages plugins (install, configure, init, test), mints service tokens, and stores credentials in a closure rather than localStorage to support Node.js and avoid cross-client token collision.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/admin.ts#L131-L236",
+          "version": "repo-lines-v1:sha256:c24e0d02c7931797fd41445b62296813a6cc24cd04cb127e111f127623e45b3f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI4OTBlNDczZjkxMjU3MzkxYzBhNzBmZmIxZjFiMmIzMjhmOGY5MThkMmZkZDAwMjkyOGMxNTVkZjE5MGJkZDI5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyYjM1YmQ1NWRiNTk0YTgzODVkODMxYjE5YjVmMTgwZWFiZThmMWY0ZGJjYmI5NTM4NGE3YjNiY2ZmMjZkNTgzIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        },
+        {
+          "resource": "repo://packages/cli/src/cli.ts#L18-L18",
+          "version": "repo-lines-v1:sha256:42bcb6ba35362a535bdedd09e759272c653a6f88f1f7b625b00ee8e2ca2f3b50:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDJiY2I2YmEzNTM2MmE1MzViZGVkZDA5ZTc1OTI3MmM2NTNhNmY4OGYxZjdiNjI1YjAwZWU4ZTJjYTJmM2I1MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDJiY2I2YmEzNTM2MmE1MzViZGVkZDA5ZTc1OTI3MmM2NTNhNmY4OGYxZjdiNjI1YjAwZWU4ZTJjYTJmM2I1MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmViNTU5YTMxMjIwYzQ0Y2UxYTZhMDA1MDg0MjhkMTQ0ZmRhYTkxYWNiMTEzMDFmYmRkNDE3ODE1YmUyMjA2ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGUyZWEwMzE0MTQ2YmE3N2RkZmJhZWY3YzI1M2Y5NzgyOTY1M2I5N2E5NTM5MjU4OWMwNWM3OWQwMjE3MDA2MiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_a59f35d418ac4117a9a4f74d9f7e9bba",
+      "statement": "The CLI's ServiceClient authenticates against a service node using a token minted lazily from the admin client's /jwt endpoint, caches it, and renews it one minute before expiry. It provides idempotent operations for collections, indexes, permissions, users, and schemas, using ?wm=upsert for document PUTs.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/service.ts#L42-L56",
+          "version": "repo-lines-v1:sha256:2b7b75eb030bdb6b362fc2997fc832629a77aa571bf98a028970972c18e010d6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMyODZlZjY2MzM3MzQ0N2U3YmE0NWY4NjY1ZDZiMWFkNmY1N2QzYmYwMDdlZjU2ZGUzMjUxMGMxNTIwZGI4ZTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMyNGQxMzY4NWQ5MGQxZTI4ZDc1YzkxMTA0NWY2OGIxZWEwZmZhYWQxMDNlODdhZmY0YmZmNGIwNDNkMTQ0NDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI5NDE0MjRhMmQ4NzNlMTg2OTI0NjE2ODU2MDdjMWNhYWY0NDBkZjdkYTk3YzY1YTJhN2FiNjNiNDRkZmNkYWMifQ"
+        },
+        {
+          "resource": "repo://packages/cli/src/service.ts#L57-L177",
+          "version": "repo-lines-v1:sha256:752102d210e60d8e8d5799079534c169d4b959a00ac31eaabf683e07c6ba7d64:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyMDYwNzA0ODE3MzQ1NzZjMjU5ZmI1YTBiMWIyYTE0NTEwY2UzMDNiMTFkYTI1ODQ0ZDFiNjY0ZmYyYWRhZTRlIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyMjY0NTZjODk2NTQyY2QzMzI5ZTBmNWZiZDViZWI0MWJmZjAyMjZlYzZkMzE5NmU5OGE5ZTM3ZTZiNjg3ZDFkIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_2d8b7076953f4976b6db33d29370588f",
+      "statement": "The CLI's setup runner (runSetup) executes steps sequentially, halting on failure. Each step has a check (is it already done?) and an apply (make it so). After applying, it re-checks with exponential backoff up to 15 seconds to handle admin-node/service-node propagation lag. Dry runs execute all checks without applying. The force option skips checks but still verifies the result.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/setup.ts#L108-L246",
+          "version": "repo-lines-v1:sha256:5e9c3c2f5a4f4bc312466076c355a39c0d82d1404bb32db5615aec3e3168155f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTM5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1NThkNDc3ZmFmMWM3YzRjZGI1YzM1ZWY1NWQ0YjZkZDFmMTFjN2ExMjBhNzBjOTNjNWM0ZThjYjQ1ZDFiYTk1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI4ZTlhNTUwMTU1OTViMWJjMjgyZDBmYzI0ZWUwNWY1YTYwNjkwMDM5ZTQ1YTZmYTY4YWEzNjAxMmRhMDY4MjcyIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiNGFmOTFmY2NlYzk5MWM0ZTEyYTFiYjA2NjQ0YjM3OTMzZDYwZDA5ZjhkMzg2NTJkNDBiNjlkYzI5Y2I4N2MxIn0"
+        },
+        {
+          "resource": "repo://packages/cli/src/setup.ts#L155-L189",
+          "version": "repo-lines-v1:sha256:20313f7492339f3f54245381fa26a4ab4d06a621d000ba01dbc0e16e869e2a51:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUwMjkwYWE4OGQ1MmQ1NzM5ZDkzMTQyNTJhNGFjYWNkMjFiYmYxYTdhZjc4ZTFjZDZiYWE1NDUzNTM3MTk2NmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2MWQzZmU2ZTM5NjZjMmY2OGI5ZDc1Mzg0OTQyYjYzY2YxZjU0NDI0OGI3M2ZlMzdmMmY4OTMxY2JlMDQ5MTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f613d76a3f7247388da0b9973bc6768d",
+      "statement": "The CLI stores personal access tokens in ~/.config/restheart/session.json (or XDG_CONFIG_HOME) with 0600 permissions. The RH_CLOUD_TOKEN environment variable always takes precedence over the stored session, ensuring CI pipelines never silently use a stale credential.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/cli.ts#L98-L98",
+          "version": "repo-lines-v1:sha256:33b92924ac11463bc659d75fddad096e998adf9c4b261480e647ccf06f41181c:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzNiOTI5MjRhYzExNDYzYmM2NTlkNzVmZGRhZDA5NmU5OThhZGY5YzRiMjYxNDgwZTY0N2NjZjA2ZjQxMTgxYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzNiOTI5MjRhYzExNDYzYmM2NTlkNzVmZGRhZDA5NmU5OThhZGY5YzRiMjYxNDgwZTY0N2NjZjA2ZjQxMTgxYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDhkNzAyNGIyNzdmODFlYTRkYzg5ODhmZTQ3NGU1NDEyNGMwNDZlM2FkODQxMmJkYzRhM2Y0MTRmZmZmNTc2NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDM0ZDQ0ZjJmNmQ1NWUzMWQwNGRlNGMwNmI5ZTZkNzA5YzBjMDZhMzY3ODQ1ZWMwN2M0OWY3OGExZWUyYTgwMSJ9"
+        },
+        {
+          "resource": "repo://packages/cli/src/session.ts#L36-L100",
+          "version": "repo-lines-v1:sha256:ebe1987c932c9b8108605a4557af2a751f223cb758b03e89478ebc9f597aaf93:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4YzUzNTcxOWNhZjYzMTRhMjE3YzEzOGY4MTI1Yzg5ODEwNjM3YzQzN2I4YTA0Mjk5Y2QwZTUyOThjZmM1NTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyNjdiMTgzYTYwYjZhZDg5NDQ5YjJkN2U5ZTdjMWEyY2NjOWRhYjI5ZDMxNzgxYWQ0NWM4NmQ1NzQ3OWJhMDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY5MmJkOTE2ZDYyNDYxMjc4MTc1OTY5ZDdmNTVkMzEzZDM2OGVkNGNkYjFjMGRmNjBiZGRlNGNlMWQyYzNhMzUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_da5bf4a493334da99835d8b19d47c823",
+      "statement": "The payments subsystem covers two distinct commerce models: subscriptions (recurring billing tied to a team, governed by the @subscription ACL variable resolved server-side) and products/orders (one-time purchases where the order status is moved by Stripe's webhook, never by the client redirect).",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/orders.ts#L1-L13",
+          "version": "repo-lines-v1:sha256:398e190b6f8a2261d7dadc7e6089a20879caee70fce3c716874cbcb0b8e0602c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwZjlmYTRiYzcyODRmZGIzMTU4NGMyOGQ0ZjQyNWQ5MjYxZDBkOTU4Y2I1ZjQ0ZDE1YzQ4M2ViZGZlNzExNjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYzEzYjc3YzZjZjJlNDc4ZWUyZDk0NDk4ZmYxZjM0OGI5ZmIwMDZkYWMxZjRkODhkMzM2YTI2NTk1ZTMxMmIifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L1-L23",
+          "version": "repo-lines-v1:sha256:5a0ff7c60fa08a2692cf1de5acd0e6708e3cbcdc4cbcb6147d12e721033da27d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5Y2Y5OTI0OTNiNTAxODNmYzM5YWQ2ZGIyNDAwYzkzZTE2Mzc4MTNhODU0NTc5MDg1NzdlM2FjYTA4NDNjZmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjczN2Q0YWZkOTI3Yzc0MDI3NDg2YzVlNTM2NjY2ZjdmZjAwOTI3MGZlN2IzOTBjZDk1NTYwMTQzNjFlMzE1NTEifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/types.ts#L190-L348",
+          "version": "repo-lines-v1:sha256:6f82606d632dfc24b6b0b208b8ba93827c7d8d3e7139b62a5cd70a8782acc208:eyJzZWxlY3RlZExpbmVDb3VudCI6MTU5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5NjVhNDUyOTg0OGI1YzhlNGUwMWExNDNiNzU3NWQxZTAzNWNjOGY1NWU5NjA0ZTJlYjQzMzljYzg4M2U4MGRhIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI2NjQwZjY3NGE1ODA1YjM3NDFkYjNmZmViYTg5ZjQxZDQ1ZWYzYTRmNGY5OTQxMTgzYzNjYTg4NjliMzJkNWZlIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_33125cae88a444e8b3b16bc7059805c7",
+      "statement": "All Stripe interaction happens through Stripe-hosted pages — no Stripe.js is loaded client-side. createCheckoutSession, openBillingPortal, and createOrder each return a URL that the caller redirects to with window.location.href. Prices are resolved server-side from the service's own catalog.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/orders.ts#L76-L124",
+          "version": "repo-lines-v1:sha256:5f37d1f40cdc8ed9316ac45fa921c26ec27d028d29c07bb07aaa2aa40c773807:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkMDgzNTgzMWJiM2NkNmQ1NGE4YWFkNTUzM2NhNWNiMmI4OGJiMWVmODY0MjE2MDNjMDNmOGQ2YWU5NmM5ODAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIyMzZkY2FkMmM1YjNmYWE4ZGVlNWY2NmYwNjA2NzRkZTRjOGRiNzk4ODE4M2U5MjM3YjA2NDQ5ZGYyZmRkZjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU2Y2E0NGIzMTBlMGUxZDc5OGEwMDZmNGQyODU1MGY2M2FlNzE5NGYyMzZkMjgwY2ZlMGJjMDc4OTQ5MTA2ZDMifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L54-L78",
+          "version": "repo-lines-v1:sha256:4da435b106918e880237c3990f8d5ddbbd35a11d145b25a20ac69eab8ce21028:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU4YTdjOTgxYjM1OWY1ZjU0NDQ2ODIxMmMzNTMzZDgwNmQwZWZlMzcxODcxNzcyYTdhMTJjMzk2ZmI3MjgwNTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM3NTUyZjRlYTdkMGI4MjBjY2UwYzU4NTFjYTgwMjA5ZjIzYTEzNTdiNjJiYjFiZGEyMDdjYWQzYTFlOWY0NzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY0MTlmY2U1MzFkN2E0MGE0M2I0NDUwNTI2YjA3ZWMwOWMzMjFmZDM4NDQyNTRkMDUxZjczZDkyM2EyYmZmNzkifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L80-L94",
+          "version": "repo-lines-v1:sha256:ced6e212188b9086c02aa22373c23335838f4968ace9b968ee57448830c32fd6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE4ODZmYjc1ZjlhNmM4OTg2ZTI1MjUyNDU2NmQ2ZDI1YzNmMzU2Yjc2NTIwZTMzOGU3MzY2YWEyYTIzYjE0MmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZlYTc5MmIxMjI0Njc0YmVkOWJkMGQ5MTkzYjk3MDk1NWI2ZjUwNGFlNjZmNTQyNDM3NjVkOTU0YTVlNzcxNTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b705829eef8847719304e2eab4f3ef7a",
+      "statement": "Stripe sends the buyer back to successUrl over the browser and reports the payment over a separate server-to-server webhook with no ordering guarantee. The fix is waitForSubscription/waitForOrder, which poll immediately (no initial delay), accept a caller-supplied predicate, throw WaitTimeoutError (not ApiError) on timeout, and support AbortSignal for cancellation.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/orders.ts#L243-L285",
+          "version": "repo-lines-v1:sha256:5458109a38e68d24a3d1cfca5a24be6ac79737b70ff0e8563f627011937e73ed:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFiODgwZWNiOGM5Yjc3YWYzZDc1ZWI3ODEwZDNhNzQ2ZjI4YmNlMzQ1MDQxMDhmYzc4MDc3OWNlMDY3MTc5NGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L129-L194",
+          "version": "repo-lines-v1:sha256:bd8bc617330284d658834edd53ee90af706dad96750de693a4775eced44e4e59:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZkNjNjN2Y5ZWFiZTI4YTIzZGQ5N2VkMzI2OTJkMTIwZDFhYjQ0OTA0NjZlYWY5NDA5MTQyOTM4NTM5ZWZiMjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkMGYyZDNhM2FhZGEyNzU4NjQ1NzhkMGE0MzkxNTYzOGQ1NDNmZWNhMmM5NDg1OGRiOTQxMjExZTg2Y2VmMmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZhMTZjZjc0NmQyMzRkMmIxZWE2NmY3YThiZjMyMjhiNTMxYTRiZjI3NDJmOWM4OWJkNTAyMTU5NzRhZjE2YTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_857c3b6e9ab84cffab62e7ea5afee7ec",
+      "statement": "Unlike acceptConsents, switchTeam, and updateProfile, a subscription change does not trigger a token renewal. The @subscription ACL variable is resolved server-side from the database on every request, cached only for the life of that request, so an upgrade is effective immediately with no re-login.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L5-L23",
+          "version": "repo-lines-v1:sha256:962eca90cb942c43ad576a8c123f01f6dbc178435aa4438d0a410873d5aeed90:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlNmU4YWY4Y2NiNDAyNmFjOWRmMTUyODU2MmNhYTNjM2MyOTU0NjcxODY2NDcwZTIzNzI3YjE2OTg2YzljZTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlN2ZjNmZhN2ZkMzBmODBmOWY1NWYzYjg2OWEzNThmNGIwMDY0MGMwMjgyNmY2YmRjNmRiZTI2MjI5YjU4ZGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjczN2Q0YWZkOTI3Yzc0MDI3NDg2YzVlNTM2NjY2ZjdmZjAwOTI3MGZlN2IzOTBjZDk1NTYwMTQzNjFlMzE1NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0d80b2812eb749fb96a81a7422de80cb",
+      "statement": "The cart (cart.ts) is a pure client-side data structure — addToCart, setCartQuantity, removeFromCart, and cartTotals are pure functions that return new arrays and never talk to a server. toOrderItems strips display fields and passes only productId, quantity, and metadata to createOrder. Prices in the cart are display-only; the service reads unit_amount from its own catalog.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/cart.ts#L1-L14",
+          "version": "repo-lines-v1:sha256:c4e5e661fdec90bc5926556d99a3c12b8331f62fae85614d189fee0a712c7895:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU2ZDhhNmI0NjQ3YzMyZGE0NmFiMDNkYmU4YmRmZTExM2JmMzkxYzlkNTk2MDUyZmM3YThjM2VlMTUwMmQ1OGEifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/cart.ts#L73-L141",
+          "version": "repo-lines-v1:sha256:a2209b308a7f2068837b4ad59dd5497ccea3f1c636263539f5d9aa0fcca5a2ef:eyJzZWxlY3RlZExpbmVDb3VudCI6NjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlOGI4ZDE4ZmNkZDJiM2QzMjNjMTgzN2E2ZTBhMTg2YTgwOWRlOTg0YmNjNDNhODIzM2RlNDdiZDFhZjk4MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2YTBlMDA3ZDhjMGVhMjhkMmYwMDhjNjdhOWViMjczYTRkZGUxMzVjZDQ2ZTNlZGQ5NjlmMDI3ZTU0ZWExZTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZlNGJjMGNmM2VkYjI2NTM2ZDgxYWEzZmFkZmVlZGM0MDVhYzMyNjEyZTUzZmQ4NDU4Mjc1YWVmOTY4ZmVlYTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fee75b3ceffd432aacf504dccb435ce7",
+      "statement": "Adapter payments tests are covered by section E of docs/ADAPTER_CONTRACT.md (E1–E10). Key rules: nothing touches /stripe/* unless config.payments is true; the subscription reloads on switchTeam but not on updateProfile/acceptConsents (key on team id, not user identity); canManageBilling compares the user's team role against config.ownershipRole (default 'owner').",
+      "evidence": [
+        {
+          "resource": "repo://docs/ADAPTER_CONTRACT.md#L66-L100",
+          "version": "repo-lines-v1:sha256:6420c50772a55e1fbd599a05e9332446a2b9bb499fa1fbbace722cc6b07fd9d9:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxNTUxMzQ0ZWI1NmM4ODY0NDE2ODkyMjA3N2NjZWFmZDJjZGMxZGJjYWNjN2ZjNzY3ZTY1OWRlZGNmNDUyODYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1ZDI2Mzg5NDQyZDQ3NjFiYTVlOGRjNzRlMGRhMmY5OGI4MjI2Y2UyY2M4YWFjYzEyOGYzZDlkOTQ4MDZiYTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlY2MyM2FiYTFjMzk3NmRmZmEyM2I5NzU2ZDVmNTcxNzI2Y2UzOTE0NjEzOGM3NWExNDJhMGE3NWUwMmFhM2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJhOWIxNTg5NTdkODkwZjUyYzdmNDJjZTI3ZjAwNjdkOGI3YzJiNGZmNTJlNjY0ZjZkY2ZlMzIwN2U0MjNmMWYifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/types.ts#L82-L106",
+          "version": "repo-lines-v1:sha256:cebe3f98355f3a53f45096090ae1f311ba42e27ffb5455a068bbe7c8fc9800c8:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI1YWNiZWM2ZmI1ZGFiMDAwMGZkYjhlMTNhNTFhYjRiMzVjZmY2NDA0ZDEyNDlmZWMzNWI2NzJhMTg4NmZlMDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ5YTRkMzI1YmMzYTU3ZjMxNmMyN2I3MTk4Mjk3NDllZmZiYmM3YzdiNzI5NjQ0ZTM2OTllM2NjNDU2NmJjNzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY2ODQwZTZkNjFmODBiZTBlMDQ0NTliMDhlYjU0MWE4MDJiNDFjMWE3NjRiZWUxY2QzMWQyZjRjMzdhMGVkMWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4fb378c7ad39421f97559efa5f4fb0ef",
+      "statement": "Payments are a separate reactive surface from auth in every SPA adapter: RhPaymentsService (Angular), usePayments() under RhPaymentsProvider (React), usePayments() under createRhPayments (Vue). Each owns subscription, plan, isSubscribed, canManageBilling, seatsAvailable and reads the user from the auth surface only to derive canManageBilling.",
+      "evidence": [
+        {
+          "resource": "repo://docs/ADAPTERS.md#L176-L194",
+          "version": "repo-lines-v1:sha256:4450d9e61a4b14a50c9b26130d7ae45d8a0974cf1589a66fb152d58745d09668:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5ZDgyNDcxMzEwYTIwYWM2MGNkODNlZDFjYjU3YjE1ZmYyYTdjNDIwMjdlMTNkYTIyY2ZmY2IwM2E1N2Y2MzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0Mzc5ZDA4NWMzMDgxODkxYjFmNGMwYmQyYjYzOGEzNDkwOTg5Y2U5MzYzZjcwZDNmMTQ2MDE0NTA5Zjc1NTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY0MzkyNmUxMGRjZGE3Nzc5ZjFmNzc4NzFjMmIyY2VhOGFlY2I1YmMwNzlhZTdhMjlhNzk5MjQyZWM0MzYxOTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBlZTNiYjM1ZjcxZjJlNjBjZWQyNDY5ZDZjZmMwODIyYWE2ZmQ0MDI3NGFlNTQwYzc4MmQyM2U0OTllYzBlNWEifQ"
+        },
+        {
+          "resource": "repo://docs/ADAPTER_CONTRACT.md#L66-L100",
+          "version": "repo-lines-v1:sha256:6420c50772a55e1fbd599a05e9332446a2b9bb499fa1fbbace722cc6b07fd9d9:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxNTUxMzQ0ZWI1NmM4ODY0NDE2ODkyMjA3N2NjZWFmZDJjZGMxZGJjYWNjN2ZjNzY3ZTY1OWRlZGNmNDUyODYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1ZDI2Mzg5NDQyZDQ3NjFiYTVlOGRjNzRlMGRhMmY5OGI4MjI2Y2UyY2M4YWFjYzEyOGYzZDlkOTQ4MDZiYTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlY2MyM2FiYTFjMzk3NmRmZmEyM2I5NzU2ZDVmNTcxNzI2Y2UzOTE0NjEzOGM3NWExNDJhMGE3NWUwMmFhM2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJhOWIxNTg5NTdkODkwZjUyYzdmNDJjZTI3ZjAwNjdkOGI3YzJiNGZmNTJlNjY0ZjZkY2ZlMzIwN2U0MjNmMWYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_459b45c77cc14f8fb8367bdfe962f832",
+      "statement": "All adapters and the CLI depend on kit at exact version 0.0.0 in development. The release workflow rewrites this to the tag version before publishing. All five packages share the same version number.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/package.json#L35-L37",
+          "version": "repo-lines-v1:sha256:1224e1299300a630cadbb42da4929c1ede5f90a6fa9d82e62b74d829b72d7e34:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmEzYjQ2OWQ5ZTA5NzU3MjI0NjY2NzM0YzllZjdiMjU0ZDg4NTM0ZjVkNWJiNzA5ODk2MDgwNWM1NTNkYzMwNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmQ1NDlmZjYyYWUzZWUxMzEyZGFiNWRjZTI3MTY1YzdhMTgwYWY4NmE2NzE3MzZmNTI2NTQ0YThiMTAxZTZhMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGNiN2IxYzNjOTBiMzg0ZDE1MWViNjhhNTE3ZjZkNmMzYTU0YmIwZjlhY2QyYjhhZmQwMWRlYzY0MjBjNzMyZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_415ca7cb165f42b8b6c224634c21ad68",
+      "statement": "The CLI is not a framework adapter — it is a standalone operational tool that runs in Node.js. It depends on kit for apiFetch, login, and token utilities (getTokenExpiry) but does not wrap them in reactive state or framework-specific patterns.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/package.json#L35-L37",
+          "version": "repo-lines-v1:sha256:1224e1299300a630cadbb42da4929c1ede5f90a6fa9d82e62b74d829b72d7e34:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmEzYjQ2OWQ5ZTA5NzU3MjI0NjY2NzM0YzllZjdiMjU0ZDg4NTM0ZjVkNWJiNzA5ODk2MDgwNWM1NTNkYzMwNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmQ1NDlmZjYyYWUzZWUxMzEyZGFiNWRjZTI3MTY1YzdhMTgwYWY4NmE2NzE3MzZmNTI2NTQ0YThiMTAxZTZhMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGNiN2IxYzNjOTBiMzg0ZDE1MWViNjhhNTE3ZjZkNmMzYTU0YmIwZjlhY2QyYjhhZmQwMWRlYzY0MjBjNzMyZiJ9"
+        },
+        {
+          "resource": "repo://packages/cli/src/admin.ts#L1-L2",
+          "version": "repo-lines-v1:sha256:bd42a578b36eec44017c36029375a44d34e1289b209bb585a77dac7a9e3bcc9b:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWQ1MzI1YjA1OTEwNjU5MzZlNGJkMGQyNDBjMTRkNGZlODMzN2UyNWUyMWU4NzUyMjMwZGE1OTdmOWM3MzU4NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDI1Yjk4ZDBkYTQyNDEwN2ZhNGYxYWY3NjEwMTNlMTg0NzcyMTM5ODA0NzM5MDIwMTdhMDQ2ODk3YjcxMGM1ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjE1Y2QxODYxMjQxYzg3MTY3NzIxMGQ5OTMzZTY5ZDJiNDViODE2OTEwMjk5YjRiMjk3Y2MzM2EyZWM4NmYzYiJ9"
+        },
+        {
+          "resource": "repo://packages/cli/src/service.ts#L1-L1",
+          "version": "repo-lines-v1:sha256:8427fe80c80ba1ba33caf5ddc9714f4d8263b5e32de9769d8468050ab4d4e929:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODQyN2ZlODBjODBiYTFiYTMzY2FmNWRkYzk3MTRmNGQ4MjYzYjVlMzJkZTk3NjlkODQ2ODA1MGFiNGQ0ZTkyOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODQyN2ZlODBjODBiYTFiYTMzY2FmNWRkYzk3MTRmNGQ4MjYzYjVlMzJkZTk3NjlkODQ2ODA1MGFiNGQ0ZTkyOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzYzOGQ3ZDVlZWYyNWUzYjJlYzkyNDI5MTJkY2JlNGFjZmFjM2E4MWQ2YmE5YzgyMDcyODFhMDdmZjgyMTJmYiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_60578e0314a646bca24b8da1785b1447",
+      "statement": "The CLI resolves fromEnv markers (secrets referencing environment variables) at serialization time — in updatePluginConfig and in ServiceClient's body helper — not earlier, so a marker never reaches JSON.stringify as a raw object.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/admin.ts#L205-L213",
+          "version": "repo-lines-v1:sha256:de155c9eb2d02ab2d5e1d09e4fda0326eb61b57649636b90ec3fa79749f003b0:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2QyYWU5YTU0NWQ0YzRlMjhiMGRkZDBkYzhlNWYyYWY1YzI0MzRlZGNlN2FmZjJkMDVlOTdiZDRhOTM0ODc4NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWYwY2RiOTcyYTdiZmI3ZWQyNDZmOWZmNjcyMzg1ZTU1ZjQ5NjhmYzExMDQzZGM1YjY4NGQ1MWRmYTMxZGJjYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTIyNDUyY2E4MTJjZjExZGMxYjg0OGI3MGQ5NjIyOTM1NDZkMDg2MDBjMzhkYjJiOTNjMmVhMDNhMWRmYTVjMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjkwNzcxZmQ3OTg5YTIzMjFkOGNkOGY5M2MxNTU3NDcwOTI5OTZmZjhjMmI3MjY2NzNkZTY5NDlhOTAyY2JmOSJ9"
+        },
+        {
+          "resource": "repo://packages/cli/src/service.ts#L91-L103",
+          "version": "repo-lines-v1:sha256:d2613abaeff1cd2efe2119f1aa0fb0dcae1b9f361bfbfd401a2c28b37be89fcb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJmMzM1ZDZhNzAwYzJmYjJlNzM1Nzg3NTEwMjFiZmM5ZjRlMzRhMWQ0YTU5MWFhMDZkZGJhZjY2NmFjOWJkZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg3MmM5MjY1OTkxNWE3MjM3OWRkZjlkZTNhN2Y3MjQwNjg2YzgzYTc0ZjEyZTI2YzYzY2EyMWEzYmZjN2NiOWQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f1281449f3b0433da0daa02b9310e762",
+      "statement": "The ServiceClient caches its minted token and shares in-flight mint requests so that concurrent steps in a setup do not burst identical /jwt calls when the token turns over. Tokens are renewed one minute before expiry (RENEW_MARGIN_MS = 60_000).",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/service.ts#L42-L84",
+          "version": "repo-lines-v1:sha256:5bb7a92ac86d1a6e78e159632ddeb333fe0177ac19286c5f4a737dcf7a4d1223:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMyODZlZjY2MzM3MzQ0N2U3YmE0NWY4NjY1ZDZiMWFkNmY1N2QzYmYwMDdlZjU2ZGUzMjUxMGMxNTIwZGI4ZTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMyNGQxMzY4NWQ5MGQxZTI4ZDc1YzkxMTA0NWY2OGIxZWEwZmZhYWQxMDNlODdhZmY0YmZmNGIwNDNkMTQ0NDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI3NDIwNGY3MzVkNzlhZDgyOGM3MWM5MjVjMGQ4MTc4MmM5NTU1YTI0ZTIyYTJhYWI0MzIwMTU0MGFiMWExYzYifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.4.3",
+    "at": "2026-08-28T16:48:53.239Z"
+  }
+}

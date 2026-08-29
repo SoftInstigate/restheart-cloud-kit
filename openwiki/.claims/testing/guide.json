@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:a64143e05396c474b3891a76ee75b3c586d142e5411651fe853745200660122b",
+  "claims": [
+    {
+      "id": "claim_e7ebb7e508804f9f92901818b0fa82a0",
+      "statement": "RESTHeart Cloud Kit has four test tiers: core integration tests (against live API), kit unit tests (mock transport, no backend), CLI unit tests (mock clients, no backend), and adapter unit tests (mock core, no backend).",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/package.json#L33-L33",
+          "version": "repo-lines-v1:sha256:a14c4eaf2c13b6b1ef14323ef7437e90fc0787ea0b1b055d0af097d24a52be5b:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTE0YzRlYWYyYzEzYjZiMWVmMTQzMjNlZjc0MzdlOTBmYzA3ODdlYTBiMWIwNTVkMGFmMDk3ZDI0YTUyYmU1YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTE0YzRlYWYyYzEzYjZiMWVmMTQzMjNlZjc0MzdlOTBmYzA3ODdlYTBiMWIwNTVkMGFmMDk3ZDI0YTUyYmU1YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjBlZDBlOTMxZTU4NGM5MjIzNmRkNmU4NTg3ZjMwNzZlNTI3NzNhYzc1NzU5NWRlYmFlNDY1Y2UyNjVkZjc0MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDMxMTFjNzNhNGU3NDBkMzRkMjE0YTk2ZDRkMWFiYmRjNGNiYTg4OTgwMjdjMGRlNmYzNmMwOTljZTZmNjA2OCJ9"
+        },
+        {
+          "resource": "repo://packages/cli/vitest.unit.config.ts",
+          "version": "repo-file-v1:sha256:f615eabf4e068b47d4581e0e811aae719df91af5144fc86a7313cc5977862dc1"
+        },
+        {
+          "resource": "repo://packages/kit/package.json#L23-L23",
+          "version": "repo-lines-v1:sha256:a14c4eaf2c13b6b1ef14323ef7437e90fc0787ea0b1b055d0af097d24a52be5b:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTE0YzRlYWYyYzEzYjZiMWVmMTQzMjNlZjc0MzdlOTBmYzA3ODdlYTBiMWIwNTVkMGFmMDk3ZDI0YTUyYmU1YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTE0YzRlYWYyYzEzYjZiMWVmMTQzMjNlZjc0MzdlOTBmYzA3ODdlYTBiMWIwNTVkMGFmMDk3ZDI0YTUyYmU1YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjFiMzE2M2ZiOWVkZWZkN2I3NDQ0ZTlmMDFhMDg0OTYwOWFmODlkZjBlNGJhNmQ4YWRjZmM5ZWQ4NDk0MzhiOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjMzOGMwODFmMzcxMDNmNWIyMmJiOTRjNzk2Yzk0MDk0ZmM2MDk0ZWM1ZjE0MzM4OThjNGI4YWIzZjFhMTNkNyJ9"
+        },
+        {
+          "resource": "repo://packages/kit/vitest.unit.config.ts",
+          "version": "repo-file-v1:sha256:91778f5f84aedf1ba8f5c572f6c5bfa833747b12ffd1726f7345da43246f61e2"
+        }
+      ]
+    },
+    {
+      "id": "claim_021e865922044ab8864b210105bf1ffc",
+      "statement": "Kit unit tests run with `npm run test:unit -w packages/kit` using vitest.unit.config.ts, which includes only `src/__tests__/unit/**/*.test.ts` and requires no backend or secrets.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/package.json#L23-L23",
+          "version": "repo-lines-v1:sha256:a14c4eaf2c13b6b1ef14323ef7437e90fc0787ea0b1b055d0af097d24a52be5b:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTE0YzRlYWYyYzEzYjZiMWVmMTQzMjNlZjc0MzdlOTBmYzA3ODdlYTBiMWIwNTVkMGFmMDk3ZDI0YTUyYmU1YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTE0YzRlYWYyYzEzYjZiMWVmMTQzMjNlZjc0MzdlOTBmYzA3ODdlYTBiMWIwNTVkMGFmMDk3ZDI0YTUyYmU1YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjFiMzE2M2ZiOWVkZWZkN2I3NDQ0ZTlmMDFhMDg0OTYwOWFmODlkZjBlNGJhNmQ4YWRjZmM5ZWQ4NDk0MzhiOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjMzOGMwODFmMzcxMDNmNWIyMmJiOTRjNzk2Yzk0MDk0ZmM2MDk0ZWM1ZjE0MzM4OThjNGI4YWIzZjFhMTNkNyJ9"
+        },
+        {
+          "resource": "repo://packages/kit/vitest.unit.config.ts",
+          "version": "repo-file-v1:sha256:91778f5f84aedf1ba8f5c572f6c5bfa833747b12ffd1726f7345da43246f61e2"
+        }
+      ]
+    },
+    {
+      "id": "claim_49239af93e75434a9b293044c0940ddd",
+      "statement": "CLI unit tests run with `npm test -w packages/cli` using vitest.unit.config.ts, which includes only `src/__tests__/unit/**/*.test.ts` and requires no backend or secrets.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/package.json#L33-L33",
+          "version": "repo-lines-v1:sha256:a14c4eaf2c13b6b1ef14323ef7437e90fc0787ea0b1b055d0af097d24a52be5b:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTE0YzRlYWYyYzEzYjZiMWVmMTQzMjNlZjc0MzdlOTBmYzA3ODdlYTBiMWIwNTVkMGFmMDk3ZDI0YTUyYmU1YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTE0YzRlYWYyYzEzYjZiMWVmMTQzMjNlZjc0MzdlOTBmYzA3ODdlYTBiMWIwNTVkMGFmMDk3ZDI0YTUyYmU1YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjBlZDBlOTMxZTU4NGM5MjIzNmRkNmU4NTg3ZjMwNzZlNTI3NzNhYzc1NzU5NWRlYmFlNDY1Y2UyNjVkZjc0MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDMxMTFjNzNhNGU3NDBkMzRkMjE0YTk2ZDRkMWFiYmRjNGNiYTg4OTgwMjdjMGRlNmYzNmMwOTljZTZmNjA2OCJ9"
+        },
+        {
+          "resource": "repo://packages/cli/vitest.unit.config.ts",
+          "version": "repo-file-v1:sha256:f615eabf4e068b47d4581e0e811aae719df91af5144fc86a7313cc5977862dc1"
+        }
+      ]
+    },
+    {
+      "id": "claim_024322923ef34a61afe20462349461d9",
+      "statement": "Kit unit tests cover five modules: payments (grantLicense, createCheckoutSession, openBillingPortal, waitForSubscription, getSubscription), orders (getCatalog, createOrder, getOrder, waitForOrder, readOrderRef), cart (addToCart, setCartQuantity, removeFromCart, cartTotals, toOrderItems, storage), client (onError, console logging, getTokenClaims), and money (formatPrice).",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/__tests__/unit/cart.test.ts",
+          "version": "repo-file-v1:sha256:b8885b9b267df21cf05ddc3d25fc95433387e559f93d9eeb8fa819fe1922519a"
+        },
+        {
+          "resource": "repo://packages/kit/src/__tests__/unit/client.test.ts",
+          "version": "repo-file-v1:sha256:1dd659ddadb4b2f421b852392a49c6881cada9b657db7ab9b5ca6d08629e260c"
+        },
+        {
+          "resource": "repo://packages/kit/src/__tests__/unit/money.test.ts",
+          "version": "repo-file-v1:sha256:704077e3619f7bd90acd32e8a3e5c0ce8bfb51cac9704bdf0621bb98ca0272c5"
+        },
+        {
+          "resource": "repo://packages/kit/src/__tests__/unit/orders.test.ts",
+          "version": "repo-file-v1:sha256:b2d968e848c28420990a7329b8732566839c2c971f914d201a2d391ece57dc1d"
+        },
+        {
+          "resource": "repo://packages/kit/src/__tests__/unit/payments.test.ts",
+          "version": "repo-file-v1:sha256:bcf4c8e94b063bc70ebb7f7ee45bb0ecebd27411d4d5a39f8fa00246cdfe41dd"
+        }
+      ]
+    },
+    {
+      "id": "claim_8459e17c3ef44c8e90d795e3a687bfab",
+      "statement": "CLI unit tests cover five modules: admin client (plugin management, configuration, env ref resolution), env (fromEnv resolution, validation), service client (token management, collection/index operations, document writes), session (file storage, token resolution, session clearing), and setup runner (step execution, dry runs, force mode, progress reporting).",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/__tests__/unit/admin.test.ts",
+          "version": "repo-file-v1:sha256:951b6f5776f2238bbb76d8634c57b4ee63239846b5752cd751b6add72706f6d5"
+        },
+        {
+          "resource": "repo://packages/cli/src/__tests__/unit/env.test.ts",
+          "version": "repo-file-v1:sha256:44c949c606d24e2f313e5d0d0c536910401193e7a64655dc184fc98910b1ddcd"
+        },
+        {
+          "resource": "repo://packages/cli/src/__tests__/unit/service.test.ts",
+          "version": "repo-file-v1:sha256:4cd712a49cb6659669156e9c2d4ce05d1c04ad783cd9b6ac63da999e0777e275"
+        },
+        {
+          "resource": "repo://packages/cli/src/__tests__/unit/session.test.ts",
+          "version": "repo-file-v1:sha256:1db59886b404645cf255c7b51ae203a0e9fd7d04429903e357c66a880bb13ade"
+        },
+        {
+          "resource": "repo://packages/cli/src/__tests__/unit/setup.test.ts",
+          "version": "repo-file-v1:sha256:d51836355374f84c2dd8f52d553419520baf56e74558367574414aef3302f55d"
+        }
+      ]
+    },
+    {
+      "id": "claim_9632ff4ff0434427881dce370a2e1723",
+      "statement": "The payments test contract (E1-E10) covers reactive client state for Stripe subscriptions: bootstrap without/with payments, login, switchTeam, logout, clearSession, canManageBilling, checkout 409, waitForSubscription, and updateProfile/acceptConsents not reloading subscription.",
+      "evidence": [
+        {
+          "resource": "repo://docs/ADAPTER_CONTRACT.md#L66-L79",
+          "version": "repo-lines-v1:sha256:0c298dfd8733245b9f1c707f73133a12297059c3f5cb8739dd636e7506ca7b9b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxNTUxMzQ0ZWI1NmM4ODY0NDE2ODkyMjA3N2NjZWFmZDJjZGMxZGJjYWNjN2ZjNzY3ZTY1OWRlZGNmNDUyODYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU4ZDRjNjcyNTFiMThlNjk5YTFiNDMzOWU2YTM5M2Q4ZDJmODE5MTY4MzcwMzFjZGVhY2RmNzY3YmVmZDQ4ZDkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlY2MyM2FiYTFjMzk3NmRmZmEyM2I5NzU2ZDVmNTcxNzI2Y2UzOTE0NjEzOGM3NWExNDJhMGE3NWUwMmFhM2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE3MTAwMmUyMWExN2U4M2Y4NWNmNjRmZDU2NzIwNjY0NWU2YTJjYWI3MWJkZDc0NjYyNGJhOTAxOGRmYTMwNjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_37f6acd5a3dd404e9fdad29248c8df98",
+      "statement": "E1-E6 test the reactive state lifecycle: when payments are enabled, subscription state is loaded/cleared alongside user and teams during bootstrap, login, switchTeam, logout, and clearSession.",
+      "evidence": [
+        {
+          "resource": "repo://docs/ADAPTER_CONTRACT.md#L66-L79",
+          "version": "repo-lines-v1:sha256:0c298dfd8733245b9f1c707f73133a12297059c3f5cb8739dd636e7506ca7b9b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxNTUxMzQ0ZWI1NmM4ODY0NDE2ODkyMjA3N2NjZWFmZDJjZGMxZGJjYWNjN2ZjNzY3ZTY1OWRlZGNmNDUyODYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU4ZDRjNjcyNTFiMThlNjk5YTFiNDMzOWU2YTM5M2Q4ZDJmODE5MTY4MzcwMzFjZGVhY2RmNzY3YmVmZDQ4ZDkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlY2MyM2FiYTFjMzk3NmRmZmEyM2I5NzU2ZDVmNTcxNzI2Y2UzOTE0NjEzOGM3NWExNDJhMGE3NWUwMmFhM2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE3MTAwMmUyMWExN2U4M2Y4NWNmNjRmZDU2NzIwNjY0NWU2YTJjYWI3MWJkZDc0NjYyNGJhOTAxOGRmYTMwNjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_711440ad80fc4484828d37a1bda462ee",
+      "statement": "E7 tests that canManageBilling returns true iff user.team.role equals the configured ownershipRole (default 'owner'), with a case covering a custom ownershipRole.",
+      "evidence": [
+        {
+          "resource": "repo://docs/ADAPTER_CONTRACT.md#L76-L76",
+          "version": "repo-lines-v1:sha256:08f514afa0683b9f79efadaf864085d9787867fb758551a203641528fc183642:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDhmNTE0YWZhMDY4M2I5Zjc5ZWZhZGFmODY0MDg1ZDk3ODc4NjdmYjc1ODU1MWEyMDM2NDE1MjhmYzE4MzY0MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDhmNTE0YWZhMDY4M2I5Zjc5ZWZhZGFmODY0MDg1ZDk3ODc4NjdmYjc1ODU1MWEyMDM2NDE1MjhmYzE4MzY0MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzIxZTg0OTc0Nzk2ZTU4NmZkMWQ1MDk0MTk3OTE3ZDE5OTI1MmJiZjJjYjJjOTdlNDhkZjFkNmUzYjBhOWE0MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDMxOTY2ZGM0N2FiM2VmZjBmMWNiN2VhOTliYTU4YzY2ZjI5NjdhYTA2M2EyMDA2ZDM5NjUwNGRhOTY1MDVmMSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7a4e67c2d5534c53b00501d3827c8ae0",
+      "statement": "E8 tests that checkout returning 409 reaches the caller with status: 409 and state does not change.",
+      "evidence": [
+        {
+          "resource": "repo://docs/ADAPTER_CONTRACT.md#L77-L77",
+          "version": "repo-lines-v1:sha256:ac2d3d2d8e331fec157e036a3ea8a6892a669b9088712b66009207c9e1c8ea68:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWMyZDNkMmQ4ZTMzMWZlYzE1N2UwMzZhM2VhOGE2ODkyYTY2OWI5MDg4NzEyYjY2MDA5MjA3YzllMWM4ZWE2OCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWMyZDNkMmQ4ZTMzMWZlYzE1N2UwMzZhM2VhOGE2ODkyYTY2OWI5MDg4NzEyYjY2MDA5MjA3YzllMWM4ZWE2OCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmY0NDhmM2MzMDRlOTdmODllNTkzMGI3NTU5MGZmODZjYTZjNmZjYmQ0ZjIzYjJmYTU0NzcyYjA5ODJjOTVjNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTM3Mjc2NDljNWU0MTU2MmIxYzcyYjg1YTE2YzU3YWM1MjA0MjlhNGVlYjAxMzRmZTYxOGU0ZjQwN2ViZmNiOCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_3ce2d2ef3e664e0cbf201dd33862af6e",
+      "statement": "E9 tests that waitForSubscription resolves and updates subscription with the new value.",
+      "evidence": [
+        {
+          "resource": "repo://docs/ADAPTER_CONTRACT.md#L78-L78",
+          "version": "repo-lines-v1:sha256:b5a4bf690fb2784939acd15a9b959f2a9e621d1d9d5a9705010420cc2ee89e9d:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjVhNGJmNjkwZmIyNzg0OTM5YWNkMTVhOWI5NTlmMmE5ZTYyMWQxZDlkNWE5NzA1MDEwNDIwY2MyZWU4OWU5ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjVhNGJmNjkwZmIyNzg0OTM5YWNkMTVhOWI5NTlmMmE5ZTYyMWQxZDlkNWE5NzA1MDEwNDIwY2MyZWU4OWU5ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDk0YTYzNDNkOGRhNzNmZjkxNTU1OGNiOTQ3NzU0Mjk1YTc5NjhiZmM4MDAxMTZlN2Q1MTYzMjJjZmM1NTVjZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTExNTk0YzcxYzJmYzMwNTBiYWEwMDVlYjExYTg5ZTE3ZTllZDQ4NzA2MjlkZmVhNjY1NDI4NTBlNjliZDZlZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_77124c7041cb49bf9f140e4ebbd20d68",
+      "statement": "E10 tests that updateProfile/acceptConsents do not reload subscription — both re-run checkSession and hand back a fresh user document, but the team has not changed. The reload must be keyed on the team id, not on the user object's identity.",
+      "evidence": [
+        {
+          "resource": "repo://docs/ADAPTER_CONTRACT.md#L79-L79",
+          "version": "repo-lines-v1:sha256:e8d4c67251b18e699a1b4339e6a393d8d2f81916837031cdeacdf767befd48d9:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZThkNGM2NzI1MWIxOGU2OTlhMWI0MzM5ZTZhMzkzZDhkMmY4MTkxNjgzNzAzMWNkZWFjZGY3NjdiZWZkNDhkOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZThkNGM2NzI1MWIxOGU2OTlhMWI0MzM5ZTZhMzkzZDhkMmY4MTkxNjgzNzAzMWNkZWFjZGY3NjdiZWZkNDhkOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjZhMDlmYjViZGZkYWZhMjdhZTEzMWY5Y2FjNGFhMTgzYWNiOGY0Yjg4YmRkNjllYjc5NjkxZDVkNzc0NGRmNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTcxMDAyZTIxYTE3ZTgzZjg1Y2Y2NGZkNTY3MjA2NjQ1ZTZhMmNhYjcxYmRkNzQ2NjI0YmE5MDE4ZGZhMzA2NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_588390e7b71b48b9869c02fb72e7f962",
+      "statement": "Kit unit tests use a custom transport function in AuthConfig to mock HTTP requests, making them fast and deterministic without a backend.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/__tests__/unit/client.test.ts#L23-L24",
+          "version": "repo-lines-v1:sha256:24c3f0b05caab4d03d5223386fb36cfba53306b75042cb06e4ca468f1e298a91:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjNlNzlhYjJmMTgwNGM2NjY0Zjk3Y2QxNjVjMzEzYmM1NjllZjQxMTgzMDg1N2VkNjVkYWZkZWM4MGViZjFjNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2Q3OWI2ODcyZTc3M2RmM2UxMzg4ZGQzNzRlNjNlNjBhNzkzMzU1MjhlMWE3ZDJkMjdjN2I2OWI5ZWY3NWUyMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGNmZDgwMjJjNzI4ZmZlMzNiZTUxZDAxNjY4M2VkYmZlYWI2NDEwMmJmZmE3M2UzYWU4NmJmZGM3OWU4OWQ3YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjYzY2RmZjI0NDMzOTJmMzUwMTk4YjNjNTRhMzIwNTk1MjgyNDFiOWFmYjA0NGI2NDM2N2IzMWIzNDZkYjVkMCJ9"
+        },
+        {
+          "resource": "repo://packages/kit/src/__tests__/unit/orders.test.ts#L28-L29",
+          "version": "repo-lines-v1:sha256:0234882d6768e157e52a98f0cdd6081b3f38e6a137ef95374e37c95fdf051c48:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTcyZjhkOTc5OWEwMTA5ZDE0ZTE2Nzg1ZTQzNzc1N2E0MGM1MWMwODZjNTY4ZDUzNTgzYjVjZWMzOTRmYzIzYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmVkZDdkZjgwOTA5MDJiODNkOTU0ZmQ2ZTY0MDFmNmY5MjAwNTJmMzhkMzFlYTZmYjRmNTQyMmU1ZjZjODhmZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGE3ODk1YjYzNzYzZTEyMThiZjdkODg5ZTE2MGZmMTI3ZmQyZTdmMzEyNWZiYjg2NTA0M2UzNWZmNmQxNDJkOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGQ1ZTJkMTZkNjRiY2QzZjQ0MjZjZTU4MmNhMDY2OWQ5ODVjNzM5ZDY2MTVmODRiOWQ0YmE5YWExYjdmZmIyNCJ9"
+        },
+        {
+          "resource": "repo://packages/kit/src/__tests__/unit/payments.test.ts#L27-L28",
+          "version": "repo-lines-v1:sha256:1180dbcc3ab8e3e4940377fe39218033b1d7ee176b76956ad6e3d3d7e3ba672b:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDNmNDA0ZTQzMGZkYTc4OTg1MWZjY2U5ODI2MzZkNDJhYWQ3M2M0YzZmODAwNjdkZWM4OGU4N2QzOTQ4NDk4NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWE4MzcyYjI0YWFhNDNkZmE2ZDUyMjhiNDcxNWIyMWYzNWVhNDgzNWRhNmY0Nzc0MWIxOTU3ODkxM2FlYTEzMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzk0MzA1NjZlMzRhNmRkMDdjNTRlOWY2ODJmMzcwZDlkMTVmNjJkNTBhOTg1ODkwMjNhN2U4YWU0ZjJhMjBkMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjIzMTIwZmNkNDNlYTgyMTMyY2Y3M2RiY2RjODAzMGI4ODc1NDk2NzBkNjNkNTM2ZTgwYjc5MTNjODBmMTg1OCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_8fa3a60b1b4143fa8157207fa9ab8f8a",
+      "statement": "CLI unit tests use a stub function that answers from a route table and records what it was asked, enabling deterministic testing of admin and service client operations.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/__tests__/unit/admin.test.ts#L13-L34",
+          "version": "repo-lines-v1:sha256:1134a0d81200a8c027e1cda11a75c3df56ccbd3cf2704c23323785f609a8b698:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdmZTc2ZGVhYjE4MmVmZmVjN2QwMWVlYWVlMjk4ZjQ1MTljYjg2NzZhMjk3ODU2NTA5ODM4OTI0ZTAyYWRkYzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAzZWZjNTM3ZjIyNzMwNDkxZWRjMWRkMGFhMGJiNDI0ZjZhODliYjQyMDUyYTMwZTljYTc1YmYyZGE4YmJkYjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQyY2Q2YTJjYTU1YjMxNGQ5NGI4MzVmYjE0ZGRjOTNlNzYzYTMzNDA3NTcwNmNiNDAyNDFhODY5NTgyMTI3NDYifQ"
+        },
+        {
+          "resource": "repo://packages/cli/src/__tests__/unit/service.test.ts#L21-L51",
+          "version": "repo-lines-v1:sha256:c44a4809e03f87edc198065aa63a504ccb895eb4fae1f8ef39edc845585ee97f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM5NTM4YTdjMTY1YzgwZmMyYWFkODc1MjI1YmFmY2E3MDkwNmYyM2JmOGM3NTZiNDQ2YWU5YjY2YTQ4MTEwYjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg1YjAyMWQzMjA2YWNiZDUyZmY5Y2I3MmMxMzJhZjZlZTY1NWFmMGNlMDlhN2ZjMWVlMzljOWFjYzY5MTkzMmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5OGJmNjlhZWVjNDZkNjY3YzM0MmUxNzA5NWY5OWNkMGJkMWMxZGE3MDM4MjZjNGQ3MzJhZThlYjc3ODZiZTIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cbf8f391cb8b403aaada6d587ae19ed9",
+      "statement": "The payments test contract (section E) is implemented for all three SPA adapters: kit-react, kit-vue, and kit-ng.",
+      "evidence": [
+        {
+          "resource": "repo://docs/ADAPTER_CONTRACT.md#L83-L89",
+          "version": "repo-lines-v1:sha256:8bb17193178854cae4fe9fb0a6c740652d5e1758e2d218d52d434887a6a1b7ac:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTBhZWJlZjBkMWRmYTUzNTZiMjNiYzQ2NTZiZDA5ZjRjMThhZmY5Yzk0OTM4M2RiOTEzYTFlZTMzZGJiZjIyZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzA5ZmRiNDNmM2I2YWJhZWEzMzYyNWFlMDk2MjcwMWIyOWU0NzhmMjk0YjMzZjY1NzM0MjczZDU5ZmM2ZTY4ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTcxMDAyZTIxYTE3ZTgzZjg1Y2Y2NGZkNTY3MjA2NjQ1ZTZhMmNhYjcxYmRkNzQ2NjI0YmE5MDE4ZGZhMzA2NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDJhMGM0ODVmZDk2Y2MyMTM1OTZhN2I4YzMzOGFjYTc5ODA3YTIwODZjNGM2ZTU2MGI0MmQzODAxMGZkZmFmNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_330a7eb38b7b4e059cb5fb750d94cfa7",
+      "statement": "Section E is not applicable to SSR surfaces (*/next and */nuxt) because they are session, cookie and middleware helpers that run before render and do not have reactive client state.",
+      "evidence": [
+        {
+          "resource": "repo://docs/ADAPTER_CONTRACT.md#L91-L100",
+          "version": "repo-lines-v1:sha256:67b9c0062ea4fa8994c8932f1cb992fc061f1fe41f8bd5aba2f383d49550b3be:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4MjAyNzY5M2EyZjVmMjgyMDBjZmRlMThjNTdlZGJmODExYWFjMDAyOGNmNjViNGJmM2QwNmEzNmNkZTUxNzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1ZDI2Mzg5NDQyZDQ3NjFiYTVlOGRjNzRlMGRhMmY5OGI4MjI2Y2UyY2M4YWFjYzEyOGYzZDlkOTQ4MDZiYTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgwNWIxZGMzZmY0NzA2YzRmODljNzRiZDY3YzJkZTFiOGI3MTU0YTkwMWZiOWFjN2FiOTBjZmJlZDg4MjRlYzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJhOWIxNTg5NTdkODkwZjUyYzdmNDJjZTI3ZjAwNjdkOGI3YzJiNGZmNTJlNjY0ZjZkY2ZlMzIwN2U0MjNmMWYifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.4.3",
+    "at": "2026-08-28T16:48:53.239Z"
+  }
+}

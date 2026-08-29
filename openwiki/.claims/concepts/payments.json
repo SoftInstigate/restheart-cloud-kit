@@ -1,0 +1,374 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:1278c7d536c216b2e2093a769f5f7a18aa616f239b25b5cd66cec4242ea670b1",
+  "claims": [
+    {
+      "id": "claim_d504fad44d244e988125c62ee795bfd7",
+      "statement": "Payments are opt-in via config.payments = true; when false or absent, no /stripe/* calls are ever made, preventing 404 errors on services without the stripe plugin.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-ng/src/payments.service.ts#L63-L65",
+          "version": "repo-lines-v1:sha256:ca3bc29bdff4bd4d54b8e96080d824ec7ba3f9b91eac9e401cdd2a32fb2ba6cb:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmQyMGY3MGUxZDIzN2FjZWZhYWVkYjcyMzBkZGQ4MWFiODczYWM1MDVlOGQyNGY0YjEwMTg5NmY1NDIwNWUzYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDE3NGI0ZWY3MTc0YzYzMjU2MmM3NzFiNGQ5MDljYzJmYTkxZjYwM2RkNTkzMWFmNTk4ZDM2NzE4YTJhZGZmYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTA3ZTM1NjIzM2Q2NDYzZjBhYTIxYjgxODVmZDUyN2NmYTNmZGYyZTk4ODVkNWI1Y2IxZTEyYzFkZDAxZDJkNiJ9"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/payments.tsx#L142-L143",
+          "version": "repo-lines-v1:sha256:7dabce94e84fd4a77f7ba48a3d58057ffb61d60c3b88d77f67539a5c43ce1637:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTk3NjYxNWNmY2Y0NGJkY2M1YWJlNmE1MTM4OTE2NzdkOGExZWEyMmM4YjQ2ZmRkNDUyNjJhMGY3ODFlZThkOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzQwNmYxZDNiYTNlNGIxMmFmMWM0NWU3NDVlOTdiNmRlZDI2ZDI2NTBkMzdhZDdhODdjM2U2MTFmYjhhOWQ0NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzkzZjc5NGU4NWU2ZjBiODcxOTcyM2VjMjNjN2FkMzNmZmFiN2Q2MDNhMWVmOWJjZGZlYTYxOTU1ODM0ODM4YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWVmODhhMjRiMjRjNTZlMTBkOTQzMjA3M2QwMmE2MzMyZjM1ZWE2MmJmZmI2NjEyZTllMDU2ZTJlMDJlOGNjNCJ9"
+        },
+        {
+          "resource": "repo://packages/kit-vue/src/payments.ts#L113-L114",
+          "version": "repo-lines-v1:sha256:1d00e59a9df87b8227c2629a67b122dfd361aa98ac2713c9451c7c52400ac0c8:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzQwNmYxZDNiYTNlNGIxMmFmMWM0NWU3NDVlOTdiNmRlZDI2ZDI2NTBkMzdhZDdhODdjM2U2MTFmYjhhOWQ0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTk3NjYxNWNmY2Y0NGJkY2M1YWJlNmE1MTM4OTE2NzdkOGExZWEyMmM4YjQ2ZmRkNDUyNjJhMGY3ODFlZThkOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjI2MmE1MjJjOTk1MjE5YjE4Y2ZjZGQxN2FkZTA3ZDQyMTc5ZDNiNTFmYzBkODZkM2VkOThlMmMwZjlhZmU2OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjg3NDMwZjYxMTI0ZDc1MDhmZTRiMGFkOTQ0YjJhNjNiYTcyNDkyZGI5NmFlN2JkOGUxZGMyMjM2MjgyYzRkMyJ9"
+        },
+        {
+          "resource": "repo://packages/kit/src/types.ts#L81-L92",
+          "version": "repo-lines-v1:sha256:94e7678c88e1c5a3deef2ba2bf360fec522542252bbf6badcb2c38908765f77d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExNTA3NmIxNWZhYWIzMTViNTM5ZWMzYzQ1MmUyZmI4ZDNmM2UxNjk2OTJlZGYzNjI5Yjk4NmI0ZWJhM2EzNzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdmN2QyODVlODgyOTY4OGFjMWI0NmEyZmQ5MTY1NGRkN2RmMDcwMmYxZTdlMmRlMTAyOWJhZWY3MzVmYTg5ODEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIzYzg2NTk4ODQ3Njg3NjYzOTBkMGY0MWY0NDU2ZDg3OTBiYzY2ZjliNDVkMTM5YjY2MWU2OGU2MzNlNzllZjIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b3999f41455940f88570c5dc05d8ae12",
+      "statement": "canManageBilling is derived from user.team.role === ownershipRole where ownershipRole defaults to 'owner' and is configurable via config.ownershipRole to match the service's accountsConfig.ownership-role.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-ng/src/payments.service.ts#L42-L44",
+          "version": "repo-lines-v1:sha256:7498b1f34afab4be43cb303551bdb35d6354571e67b2522fc0b58c690af84fb9:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWRjNjg1NjA1MDkzNjAwY2FmYThmODUzMGE0ZDQ1YWNiMjY2MDdjN2FhZWYzMWVkNmQ4ZjAzNzFhY2JiMzQ1NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTVlZjAxYmMwOGRiYzNiNjNlNGU3NWVhM2QyNmE1Yjk0MTg5MTg3N2UyN2FkODkxMzI5Yzg0MTFkN2Q4ZGM0ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTRiNDllNjIzOGJhMDQxOWQzZDRhYTAxYmFhYWUwZjg0ZGUyZDc4YjU4OTkxMTI3ZGY3NWIwNTU3ODkxZTI5NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjM0MTFhN2QwM2E0YzI0M2Y2Y2MzMzRmYzcyZmIyMWI1MGVhOWYyYWY4NDMwZjNmYjkwZmZlZjlhMjQyNmM0MiJ9"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/payments.tsx#L143-L148",
+          "version": "repo-lines-v1:sha256:b22965bcc1a3b7d1f33e2b795cee8cb8cb44b607f616c7c61e9b9fe6c2425114:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzQwNmYxZDNiYTNlNGIxMmFmMWM0NWU3NDVlOTdiNmRlZDI2ZDI2NTBkMzdhZDdhODdjM2U2MTFmYjhhOWQ0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTNiOGMzMDEyMjk4NDU3YjgwNWQ2NjIyNmJkMGEzYmNmOTk5ZmQ2MTkzMzE4ODY4YTc2Y2EzMWM3YzQzYWVlYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzcyYTNlYmI5NjI1YzI3MGZmNjQ1ODY1MTYyOTE3NDRhNjkxYTVkZmY2Mzg1NjljNDcxM2NkMmQ0ZDJlMjAxNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzdkYzZlZGNlNTc3ZmQ1NjdjNGUxOTdmMGZhZmQyZTgzZDcxN2Q2MDdhZWRkNjZjNDMyZDAxYTI5ZDBjZTZhZCJ9"
+        },
+        {
+          "resource": "repo://packages/kit-vue/src/payments.ts#L113-L118",
+          "version": "repo-lines-v1:sha256:705d7d0c22077bc47016eb9e35e30b5255847f9f58bca28a2107f2d2945e4a5d:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzQwNmYxZDNiYTNlNGIxMmFmMWM0NWU3NDVlOTdiNmRlZDI2ZDI2NTBkMzdhZDdhODdjM2U2MTFmYjhhOWQ0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTcwMmFlYzY2NTk4OGFmYjYwMjg1MjY4NDI5NTg4Njk2NDc2NmNmNGQ5MWNhOWQwOThkYzk1MDZjMmUzNzIwZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjI2MmE1MjJjOTk1MjE5YjE4Y2ZjZGQxN2FkZTA3ZDQyMTc5ZDNiNTFmYzBkODZkM2VkOThlMmMwZjlhZmU2OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWUxMGZkNDE5ODRlOTJkYTM4NmE2Y2M5NDc2MTg1ZDQ2ZTAwYzczODJlNDU0OGJkNGZjMGQ3OGQ5MzA1ZDhmMSJ9"
+        },
+        {
+          "resource": "repo://packages/kit/src/types.ts#L94-L106",
+          "version": "repo-lines-v1:sha256:6beccf8bb7dd5dfd2299e32cd099ab868e1c89c397e773d84768b1c7f69b7e8d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE3YWExZTE4OWRmZTFhZmExM2M3NTUzY2M0N2NkYjhhNDBmYjk5MWZmZmU4YWJhNTQ1OWU1MjNiOGY3NWE4MmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY2ODQwZTZkNjFmODBiZTBlMDQ0NTliMDhlYjU0MWE4MDJiNDFjMWE3NjRiZWUxY2QzMWQyZjRjMzdhMGVkMWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_717b43c6db8e4d5e8a3fdaf9cd179554",
+      "statement": "No token renewal happens after a plan change because @subscription is resolved server-side from the database on every request (SubscriptionVarResolver), cached only for the life of that request. An upgrade is effective immediately with no re-login.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L4-L23",
+          "version": "repo-lines-v1:sha256:da12df19f258662336ff8355b71101bf68e169e0eb09c704b7d475afec4ffa4c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBjNzdkMjIxYTU5NmIyZWI0MjhhNWJlM2QzZDRkZmQwOTM1MzYyODljOTc4ODEzMDE5ZDM3YTc5NjBjZjAxMjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjczN2Q0YWZkOTI3Yzc0MDI3NDg2YzVlNTM2NjY2ZjdmZjAwOTI3MGZlN2IzOTBjZDk1NTYwMTQzNjFlMzE1NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d857a2ba2be643cebcc89f8479526c2a",
+      "statement": "The redirect back from Checkout races the webhook: Stripe sends the buyer back over the browser while the payment confirmation arrives via a separate server-to-server webhook with no ordering guarantee. waitForSubscription and waitForOrder poll with immediate first check, configurable interval, and timeout to handle this.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/orders.ts#L243-L285",
+          "version": "repo-lines-v1:sha256:5458109a38e68d24a3d1cfca5a24be6ac79737b70ff0e8563f627011937e73ed:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFiODgwZWNiOGM5Yjc3YWYzZDc1ZWI3ODEwZDNhNzQ2ZjI4YmNlMzQ1MDQxMDhmYzc4MDc3OWNlMDY3MTc5NGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L147-L194",
+          "version": "repo-lines-v1:sha256:44528766364a2069aa02ba422dc75b5febf04aeeb0508334f84ed71d24d7a1a5:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZhMTZjZjc0NmQyMzRkMmIxZWE2NmY3YThiZjMyMjhiNTMxYTRiZjI3NDJmOWM4OWJkNTAyMTU5NzRhZjE2YTMifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L17-L23",
+          "version": "repo-lines-v1:sha256:0120db994428daf1341e6f0e775da78618bd8050bf64bcd0974c5d33ea82100d:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjlhNTRiZDZmYTFkYmI0OTQzNzRmZTA4M2JlZGRmZDk4MmI5NDk4MmIwY2Q0ZDNjMjgzN2YxZmJmM2ZlMGUwNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWJhZjhjMTRmOGEwMTJhMTAyOTkzOWNkZmUxZjY0MGE4Y2Y0ZTBkMGQwOTE4YmQ5YjY5NmQ0OTY0MTZiYzQ3ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzM3ZDRhZmQ5MjdjNzQwMjc0ODZjNWU1MzY2NjZmN2ZmMDA5MjcwZmU3YjM5MGNkOTU1NjAxNDM2MWUzMTU1MSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_60604b1d9eaf40dbb341e8b4be3c81be",
+      "statement": "WaitTimeoutError is deliberately separate from ApiError so that 'you're not subscribed' (ApiError) and 'you are, we just haven't heard yet' (WaitTimeoutError) never collapse into the same error screen. Timing out is not a payment failure.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/orders.ts#L253-L257",
+          "version": "repo-lines-v1:sha256:467e9f7a531ddd6e3dd51e911c244bbc733fc44eea2df5ae123d6bc431c4afcf:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmFhMTYyNWEzNzEwMTkzODFiZGRjZGMxMzIxNGVmMzM0NTAyYTRiYjJhNDU2OTU0MjYwZTZjN2MxYzE2ZjcxNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjIzY2I0YzEzZDY3NzU5ZDU0Zjc2NzFkNDQwMzQ5NzJkMDkwM2EzOWQwOGFmYWU3M2JiOTgxZWI5YWIwZGNmMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2M2NTViMmZhYjM3Yjg4NTJjNTZjMjJjNmM1OTA2NjcyNjQ5NTZkMzdkMGJjNjE1NmNhYTI1NmI0MDc4MjU5NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjk4NTI0Njg4NmUxNzNiZDk5ZTc0ZDgxMmZmN2ZhZDJlNWJlY2FlNDBiNGI3OWE3MmFkYmMxYzBmZjBkYWIyYyJ9"
+        },
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L139-L145",
+          "version": "repo-lines-v1:sha256:d48b36caa2c79f2bfb274649b78ea52c64111068ba7d1fbe3edbe3cf3b752d43:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDBlNDk3ZTI2OTI3YmQwZDNkZGMwNzJiYmQ2Y2VkZGU2MDllNGI0YmZmYjA5ZDgwYWYzYTFmYzhlZDVhMDBmNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjQ5OWE5YzEwM2MxNDEzMmExN2NhYmFhNDNkOGU3MTNmNTkzZWUxNzc4NTU2YTY2NmY2ZTQ4YzVkZDRmZWUyYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjJjM2E1ZGNlZWY5ZjkwMzZlMzhhOTY3NjYyMTVmYjhhZmJkNDYyODM5NDMyMzU0ZDc2YmQ1ZWU1OWU1OWQzNCJ9"
+        },
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L165-L171",
+          "version": "repo-lines-v1:sha256:a1c7e99b19981cbc3888067133272d76aa3e2e763f6f2a5b7cce80d7f6bd4bf1:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjQ1NzFiNTA4NGM3YTU1YzhlMjZhZGMyZTUyNzI3MTY4MzQyYzU0ZGU5ZWE3ZTYxNGIwNzRhZTU2YWUyODZjNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjIzY2I0YzEzZDY3NzU5ZDU0Zjc2NzFkNDQwMzQ5NzJkMDkwM2EzOWQwOGFmYWU3M2JiOTgxZWI5YWIwZGNmMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODhhYjc1NzQ0ZTI4ZWRhYzU0ZGI3MTQzYjUxZjkwOGY2NjE3OWVkOWFhMzc5YjNkNzUwOGUwYjgwNTczOTM5YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWE0M2Y3MGY5NjJlMGRjZDE2Y2U4MWIyNmQxMjY0MDAyYjE1MTQyZTQyMWU4YjkzMjI3YTFkNGEzNTFlYzg1ZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_14c71fdd663b44f8841ecf543ea1e017",
+      "statement": "The cart is a pure client-side data structure with no server calls. Every function is pure and takes the lines it works on, returning a new array. The cart is localStorage-backed and framework adapters wrap the pure functions without reimplementing them.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/cart.ts#L1-L14",
+          "version": "repo-lines-v1:sha256:c4e5e661fdec90bc5926556d99a3c12b8331f62fae85614d189fee0a712c7895:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU2ZDhhNmI0NjQ3YzMyZGE0NmFiMDNkYmU4YmRmZTExM2JmMzkxYzlkNTk2MDUyZmM3YThjM2VlMTUwMmQ1OGEifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/cart.ts#L151-L175",
+          "version": "repo-lines-v1:sha256:39a4496db05ac773131573afe0d030900c05ba6e8c71389d1dabcf03e7847b3f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5NDEyYWRlMGRmMmI5Mjg0YjM1Y2VhMDE2NzI2Mjc1YjhmYjZhY2FjZjZlMWQ2NjM5OWZjMWZiMDgzMTYyMTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc2OWM3ZWM3MGUwN2Y0YjEwNzU3Y2QwMGM0YmE2NGEwOGNhZmI0NDI5NzA3MjY4MWNmMzI3OTk4NjUyNDVlOTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBjOTE2NjBlMTgyODRkZjNjMWY2MmY1MmQ1NDBlZjdlZjBjMjFlMDA3MGJkMWY5YjdiOWMwZDExNmI5NjI1NjgifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/cart.ts#L73-L95",
+          "version": "repo-lines-v1:sha256:9868b5ff8513ba11d7500ef27fdd1b9b8b30c47f9917e2f9b407e5da06330f50:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlOGI4ZDE4ZmNkZDJiM2QzMjNjMTgzN2E2ZTBhMTg2YTgwOWRlOTg0YmNjNDNhODIzM2RlNDdiZDFhZjk4MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2YTBlMDA3ZDhjMGVhMjhkMmYwMDhjNjdhOWViMjczYTRkZGUxMzVjZDQ2ZTNlZGQ5NjlmMDI3ZTU0ZWExZTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNiYzUwYmNhYTk4MGEzZWU2Mzk1YmIwMmUyY2EzNjIzMDkwMGFjMmJjMmIwY2EwMTQxYzNiYjI0YzA1Mzg3ZDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8cc6a9e3cd1b4360b73e6c601b8cece7",
+      "statement": "Prices stored in the cart are display-only. The service reads unit_amount from its own catalog when building the Checkout session, so a tampered cart line changes what the buyer sees but nothing about what they are charged.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/cart.ts#L29-L30",
+          "version": "repo-lines-v1:sha256:2d33b23a0aa9afdbbd17d3fe104c1160ddf663a15e311595745eea2a4203b4dc:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzViZTU4MjRjMzc1ZmRmNmE0OTU2OThlZWU1MmY0NzE3NTZjYmMyMmY4MWViZjU4MmNmYTJkODgzMDBmODQzMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjY3YjA1NzM1MGY4MzY0ZTk4NjcyYzQ5NGFkMDFjNmZiNjg2NWU4ZmU4ZTZmNzQyNTNhYWIxMjZlMGY1NWUzMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjYzZDZmN2I2YzMyZDc3MTcwNTA0YmU0YmI5MTNmZmMyMzY0MTE0NjM3OTExMWNkNTE5YTZiMDhlMzcxNThhNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGRjNjRjYzljNTBkZWU4ZDdhZTY2MDgxNWFjMGMzODgwYTc2ZTlkNWU5NTFhNGM3ZDVmNDk5NTE3ZTA1NWFjYSJ9"
+        },
+        {
+          "resource": "repo://packages/kit/src/cart.ts#L7-L9",
+          "version": "repo-lines-v1:sha256:4acb8c8faf81757d22d795dcfe7ca475d82a02a255689835d08f59a77d097f06:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTkwNmM3NDdiZWRjNDNhMWZjNDBlNGU3MmQwOTBjYWZiMWY4ZmEyMmE2MTBjMWIzMjk0ZGU2NzI0YjkwYjNlNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzdhYWQzNWMzYThlZDNhOGQxZWMzYjY4MGZiYzA3NjQwN2ZkOGRjNTYxY2UwYzlhZDA1OGFhMGE5YzQ4ODgzYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzU3YTI3MTVhZTY0ZGQ5MzljYWE4YTEzNjRiMTBkNDVkM2RhY2M5OTAyZjE1MTNkMDgxMzA4ZWM1NmZiMjM3OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGU3ZGM4OGRkMzA4NGUyOTg5MTc1ZTYyYzA1M2VmYmE0NGYzYmVkNTJjMWQxMDAzZTU2NDI1NWNkMmNkMmFmYiJ9"
+        },
+        {
+          "resource": "repo://packages/kit/src/orders.ts#L78-L82",
+          "version": "repo-lines-v1:sha256:69cd4e6f65ab6e2169e92453fc9135616cdd8389384f941c1f32c17733ffa5e1:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjIzY2I0YzEzZDY3NzU5ZDU0Zjc2NzFkNDQwMzQ5NzJkMDkwM2EzOWQwOGFmYWU3M2JiOTgxZWI5YWIwZGNmMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjIzY2I0YzEzZDY3NzU5ZDU0Zjc2NzFkNDQwMzQ5NzJkMDkwM2EzOWQwOGFmYWU3M2JiOTgxZWI5YWIwZGNmMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWIyNjQ1MTc3MDBhYTRlYTdjM2NjNjM4MzEyZWI2NzdjNWI4YTgwMGY1NGI4OTRmMTMxZDE1NjJkZjc0MzNkOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDA0YjFiOTM4M2U2NzFlYzZlNmRlNTk4ZTk3ODI0NzViZjU0M2UzMTEzMDRlZGVjZmQ0NmM1MDQ0MThhZDljMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_6df9903e98724ce1819dcab6f457d521",
+      "statement": "formatPrice uses Intl.NumberFormat's currency style to determine each currency's decimal digits, preventing the amount/100 bug: JPY has 0 decimals (¥500), BHD has 3 (BHD 19.900), EUR/USD have 2 (€19.90).",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/__tests__/unit/money.test.ts#L1-L24",
+          "version": "repo-lines-v1:sha256:704077e3619f7bd90acd32e8a3e5c0ce8bfb51cac9704bdf0621bb98ca0272c5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2MDNhNjRhNzkzYWM1ZGE0MWZiZTdiYjgzYTM2ODNiZWYzYzc1NTU3NTQwN2NlOGI1YThmMjM5YzMxMDE5NjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/money.ts#L1-L35",
+          "version": "repo-lines-v1:sha256:27990e1a5bb12ed55e3666fbe38e66fb5b12290556db574efb2d791a916255f3:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b40f96c65ee54cac844ab119b2c81807",
+      "statement": "createCheckoutSession rejects with status 409 when the team already has an active subscription. Checkout does not do upgrades/downgrades; send already-subscribed teams to openBillingPortal instead.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/__tests__/unit/payments.test.ts#L64-L68",
+          "version": "repo-lines-v1:sha256:3f53bdf41938fb16ab0f4e7f2129528221267591eb94a5b48215d4ac8a743836:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzE3ZTAxMTc3ZTI0ZDNmYzkzNjg2OWNhNWI1MDE0YzkzMmI2ODBlNjcwZWZjZGFiOTc3ZjA1Y2JiOGNiMDA1YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjE2NDhiYzJhYTI4OWQ2YzZjNzBmZDZmMjEyZjU4ZDAwNTliZjMyNTMxZTRhNDUzZGU3NzY2MzI5NmZkMTUzMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmE2YjUzOTRlY2RmNWUzMzM3ZmZiMmVhMTIwN2E5ZDlmNzg4OTk0MWQ1M2ViNmUwODI1OGU2NjM5M2QwMmQ3ZSJ9"
+        },
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L60-L64",
+          "version": "repo-lines-v1:sha256:3f84cd7fce6139f7e6b1f0eea5d566bc77866865ace3935b3a8c4aff61de1200:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWYxYmZkOWM2MjNmMGEzNTNhOGMzNmZiYzJlNDM4ZDZkZTljNDEzZWFiMjVhYWQxZTA0NDkxZWYyYmU4MjNhZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjIzY2I0YzEzZDY3NzU5ZDU0Zjc2NzFkNDQwMzQ5NzJkMDkwM2EzOWQwOGFmYWU3M2JiOTgxZWI5YWIwZGNmMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2I4NDE3NjFkOTkwNjVmNDRiYWIxODFkODQ5NzliYzA1MTA2YThlNDcxZTkxNjI3ZTM3YjdlNWQ3Njk0ZjcxZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTU3NGY0NGVmNDFhYmRhMDFiYmNjMTUzNWZlMThkNmViMGVmMWJlMGNlMDQwMjhjMTRmMTFlYmUyMzIxMGUxMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_b2ffe5dd53044e27927f2b2a7162947c",
+      "statement": "openBillingPortal rejects with status 402 for a team that has never checked out, because the Portal has nothing to manage without a Stripe Customer. Route a 402 to createCheckoutSession instead.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/__tests__/unit/payments.test.ts#L70-L75",
+          "version": "repo-lines-v1:sha256:cd5ed0aec8e06d1f344287a6852f4afd3bd4dcb423f2ea82a1562768ee86b55d:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjE0ZDg4NWYyOTkxYzMyZjE2YTllZDI1ODBmNzA4YTMwNTBhMTc5YmZmMmU5Y2E4M2RlOTg3ZTMzNjg4ZjQ0YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjc3OWQxMThkNmUzY2JmNDUwNTM5NzQ4ZGVlN2E0MzA3YWNiZTY0NDZjYmEyOTdmMjc2MGZhNWQwYmJhMWJjMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDI4NzIzMWFmM2ExMTJiNmM5Y2I0NWZmNTQxMGVlY2U2NzM0NWM3NDFmNmM2NjlkYmZhNDIyMzljYmNhNmU2YSJ9"
+        },
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L86-L90",
+          "version": "repo-lines-v1:sha256:ee66b65d1360afa478ce92d2f06961c56819dd676829a14390c1d6ebbb9e2466:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjIzY2I0YzEzZDY3NzU5ZDU0Zjc2NzFkNDQwMzQ5NzJkMDkwM2EzOWQwOGFmYWU3M2JiOTgxZWI5YWIwZGNmMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDU2YjhkMzEzZWFkMzEwOWFiMDJiZjQ3ZTEzNmM1M2FjMzM0MDA5YjRjM2ZlNDhlMzNmNzIyYzNhYzYzNjdkYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzMyMjJhYjgxN2ZlN2ZmNDlkZWRlZGQ1MTA4MWVhNjJkOGFkOWJjN2ZjNDg2NmVlMDBjNDZhYWMyMmE0NWVmYyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_de2aae13e3a44e2880f572fa762883e5",
+      "statement": "grantLicense returns 'granted' (201) or 'already-licensed' (200), and rejects with status 404 (no such member) or 409 (no seat available), all distinguishable on ApiError.status.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/__tests__/unit/payments.test.ts#L25-L51",
+          "version": "repo-lines-v1:sha256:ffe7496de5b8dd0b736a5242ac10ef81f9d90e7c40087d7c44a86074428fcf82:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxZGJiZjZkOGYwNDdmNzQ0MzVhODQ0NzgyNjgxY2MwNzZhM2M0ZGYzNWY1NjMzYThhMzFlN2U3MGQxOTMzMWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcwMTM2OGI3ZmEzMDk5NTI5NGFkNWZkY2Q4N2MyYmFlMzNkMGYyZTMzNmU5MjFjN2I2ODQ0NWI1ZDM1NDM4MmQifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L104-L119",
+          "version": "repo-lines-v1:sha256:f943b21007bbd18c02071a245c33c67f336f49c404bf6bd0134e25c6d07701ce:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2OGQzOTE3NGQxMjQxNTIzYWI1MWU4YTRjMWJiMjI4N2VkZmQzZGJhZDMxYjRlZjU4NDRkOTMwNDViOTZmNjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZiMTI5NTJkYzczYmQ5NTFiMWU3ZjNmYmRkMWMwMDQxYWRkNjg5NzM5Y2Q0ZTIxZTRlMTI1YjY5NzU4ZWY0MTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_819de9574a8b434b949900e10ff010a1",
+      "statement": "getPlans requires no session — StripePlansService does not check authentication, so it is safe to call from a public pricing page.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L27-L34",
+          "version": "repo-lines-v1:sha256:753e0e9e5d27eedab572e3fb33cf423b7c3df8afbd73b6c772192eb3398f7d8d:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzM3ZDRhZmQ5MjdjNzQwMjc0ODZjNWU1MzY2NjZmN2ZmMDA5MjcwZmU3YjM5MGNkOTU1NjAxNDM2MWUzMTU1MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDNlZjM3YjE2Mzc3M2ZhZTMxY2JkNzllNGRlZjAyOTA4OWQzOTQ4MmFhZmEwZGViZGEzNWU1OWNjMTk4NWFiMyJ9"
+        },
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L35-L38",
+          "version": "repo-lines-v1:sha256:464d49e5ba20b4b09648ba899748f53da423f563fa02b7cc92bd5475dd5a8eaa:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzYxYjBhYjg1MjVmYmU3YWZmMDI1ZDczYzg1OGE3MzY2MTE1OTE1MGI0OTQyZjBiNTFjM2YzYmVjMmUxOTIxNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGQxODRiODViY2RkZTJjZGM5OWU5YTQwMTA0YzdmNzRjYmI3NzFlOTQ2YzQ2N2RjZjRjMjViYzQzZjU5NDJjNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDdiNGQ2NjVhOTkzYjE2M2U3ZWU2NGMwNGJmN2YzMGJlNjI3OTI0Y2ZjNzNkZGI4MTM0OWNiNjE1OGJlZjM0MiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_8ce5d41b38ae4ba280bb834cf8752cc6",
+      "statement": "getSubscription is not gated on canManageBilling — any team member can see their team's plan, unlike createCheckoutSession, openBillingPortal, and the licence functions.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L40-L50",
+          "version": "repo-lines-v1:sha256:e510aa5c2ecef548ad8a447f5530a1b088a0066f0025b38b8a36c553011bdfa6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRmZjE5MDNjMDlmYzlmNWM2NjQ2NjNmNDE0ZWE0MGEwMDdiYjhjMzRjMDUzMDMxNWI0NzE1NGM5ZjUzZWYwZDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3NTUyZjRlYTdkMGI4MjBjY2UwYzU4NTFjYTgwMjA5ZjIzYTEzNTdiNjJiYjFiZGEyMDdjYWQzYTFlOWY0NzkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b26ac95ab999406096cf01996a3d4fc1",
+      "statement": "toOrderItems strips names, prices, and pictures from cart lines, sending only productId, quantity, and options (as metadata). The service reads product details from its own catalog; options travel because the service cannot infer variant selections from the product id alone.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/__tests__/unit/cart.test.ts#L99-L119",
+          "version": "repo-lines-v1:sha256:82787ee467b03c3bc0bc2d656582205b877e9a001512ded544c9e5c20673d7bf:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxNjI4ZGYyMDVkN2U0NzlkNjVlMzVjN2Y4YWJhMGM3OTc0NWJlN2M4NTEwODhmOWQ5NmU1YTdkYzYwNDNiNzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYxYjEwOGZjNDJlNzE2OGYzZDY0MDk1ZTYyOTU2MGYzODE4NjQ2NmIxZmVlMTNkMTM5ZjIzMDEwMThmNWExYTYifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/cart.ts#L122-L141",
+          "version": "repo-lines-v1:sha256:70ddb51e404fa84cabf3e9b71412914e173bb4faa81ca5a0404723b9df2f03a3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZlNGJjMGNmM2VkYjI2NTM2ZDgxYWEzZmFkZmVlZGM0MDVhYzMyNjEyZTUzZmQ4NDU4Mjc1YWVmOTY4ZmVlYTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b50c715506c04e27a3456c1eb0b0465f",
+      "statement": "loadCart returns [] for anything it cannot parse and drops individual malformed lines. saveCart silently ignores storage failures (private browsing, quota). The cart survives localStorage being edited by hand or changed by a deploy.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/__tests__/unit/cart.test.ts#L138-L188",
+          "version": "repo-lines-v1:sha256:0f883a9e267beab5a38538f025fcde5bbe8ba5575cc8484e390df86bf5ee37a2:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxODE0ODkyZDBjMGUzZGU4ODg4OWZjYTZmZDVjNGIxMmVmMDJhMzE0OWViMzJjNjE4M2RjMDdiYmI5Zjc1YTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA0ZTBkODI1ODAwZTE5YzYzMGU3MDQ5M2I1NmJiY2NiZDcxZWFiZGRmYjA2MjJjZWI3Yzc1MDc2NzY2YmU2YTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/cart.ts#L143-L184",
+          "version": "repo-lines-v1:sha256:6efdfceb42e4bba6fe57d593c4ba058f7cca3e002e70028c121f7f497b8743af:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU2ODQ3OTdkMTQ3MGE4YmZmN2JkNWE2YTAyMTRlOTViOWYzMzMwNzg4MWU2NmMzNWZmNzAwNTgxYzcyMDhiZGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY4NDZlZTNjY2QzMWM1NjI5M2UzZGM0YmJiNzA0MzYwZWNmN2MzOWRkNWI3NzEwZjdjYzg2YWRhNmNlNjY0MTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_42719936c99f411395b455d22bff05dc",
+      "statement": "All adapters track the team id (not the user object) to decide when to reload the subscription. This prevents reloads on updateProfile or acceptConsents, which re-run checkSession and replace the user object but do not change the team.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-ng/src/payments.service.ts#L47-L80",
+          "version": "repo-lines-v1:sha256:aa0618c5759f8fcecfa4d526c179a0b39ed01ec6c0c366d039aaf421d3cf4879:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVhNzI0ZWRkZDY4NTZkODFiMzVlNzI0NzVlZDQ0OTY0ZTUxM2EzN2ZmMzBmYWJhODQ2NTA3NzBmMGE1ZGRkMjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliNjBmMjQ4MmNiM2VjZmE4NzZkOGM3YmMxOGY0MDg3NGZjNmYxNjRlNjg3NTUwMzk3MTUyNGZiNjU1YTllMzAifQ"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/payments.tsx#L164-L181",
+          "version": "repo-lines-v1:sha256:e045ea0d4010e4e562ea09acccf96a2bca99edac942b32c1294ec91f114c8e64:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4NTQ2Y2Y2NjcxOTE1YTIzYjA1MDk2Zjg5NGE5N2RlMmQwNjllNmQ2NTExNWQ5NjJlZWZmZGY3ZGYyYzM4OTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVjMzMzZWNhNzQ4OTljNmE3YzBjODUxMDI4NDljNTcwOGZjZTliODAzMmZiN2JhNzdkMWUyOGE1N2IzMDIxNzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk2NjE3YzU5NWQxYzc0NjA2MDlmMGMyZGMxMDVlNDg1MmU0OWIwMWY4OWI2NTQzNDhhYWU1YWVmYjE0ODVmYzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjljOGFmYzA4MGUzMjhmYWJmMzU0MTM1OWJkZTAzZGRhNDRlZjRlYTU0N2Q4ODMwYzAxNDQ2NDA4YWQ2MmVjYjAifQ"
+        },
+        {
+          "resource": "repo://packages/kit-vue/src/payments.ts#L132-L151",
+          "version": "repo-lines-v1:sha256:166b6a78e65fd294ccd20f3f10f933ee0a1d6e27d7d5dcc4519e44a47ef93a49:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZmZjdkYWUxMWMyOTE5ODBhMmEyZWQ2OTVhODM0ZjMwNGY1YzFiMDBhNGNjMjMwYTYzMjkzMDUzOGEyNmUxNDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdlNTViNzM3OWJlYTk2Mjc2NzljM2RlMzI1ZTU3MThlY2UwOTM0N2EyZGViMDkzYjFlOTcxMGM5MzFmMDAxMzYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c13b6b4014ff49e8aa37a80b3732908d",
+      "statement": "The cart is independent of authentication: it belongs to the browser, not a session. A shop that requires sign-in before adding to a basket loses most visitors. The cart becomes an order (which needs a config) only when handed to createOrder.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-ng/src/cart.service.ts#L30-L37",
+          "version": "repo-lines-v1:sha256:da87a01c8348bd22d6314e2880acfae5342505ce48832994e3cc5041f956ced1:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmVkZTkxZjc5MjIzMzJiYmI1MGEwMjg3MDk4MjU0Mjk2MmZlMTY2N2I4NjBiNzZmYjBjNWUxZDY2MmNlZjk2ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGE5OGY2NWVhZDA0NzE1YjE3NGQwZTNjMjdhMTIzYjk3ZTFiNTQ3ZGQxMTNlMWIxYTk1Nzk2MTZjNWNkYmM3NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDgwNzgxOTQ2OTNlYjM2ZGRhNzdlMDlmNzM1MTQ2ZmIxNzI4NWE4NjZkNjlkODUyZjUxYjEyZjdlNDM0MDhlOCJ9"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/cart.tsx#L26-L31",
+          "version": "repo-lines-v1:sha256:948f9c481d7eef797878e351f7d215850efac3478fd742ae8e408ab5e2cf25f8:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTlhZmYyYzE1MDNkNmI2NDViMDM1YmVjYTUxNDRkNmIxZDY2YjdhMTNmMDU1MmJjMDU2YmNmNDFkMTJkYzg5YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjhmOWMxYzczYjZkOTFmYWFkZTU2YTM2ZTIxM2JlMGQ4ZTE5MmFjMDY5MWQ1NDQzZWQ1ZjBmZWE0N2Y4MjNjZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzcyOWMwMmU1NzRhZDI5MGYwOTJkYTg2OGY5NjVkMDg4M2FiMmQxNjg4N2IwODQxZjkzZTBiMjg4MjI2OGE1MCJ9"
+        },
+        {
+          "resource": "repo://packages/kit-vue/src/cart-store.ts#L17-L25",
+          "version": "repo-lines-v1:sha256:c2871a9e3e8d26ffe2d04b9353c8c171ff33b989baef58110f786f3557061b12:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmUwMWQ1ZWE2YTIyZGU4ODcxMzlhODc2ZTE1YTcxNDkyZTQzZTQ1N2FhNTQ1ZDNiODNkNjQwNmQyNzQ3YWJkYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTc3MDUzMmY1Y2IyYzJkM2JhNDM4Y2ZkMmJmYjUzMjQ2MzQwZTg2Y2Y2N2YyN2NiOWE4OGI5OTI4MDdkMjZiMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTBlMThiNWJhNGNjZTE0MjJiNTM1Njc1OTVkMTJiOTVmZjkwYTczZDIwYzQ3M2M5ZTBiZTkyNjNiYmIyY2QzNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGZkYmFjYjU4ZWZlMWIyNzllM2Q3NjA3YmEzYTQxMTViOTkzNDQxZTg4ZDc5ZjVlODM0MTcwNTYyZDA1ZTk0ZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_4eee979f059a433caf2238da1d9cf2d6",
+      "statement": "readOrderRef reads the fragment first, then the query string. The fragment is the recommended placement because it never leaves the browser — absent from access logs, proxy logs, and Referer headers — which matters because the order secret is a bearer credential.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/__tests__/unit/orders.test.ts#L156-L195",
+          "version": "repo-lines-v1:sha256:1a131547909b83e888f26dfb2ba4f55b4ccae20a74513db605723281a2ac4389:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJmNmE4MjU5OTBjYmZiZmVmMzRjMmIzNjFjMjZlY2VmNDVlY2FiN2YzMDQ1ZGE3YjJhYTMxNGZmYThlM2M3MjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/orders.ts#L154-L214",
+          "version": "repo-lines-v1:sha256:5fe88cd0ecaa147720010a9eebca2eeb511a34970630b92318692b97d66f4337:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNiNzIxYTY4YjNlNzIzYWEzNDc5OTY4ODY3ZmMwY2Q5M2I2YTIwZTE5NjlkZGI0NTNlYjZhMzk4MWRmODhhZmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwMWQwOTQ5NjAwYmM0YWUyNjFlNjM3YWMzMjc5ZGM3MDI3MzcyZjAxNjRiZjUzYmFmN2FiZjRhM2Y3MDkyOTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7b266e71a0a04d56a0950b46f4f5dbfd",
+      "statement": "The catalog and orders collection names are configured per service (stripeConfig.products.*-collection), not fixed. Every function takes the collection name as a parameter; the default matches what the service uses when it hasn't been renamed.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/__tests__/unit/orders.test.ts#L26-L44",
+          "version": "repo-lines-v1:sha256:d7f8f4fed4d9f69b23f4d774670c4717dc30a169d9a70761d5c9c3da09a6a0df:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxYzUyMWMwMjI0MjE0MjhjZjE5ZGQ0NzNiNTk2OTE0YjdmZWM2MDI3NGFmYjM4NjgxOGUxODdmZTdlOWEyNjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2ODYyMTBjMzcyOThmNzhjMTMxNjY2NzI5YjJjYmRhODE2MWZhYTBhOTVkZDNkMTA4NzM3MzgwYjdiZDljMmYifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/orders.ts#L6-L16",
+          "version": "repo-lines-v1:sha256:5a55185790a46f682c706898317a7fd75bdc1234fb0604b3e07b251859b6b9cf:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdmODc4ZDBkZDYyZTgwYzA0MTM1OTBjZTNkY2RhYTYwMjlkMTJmZWY1ZTI0YWEwZDMyMzY0MDI0MjhlMjcyN2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNmM2UwMmFkNjBiNzhjZTAwNGE5ZGIxOGY4ODAyMDI1MTIxZWI0NDNiNjM1NDhhZjcwZWU5ZGI3ZWZlODVhYTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJkZTRkM2Q1MGVjZTA2MWI4NjZjZDUyYTk3OTYwZjhjOTJiNmY5NzFiNjY4NDhhYjMwYzc4MTE1ODliNGRmNzIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_039eac8322c84bf39c1463faa8295206",
+      "statement": "RhPaymentsService in Angular returns Observables for all methods, wrapping the core's Promises via RxJS from(). waitForSubscription and waitForOrder update the internal subscription signal when they resolve.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-ng/src/payments.service.ts#L82-L190",
+          "version": "repo-lines-v1:sha256:832447faf87f46bd2ff1dd2bb9adf1a415082f4cc100813f275a81f9bc4ec268:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJiMTQyZjQ5ZGMxZTM4MjY1MTBmYTM1ZjVmNDg0NzNhZGY4OGQ1OTEzNTAxMWE1ZWUwNGYyYzY5OWYwMDcyOGUzIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIyN2U1Nzg4ZDVkOWQ3M2QyNGE4MWRiYzBhNWE3NGJmYTgyYzljM2IzYWY5OWU1MmFmNzk2ZTkwYjQ2OGE4YTNkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5N2Q4NjMyZTU0ZTkyOThhYmI5NTg3MjdlMmQ1MTQwOGFiYWYxMzY2MDM1Mzc5MTAxNDBhYmY2NWIzMGFiNjEzIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MSwiZm9sbG93aW5nQ29udGV4dEhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_484f73da204d47ee89743798c2ffad90",
+      "statement": "Vue uses a plugin pattern: createRhPayments(config, auth) and createRhCart(storageKey?) return objects with a store property and an install method. The install method provides the store via Vue's provide/inject, accessible anywhere via usePayments() and useCart().",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-vue/src/create-cart.ts#L1-L38",
+          "version": "repo-lines-v1:sha256:4052cc5b94c4e2f0ad7c3fc934c9cefd96468e570d37025f964082a338979656:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4NmNkYTE1Mjc1Mjk3MjVjOGU2ODA4OTExYmRhNGQ1YjIwMTU5ZTEyN2ZiNTgyOWFhNGE4ODZkYjJiYTVlMWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/kit-vue/src/create-payments.ts#L1-L49",
+          "version": "repo-lines-v1:sha256:0de1bcdd09926398653507dc489868a5732930972ada579e0a6b72dd3be277df:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4NmNkYTE1Mjc1Mjk3MjVjOGU2ODA4OTExYmRhNGQ1YjIwMTU5ZTEyN2ZiNTgyOWFhNGE4ODZkYjJiYTVlMWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9c08bd68662d4cfd89bee4cb85a6a341",
+      "statement": "React uses Context: RhPaymentsProvider and RhCartProvider wrap the app, providing usePayments() and useCart() hooks. Both throw if called outside their provider.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-react/src/cart.tsx#L63-L127",
+          "version": "repo-lines-v1:sha256:ed51f8fa95c448319ede762f7f866bdf710333524efc7403ab0af570588350d4:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljYjEzZjE5MTRmN2JhMGM2NjNhY2FiZGNkNmE5YzM4MDZjYWVmNmQzOTkyNWMwYzMzNGUxZjg0OWNhZTk4YWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhmNzA0MTM3OWY0Njk4OWZiMmE1ODAxNDczNTc5OTg1NWE5NjUxMjA2ZDA2NzRiNzAyZmYyZTdkM2RiYTBkMzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/payments.tsx#L113-L297",
+          "version": "repo-lines-v1:sha256:0a7c0fb8dc2049aa655839eaeb1729d6231ef1de088d6953550ebe778a0ac969:eyJzZWxlY3RlZExpbmVDb3VudCI6MTg1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJiZWVkOTk0YmU0MjBjODFhYzE0MDllY2Y0Yzc3ZDI2YjM4ZjBhYThiZmY0OTlmZDk5N2FlYzY3MTliNmRkY2Y5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIzODBiMjBjY2JmZjRhMDc3MzVmMTc5ZTdhYjk2ODNmZjcwMjZiM2ZjYjdmMjQ2NGE5MjQxMTFhYTc1OTIxNmFjIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_ba00eb58afb34a46ad711f1bebf0be37",
+      "statement": "All adapters keep cart state and localStorage in sync within the same operation (not via a reactive effect/watcher), preventing a removed line from being resurrected by a stale storage read on reload.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-ng/src/cart.service.ts#L83-L94",
+          "version": "repo-lines-v1:sha256:4f75e04e59bfaec3543a13ddaa266f63fb81673d025eee2cc9ca0cb961b74097:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU2NTY4M2Q5ZDYxMzAzYzUyNmY4MzlmMDg2YTNjMjliNjVjYTI1NTQwMDhlNjFiZWY4NjQ1MmRhZWFkNmI1YTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/cart.tsx#L67-L84",
+          "version": "repo-lines-v1:sha256:6591284125adb00d10350ff9980edbdc69eb30c8c50ad2ddd89ccacd23252e07:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyM2NiNGMxM2Q2Nzc1OWQ1NGY3NjcxZDQ0MDM0OTcyZDA5MDNhMzlkMDhhZmFlNzNiYjk4MWViOWFiMGRjZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZlMTU2YWYwODE3MWY1ZTdjYTNhZmFmMzNkODhhNTk1ODI5YzYzNzhiNDg4YThkNGUxZjgzM2YzOTFjZTMxZGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg4MGU1YWMzODIyZjY2NzhmNzYxMjk0MmI0ZGQ3YTI3OTIyMWU5NGI1YzYzOGE5YjMwNmQ0N2EwYThkOTI2N2EifQ"
+        },
+        {
+          "resource": "repo://packages/kit-vue/src/cart-store.ts#L63-L74",
+          "version": "repo-lines-v1:sha256:4ecec857eff351798e6bdc96b2606fbb6153b3ad8f7a62d97b4033a84185a2ca:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlmOTZmNTAyZTUxMmI0MDZmNDg0ODFjMmRhOTkyNTI0ZjEzM2NjN2UwZDQ0NGVmMzUwNGI1ZWUxYjljYzA3NzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYyOTU5M2Q4NWMwNzk1YjZjYjA4ZWJmMDFjZTU1N2E1ZmFmNjY1ZTZmYzY4OTYwNmE0Nzc5MjMzOTdlZTgyNmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1a5d25d65e334a2f8575c70dbd63cf34",
+      "statement": "The adapter contract section E defines 10 payments test scenarios (E1-E10) covering: no calls without payments config, subscription loading on auth events, team-switch reload, canManageBilling derivation with custom ownershipRole, 409 error propagation, waitForSubscription state update, and no reload on profile/consent changes.",
+      "evidence": [
+        {
+          "resource": "repo://docs/ADAPTER_CONTRACT.md#L66-L100",
+          "version": "repo-lines-v1:sha256:6420c50772a55e1fbd599a05e9332446a2b9bb499fa1fbbace722cc6b07fd9d9:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxNTUxMzQ0ZWI1NmM4ODY0NDE2ODkyMjA3N2NjZWFmZDJjZGMxZGJjYWNjN2ZjNzY3ZTY1OWRlZGNmNDUyODYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1ZDI2Mzg5NDQyZDQ3NjFiYTVlOGRjNzRlMGRhMmY5OGI4MjI2Y2UyY2M4YWFjYzEyOGYzZDlkOTQ4MDZiYTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlY2MyM2FiYTFjMzk3NmRmZmEyM2I5NzU2ZDVmNTcxNzI2Y2UzOTE0NjEzOGM3NWExNDJhMGE3NWUwMmFhM2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJhOWIxNTg5NTdkODkwZjUyYzdmNDJjZTI3ZjAwNjdkOGI3YzJiNGZmNTJlNjY0ZjZkY2ZlMzIwN2U0MjNmMWYifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.4.3",
+    "at": "2026-08-28T16:48:53.239Z"
+  }
+}

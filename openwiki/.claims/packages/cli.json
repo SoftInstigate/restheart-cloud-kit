@@ -1,0 +1,262 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:9585861dffeca588eddb42285278131ab68c1fa457db19584b44fd740e6a743b",
+  "claims": [
+    {
+      "id": "claim_acd1c970ec6249f5854fc444f6b659e0",
+      "statement": "The @restheart-cloud/cli package ships both a CLI binary (rhc) and a library (defineSetup, step, fromEnv, createAdminClient, createServiceClient, runSetup) for idempotent, file-driven configuration of RESTHeart Cloud services.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/package.json",
+          "version": "repo-file-v1:sha256:08bb2546a3b324bb438e7e95a8bf9acc237befc1688d2bf055e8d4dc6a109c85"
+        },
+        {
+          "resource": "repo://packages/cli/src/index.ts",
+          "version": "repo-file-v1:sha256:0917831eb60535f35123caa2233e3986b4ae6db7217cff4506d0477b632e6166"
+        }
+      ]
+    },
+    {
+      "id": "claim_d98c78ed2f6942c78f31dcf987c2799a",
+      "statement": "The package has two install shapes: global (npm i -g) for the rhc command and devDependency (npm i -D) for the library imports in setup files. The two copies interoperate because Setup is plain data and fromEnv uses Symbol.for for cross-version marker identity.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/README.md#L57-L79",
+          "version": "repo-lines-v1:sha256:4ba4ee0dc6db3733a00d4ab288897666e96f1b24111f7e1640fc92a3d35b9f85:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzOTRkNjA0MzMzNzI2NTIzZGQzNTViYmE2YzIxMzI5MTdjN2ZkNjJhMjBjY2Q3NGQ0YTBiY2JmN2Y2ZjcxZjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyNDEzZjdmMzQwZTUwNjUzOGMwYmJmNTVmNzI1Y2IwNTUyOGI0MjNmYzQyZDc3MjM4MWUxNDg1MTk5ZjI0NmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE3MDU5MGY2YTE2MDEwMDUyYzFjY2YzNzM1ZjFkMWQ1ZTM2ZDk1NDk2ZjQ3ZmNiMDYzOTgwOTAwMDJhNTQ0NmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI1ZDUyNTgwOTc3OTI0MmE0MGVmMjEwOTBlNzI4NThjMDBlZWIyOTRhNzgyNzNjZmJhZjY4ZmQ1N2ViOWY2YjgifQ"
+        },
+        {
+          "resource": "repo://packages/cli/src/env.ts#L21-L21",
+          "version": "repo-lines-v1:sha256:c5b5d232fe0b661f39ffa80304478faba7b3013ac08fe7bf3bf6acb18b7ed902:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzViNWQyMzJmZTBiNjYxZjM5ZmZhODAzMDQ0NzhmYWJhN2IzMDEzYWMwOGZlN2JmM2JmNmFjYjE4YjdlZDkwMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzViNWQyMzJmZTBiNjYxZjM5ZmZhODAzMDQ0NzhmYWJhN2IzMDEzYWMwOGZlN2JmM2JmNmFjYjE4YjdlZDkwMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzJhNTYzZjc5ZTVkOWVjOWE4YjMyZjNkZDEwNDUyYzVmOTE1M2YzODcxNWIyYzZiZWNhYTcwYmI5NjE4OGEzYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTc0MGQwNDcwZjFhMTcxYTY0MGUyOGMxYWJhOGQ3MzNlZmJlNzYzNWE0ODY1MjNjNWQ4NDlmYWIxZjdjZGVhZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_3f8d34ee5783498493fd066188180b6b",
+      "statement": "The fromEnv function returns a marker object (not a string) identified by Symbol.for('@restheart-cloud/cli:fromEnv'). The marker carries a toString that prints the variable name (never a value) and a toJSON that throws to prevent accidental serialization of unresolved markers.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/env.ts#L21-L63",
+          "version": "repo-lines-v1:sha256:1687cf58c64a2459739b7eb69c414f8f660cc1bc93096cdf46ff29612e11b8bd:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1YjVkMjMyZmUwYjY2MWYzOWZmYTgwMzA0NDc4ZmFiYTdiMzAxM2FjMDhmZTdiZjNiZjZhY2IxOGI3ZWQ5MDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcyYTU2M2Y3OWU1ZDllYzlhOGIzMmYzZGQxMDQ1MmM1ZjkxNTNmMzg3MTViMmM2YmVjYWE3MGJiOTYxODhhM2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1YWFjYTNkZjJlYTYwNDZlNjZmMjA5NWU2ZWFiZmE0ZTUwZDVmODg4NTE3MWM2ODg4NTBhMmQzZGY1MmEyNzQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_bfea476d68184bd79a1ee305fd5e88d0",
+      "statement": "resolveEnvRefs walks a value tree replacing fromEnv markers with environment values, collecting every missing variable before throwing MissingEnvError so a pipeline learns all missing secrets from one run. Empty strings are treated as missing.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/env.ts#L108-L134",
+          "version": "repo-lines-v1:sha256:08da24f2accab3c1934ef78b647e592fcd205d759c1befb8f833bdc5177e98ff:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxOTdkNjBiNjUwMTExODZiNTA4Y2UxMTA1YmE1MDhiMWM4YWVjNmNkYTZhYTkzYzllY2I3MDA4MTFlMWQ2Y2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY4MjM1NmNmMjZlMDBjOWViZmVlZmY1ZWU4YjQyM2M2YmJkMzc3YzgzNmVmZTU5OGM3M2VmMmM2NGI0ZDAyZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1c1f208c575e470992c7248435da96f2",
+      "statement": "Resolution of fromEnv markers happens at serialization time inside the admin client's updatePluginConfig and the service client's body() helper — never before, and a dry run never calls apply so markers are never resolved.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/admin.ts#L208-L213",
+          "version": "repo-lines-v1:sha256:9202a5f24477b0be69cecbc3414cf94faae73941f76c5be911297117878f7354:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzRiYjg4ODBlYTcxYTE1YTI4ODBlYTFkYjdhMzI5OTUyYzYwN2RjZjA5MTQ5MTRmZjMzZTVhMjJiNjY1NDZiZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWYwY2RiOTcyYTdiZmI3ZWQyNDZmOWZmNjcyMzg1ZTU1ZjQ5NjhmYzExMDQzZGM1YjY4NGQ1MWRmYTMxZGJjYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmQ0MDVkM2QzYjc2M2M2Yzg0Y2ExYWVlY2IyMTkwODIzNTgyNzJkYWI3Y2FhMDgwNzUzNDY3ZGM2ZjQxNjkwMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjkwNzcxZmQ3OTg5YTIzMjFkOGNkOGY5M2MxNTU3NDcwOTI5OTZmZjhjMmI3MjY2NzNkZTY5NDlhOTAyY2JmOSJ9"
+        },
+        {
+          "resource": "repo://packages/cli/src/service.ts#L101-L102",
+          "version": "repo-lines-v1:sha256:44d858a694e4d0034e6f0b1d8f1f125dbfa7005225b85ae180f90531adc399cc:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjc2NjdmMzhmNzhhZGM3NzRmOTQ3NTNkMjNlYzJiNTk1YTkwZjNlOTE1YjM1M2M1ZDBiMDk5MGZkZDFmOTMyMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWZlNzNkMzljNjIxOGMzOTRkMTNmNjc2MzExZmU4YmQ1YjMzODY2YWVmY2U4ZTRlYzVhNmUxYzdlOWY4Y2I4NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmRlMzdjZGZiNjFiODBjOWRlMTE0NzI2ZjkxOGI2MTAwYTg5NjNmNzdjYmI5YTExNDMwMjM0ZjVkMTQ3Y2I2YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWQ4NTA1Y2RjNDY3NDAzNDkzYjJiMDUyYWVkZDYzYjc1YzgwMmM0YmY5MDk5YjNlYzdlZWRkMzQ1NmNjOGE5ZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_b7f69fc1d1554866ba30092f0b6566a0",
+      "statement": "Session management stores a personal access token and the admin node it was verified against at ~/.config/restheart/session.json (or under XDG_CONFIG_HOME) with mode 0600 on both directory and file. A corrupt file reads as absent rather than throwing.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/session.ts#L37-L86",
+          "version": "repo-lines-v1:sha256:fd659e5dcaf19830e797ab2a9ed4777316fd1abf8cfc8f4d1a5153a46b5c8027:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2ZTQ2ZWI1ZmVhNjQ3NjFiMTI0ZjFjYjI4MTU1ZGQwMDUyMjYwOTJmZmE5OTNkN2ViYmY2MTc4OWU4ODVmYjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY5ZWFjZTI0OWFkNGIxOGM5MThhNTYwNmUwYjVmZmI0NGU1ZTQwNGQyNGE4MjljOTRjNzc0MjNmOGYyNGQ1ZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhY2E4ZDQ3MTE4ODc1Njc1M2NmYmVkN2FiYzhmNTM0ODdlNjYwYTU0NWQ1MWI2M2Q1OWNlMGJlMjAyNzMyOWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_17006ca23aad40aa92d982e3cc301554",
+      "statement": "resolveToken implements strict precedence: RH_CLOUD_TOKEN env var always wins over the stored session file, with no conditions attached. This prevents a CI run from silently falling back to a session left on a shared runner.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/session.ts#L88-L110",
+          "version": "repo-lines-v1:sha256:072f4df3d8f9af812037fa6c411f07a15618c8f49cbb6c5ccf31f2d3dea181d4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRmMGQxMzk5Mjg4YmY2ODVhZTgzOWJkNzhmYjhhNGMyYWVmZWRiM2U5MmVjMjRkNDQ1MjE3MGUyODFjODg1OWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c123e72b7c3045df9492c1098f7641b9",
+      "statement": "The CLI commands are login, logout, and setup. login verifies a token against the admin node before storing it. setup loads a setup file (default ./rhc.setup.ts), resolves credentials, and runs steps. The rhc new command for provisioning is specified but not built.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/cli.ts#L111-L112",
+          "version": "repo-lines-v1:sha256:003338ea3e1fd582e844715562d498c14fa491b9c156e45792413b3b63048e59:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmE1OTY2YTM2Zjg0YTVmMjcwYjUwMWYxZGM2N2ZkMDgxYThjMTQ4YWU5YTE5YTk1MWUwZTMzMjhiZDdjZGNhNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGFhZjg1ODAzNjljNGE4YWIzMjg2ZDQ5MzVlZDM3ZTMzNzg5Mjc1YjllMDczN2IxOTdhMGI3NWQ0ZmI2ZjQ1NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjE1NmUwNDJmMDQ0YTRlMDM5ZGQwZTZhNzc3MmJjZTE3MjMwY2JjMWU3ZjdmNWM3YmY4OTRjZmM1NTcwOTM0MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmVlNmU2YzRkZjllZTU1MDc5MWMzNDI3MzIwMTdiYTNhMTRmNjNhZDdlZTFjZDZhMTI1ZWJhMTViZjlmZGJjNyJ9"
+        },
+        {
+          "resource": "repo://packages/cli/src/cli.ts#L368-L416",
+          "version": "repo-lines-v1:sha256:e64ea6ed94abf9608335a55c2883c5434b53d35ea8863bd125ca28acd40620f7:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyMjYwMTljZmY2Y2JlNTY4MTZmMjM4ZGVkYzgxNDM4N2I0MzE5NmMyZTlhZjlkN2M0ZDAwMDgzNjE1ZTExOTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVlZWY3OGM1ZDE2YTkwZWQ5MjdhZjBlMDNlYjE2YzU4N2U3NjMzOTMwYTYxOTU1MWIyYzcyMWJiMjVjYzBkMGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEyNTk4NmFhYzZjNmZiNmZlMjIwZGUwZTAxOWNkZGE1ZmYzY2VlNzBkOGVlZTljYjIyYzBjYmYyOGFjZDI3ZGQifQ"
+        },
+        {
+          "resource": "repo://packages/cli/src/cli.ts#L484-L538",
+          "version": "repo-lines-v1:sha256:da952d45ac18835b0f9499f3f180b59d7cd3195ad5094d11a1cc873dccd57dca:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxYWU3YWVkNWRlMDdlZDVhYTg5YThjMjBjNmQwNzBkMTg3Y2Q3OTk0NmRiODlhZGEwYjhiYmVjNzcxNGI5NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUyY2YxMjQ4MDg0MzhjYjY1ZWNmMDY0MDQ0YmU2YTg2NmU5ZDFlZjgxMDg3ZDA0MzlhZmZmMWE5YzFjMzMyMDYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3c3b398a500f4064ab7ea1f6c94a4475",
+      "statement": "The setup file is resolved from --file or the first conventional name (rhc.setup.ts, .mts, .js, .mjs) in the working directory. It accepts a default export or named 'setup' export; a function export is called with no arguments.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/cli.ts#L177-L255",
+          "version": "repo-lines-v1:sha256:ad6f5c3041049d0f9865d167c7fd2c90a1a7f854191d2e0863f7ffe1a6d882ec:eyJzZWxlY3RlZExpbmVDb3VudCI6NzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmYmM0OTk4MWZiZWJlZmRjMmYyZTRjZTIyZDI2NDVmNTA3NDExZGY4ZTczYjM2N2I4OTBjZTUzOTYwN2JkN2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJhYjE3M2RjNjI5ZWQ0NzcxNGUxOWNjYTNjZmJhNWQ1MDRlY2Y5MWI4NTVmNGYyNjhmYjNlMzM0YTgzZTgzYjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk0ZTEwZTU3NjUwODAwZGJmOWZiYjkxMzhmYzkyMDE4N2RlNmQzYzE4ZmFkMmVhZTdhN2QxNTZlNmM5ZDI3MTAifQ"
+        },
+        {
+          "resource": "repo://packages/cli/src/cli.ts#L48-L49",
+          "version": "repo-lines-v1:sha256:01702e2e192d9394d3cde9040dcf3621c0e2eb14cfce650213fcea459359947d:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWUyYTQ5YzdlOGUyYjUxMTQ0NTc4MDUzMGE4ZjNlYzQ5NzM4NDlhZGFjYjYwYWE4ZGMwZTk1NjYyNDg1NDU5NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWE5ZWMyNzcxNjA3MzE3ZDNjOTgwMGEwMmQzYzFhZDM2YmUxMDNmMWY3MDdjMGIxMGIwM2E4YjUyNTEzNjc2MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTY1NjI2ODkyNWM3ZjVlOWE2M2EyMDdmZjRjYTM1M2UyZGFhYTBjYWFhZmViMWU1YzBiZDFmNGY2NTU1NjAzZSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_67d9bb3035f2444cbf485a9f62ec589d",
+      "statement": "The admin client (createAdminClient) manages its own token in a closure rather than localStorage, silences the core's stderr logging, and provides methods for plugin lifecycle (install, config, init, enable, disable, uninstall, test), service token minting, and a generic fetch escape hatch.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/admin.ts#L131-L236",
+          "version": "repo-lines-v1:sha256:c24e0d02c7931797fd41445b62296813a6cc24cd04cb127e111f127623e45b3f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI4OTBlNDczZjkxMjU3MzkxYzBhNzBmZmIxZjFiMmIzMjhmOGY5MThkMmZkZDAwMjkyOGMxNTVkZjE5MGJkZDI5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyYjM1YmQ1NWRiNTk0YTgzODVkODMxYjE5YjVmMTgwZWFiZThmMWY0ZGJjYmI5NTM4NGE3YjNiY2ZmMjZkNTgzIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_f1e0ce23c6d848bcb0f6a460b3f055c4",
+      "statement": "The service client (createServiceClient) derives from the admin client, mints a JWT lazily on first use, caches it, renews it 60 seconds before expiry, and shares one in-flight mint between concurrent callers. The token is never returned to callers.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/service.ts#L42-L84",
+          "version": "repo-lines-v1:sha256:5bb7a92ac86d1a6e78e159632ddeb333fe0177ac19286c5f4a737dcf7a4d1223:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMyODZlZjY2MzM3MzQ0N2U3YmE0NWY4NjY1ZDZiMWFkNmY1N2QzYmYwMDdlZjU2ZGUzMjUxMGMxNTIwZGI4ZTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMyNGQxMzY4NWQ5MGQxZTI4ZDc1YzkxMTA0NWY2OGIxZWEwZmZhYWQxMDNlODdhZmY0YmZmNGIwNDNkMTQ0NDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI3NDIwNGY3MzVkNzlhZDgyOGM3MWM5MjVjMGQ4MTc4MmM5NTU1YTI0ZTIyYTJhYWI0MzIwMTU0MGFiMWExYzYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3a5cb4e0fcac43099e21d163534c36a9",
+      "statement": "Service client checks answer false on 404 and throw on anything else (including 403), because a 403 means the token cannot see the thing, not that it is absent. Document writes (permissions, users, schemas) use ?wm=upsert; collections and indexes do not need it.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/http.ts#L66-L81",
+          "version": "repo-lines-v1:sha256:3e28777794d85fcb0f601d585f0cdfb1aba7c6821403878d1450b4c87e65d13f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhN2Q4YjlkOTVjZDgzMDhhNTBhMGUzZjZjZGIwY2YwZTg0Y2JiNDczMzBlZjFlMzJhNzBhMTYyZGMwNmYwNjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/cli/src/service.ts#L107-L122",
+          "version": "repo-lines-v1:sha256:94bb5ffda8cee0314d1a5d51f73640aaba63716057c66f0fcb6e59dd23c0d4a4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhM2QwODU4ODQ4MjExYWZmYjMxNjhkODQzOTZjODM1OTEwMzYzYjZiZWI2ZGU1YzA4ZGE2OWE4OGY5MTU0MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxZTc4YzRiZDk5YjVjYmMzOTc2ZTBkZTA3YmI3ODZlZTE3YTA4MjA2Mjg3MGUzOTg0NDUzZjE1YWFiYjhmODEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg3MmM5MjY1OTkxNWE3MjM3OWRkZjlkZTNhN2Y3MjQwNjg2YzgzYTc0ZjEyZTI2YzYzY2EyMWEzYmZjN2NiOWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk0ZmIwN2ViOWRlN2ZkYzZiYTUxYTdiZTQ1YjgxMzUyMTBkYjgyYTE5ZTJkNDE1OGQ3MjYyYzMzZmQ4MDQ4OGMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8ab950e43d704d76b58478e211337676",
+      "statement": "A step is a { name, check, apply } pair. defineSetup(name, steps) declares a setup. runSetup executes steps sequentially, halting on failure (except in dry-run mode where it runs every check). Each step receives { service, admin, srvId }.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/setup.ts#L108-L119",
+          "version": "repo-lines-v1:sha256:b62760667566b84a83b27951d76a132ddf3c54c2cef51682229dca7f6e5edc7e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1OGQ0NzdmYWYxYzdjNGNkYjVjMzVlZjU1ZDRiNmRkMWYxMWM3YTEyMGE3MGM5M2M1YzRlOGNiNDVkMWJhOTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhlOWE1NTAxNTU5NWIxYmMyODJkMGZjMjRlZTA1ZjVhNjA2OTAwMzllNDVhNmZhNjhhYTM2MDEyZGEwNjgyNzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA0MDIxNjljMmJiZmE5MTA5YmQ3NTBiNDc1N2FmNTU3YjE3NWExM2ZjZTUzZThkOGZiMjI2YjlmMTZlMGY2NWYifQ"
+        },
+        {
+          "resource": "repo://packages/cli/src/setup.ts#L132-L246",
+          "version": "repo-lines-v1:sha256:79d7863541f64517364a50ca4daf0b90a997f6035a35408ad84b02e9f991cda0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjNGUzNzFiMWYzMmFmZGI1NDk4MDY2ODMwY2ZlYjllN2VlZDdjNGQ1OWU1MWE3ZjE3MzM5Yjg4NzAxMGUxOTE4IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIwZDY0Y2E1YTRjYmFkNjc1Y2I1Y2NiMGI4NzI4ZTBmYTc2ZjUyZmIyZTIwYjNiNjgwYTI2OTA0MTJlY2JlNDJlIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiNGFmOTFmY2NlYzk5MWM0ZTEyYTFiYjA2NjQ0YjM3OTMzZDYwZDA5ZjhkMzg2NTJkNDBiNjlkYzI5Y2I4N2MxIn0"
+        },
+        {
+          "resource": "repo://packages/cli/src/setup.ts#L19-L30",
+          "version": "repo-lines-v1:sha256:060b8f159f5e664401af46b4408f3dfd7e875fb0bb490990ddd62c35b62130db:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJmYTk2MzM1ZjU2MzdkNDhhNzVmOGM2OTZlZDViZTBmNmY3NzY4MDI4ZDgwMTlhZTRkMWNlODc1ZDJmNmMwODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhZDk4Y2VjMDkyMjUzNGMwODNmODNiMDQ2YjUyY2Y0MzY4NDAxYjYzZDA5ZTgxYjQzNjQwMzA1YWEwM2U0MDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVlZWJkNjUzMjNjNGM5YzQ4ZDVkMzNmNjI5YTk0YTliYmYyZjhlZTIxMDliY2ZiMTA0ZGIwOTJlYzhhNjRlMWQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_681794ceeec64c3fb2a2d89d2bb7e693",
+      "statement": "The runner re-checks after applying with exponential backoff (delays of 0, 300ms, 700ms, 2s, 4s, 8s — up to ~15 seconds). This handles the lag between admin-node writes and service-node cache visibility, without turning a wrong step into a passing one.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/setup.ts#L155-L189",
+          "version": "repo-lines-v1:sha256:20313f7492339f3f54245381fa26a4ab4d06a621d000ba01dbc0e16e869e2a51:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUwMjkwYWE4OGQ1MmQ1NzM5ZDkzMTQyNTJhNGFjYWNkMjFiYmYxYTdhZjc4ZTFjZDZiYWE1NDUzNTM3MTk2NmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2MWQzZmU2ZTM5NjZjMmY2OGI5ZDc1Mzg0OTQyYjYzY2YxZjU0NDI0OGI3M2ZlMzdmMmY4OTMxY2JlMDQ5MTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9966a31ac53641f18971c5f8d3796fd6",
+      "statement": "The --force option skips the check but not the recheck verification. It accepts step names matched by case-insensitive substring, or bare --force for all steps. Forcing does not turn a broken step green.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/setup.ts#L136-L140",
+          "version": "repo-lines-v1:sha256:1442d625a98f55e4134c65b04da72b4d8cc40262ab536b95efb9c8c034cd2fcb:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTg0Y2NmZjVhZTdmMTUxMjI3Njg0MmUwMzA0MGE4ZGU1NzY2MWRhOGI0NmJmYjc0ZjEyZTFmZTFkZjc2MDgzZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDJhMmNiMjVhMTIyYjQ0MjIxYTYyMzRlYzY2MGE3YjVmYjdmOWJkZTdiM2I5ZTJiM2M1NTlhMGQ5NmZhYzczOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2U5OTVmODM5ZTZkY2I5NzhkODFkMmRhMGJmNDFiNTUxNTg0NTQ4MzI3ZWQ0YWFmNGVlNjk1MTNhMDIzMjVmNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzEzN2E4YzMzNjI0ZDVhN2IzNzVlNGZkYTIxZmE4NWUzNDMzMGQwMzg4NDcwYWNiOTM0ZjUxYWUzMDUzYzhhNSJ9"
+        },
+        {
+          "resource": "repo://packages/cli/src/setup.ts#L207-L223",
+          "version": "repo-lines-v1:sha256:0aa175e07939395b71d0d0f469ac830acb4b7e5f09f7d2b5b5241de8811218f8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZGY4N2E0NzMxNmM3MDhjNTUwMjA5OGU5YWY2YzQ0NTM0ZWI4MGJlYWRjZjYwNjMwMjhlZmNhODU5MzdhYmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNhZWZiMTQ0YmE2ZTJjMmJlOWM2Yjg3M2Y0NTQ0MTVhZDk5MmNhYTgwMzA5M2Y1NjRhZWNmNGU4ZDg0ZDY5M2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNlYTFhY2M4YzJkYzU3ZTYxOWYzMTk3ZGJlNGE3N2ZlOWUzNjAxZmIyMzQyNTc2OTg5NWEwMWVmYjFlYzAxNzIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_31c6a10ecdc5497483a330f784c0acad",
+      "statement": "Progress events emit only a step's name and state (never config values or secrets). The CLI renders progress with glyphs (· satisfied, + applied, ? missing, ✗ failed, — skipped) and a summary line. JSON output is available via --json.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/cli.ts#L433-L482",
+          "version": "repo-lines-v1:sha256:8c5106a95d800a1c8ec0237d51750596ea77bcbe2ba94778358a330c0cb9a1f4:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2YzkyZmY2Njg4NGNkZjE5NGRjODA5MmMyNDJiYWUzYTYwZThjNWQ5Mjg0M2M2ZWM4YTEwNDA3ZDE4NTY4MTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY5ZWJiNzY1ZDFkYjVkNGE3OWU0ODRlNTdkMTEwNjY3MjZhMjYzNDZkZWI5YTNjNDEzODBkMGFmODZjZjgzMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjViNDBlMjA5Y2E2NWIzNTM3NjA0MmQwNWYyZjdlNWQwMDE2ZmUxOGE4NzQ2MDRhZDIyNDg5ZGVhZGY1YWM1MWIifQ"
+        },
+        {
+          "resource": "repo://packages/cli/src/setup.ts#L68-L77",
+          "version": "repo-lines-v1:sha256:3fb2d15085ce93a3f298af0ff90ce043a2ca591468fd519bbc6b8d3f878d7afd:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1Zjc0YTZlNjVkOGZlNDkyYmE1MzFkZmQyMjYzMWMxYzc3N2M5NTNiM2NjYTA0ZDE3YmFiNjMxN2MxOGIzODYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhkNDRjNzc4NjYzOGJjZWNjNDU1OGJjNGFkNzYyYWVhMmQzMWVjOWJjNmIxYzk2YTg4N2JiNmNlNzcwZjIwZDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVmZDc3NjRmOGZjM2QxOGZlMWFiZDk2YmE2N2M1YmExYzc5NTkwNmFmNDg1MTQ4OGFiMmU3YTFiNzZmNWNiOTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_87c2ecc76a964900897731bc5ad1908f",
+      "statement": "Exit codes are 0 (every step satisfied or applied), 1 (a step failed), and 2 (a dry run found work outstanding — configuration drift, not an error).",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/README.md#L233-L238",
+          "version": "repo-lines-v1:sha256:cb063bbab9a685e0f69f4ef31e0a699652aa54b7778b529b1c085eb66e9fd1bc:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGYxOWNiMGM3MTg5OWFlNjhkZTM0YTQ4YzlkOWY5ZmMwMzhiYTc3MmVmZjg2ZTdkN2U4Njg0NzJhZDBmNWFjNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDllOTRkNGM4ZWM1YWY3NzM0OGQyYWZkMDAwNTMzYTljOTM2ZDFiZGQ2MDQ2ZTM3MDA5M2Y3Yjg0ZjU1YjdjNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzZhZmIyZmNjMDFiNzUyNmM5MTljZmY5N2FmZDVmZTkxZDI5ZGRlZmY2ZjBhNTJiZDNkZGM2M2NlZmUzOWE5YiJ9"
+        },
+        {
+          "resource": "repo://packages/cli/src/cli.ts#L535-L537",
+          "version": "repo-lines-v1:sha256:643bf9a5a398d6ff822e403980428dca7e62d09da2a6f7a01b461f4cbd6bf2bc:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWZiNjNjNzhjYjkyMWQ0ZDJiZDc4ZjNlODFlOGJhNGVkZDYwYzU0Yzg2ZmMzZGY5ODZmNTk2OTI0YWQ5ZWJjMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjk1OGJkMjZhNzU1ZmRkMzY0ZjFiMjE0Zjk5M2RhNjg5NzVlNjcwMzk4Mzk4MGUwMTRlNTMyMDBiMDNkNmNiYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWFlNWY5MjIzNDRlYjRlZjA2YTVjOGFhMTMwNDFkZjU5YzQ1OTRjY2IxZGI2MzhmZDljZTI0NThiNGMwMDJlNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmMxNDAwYTI5NDczMGEyMmNhMTkzMTVjMjczMmNlYjE4N2YyNzczMzNhOTI3YzU1ZTUyYTE3MGFjZjc2ZTc4OCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c27cbd800c2047af89d1801be32c0155",
+      "statement": "The REDACTED constant ('••••••••') mirrors the server's PluginSecretsRedactor.REDACTED. It is exported so callers can recognise a placeholder; nothing in the package ever produces one. isRedacted() checks for it. A blank or absent secret is not redacted.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/types.ts#L1-L22",
+          "version": "repo-lines-v1:sha256:d949a7028c81d187575fba000de038afae79b501a6554b731939aad7cc0f4fd3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU3ZWM5YjRjMDJkMzBhZWE3YzA2ZDY5MTE3ZGRmMGZlNmVlMzk2OTRmNTMxYTYyMTc1ODcyNjVlODA1NDAyZDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d8de3ebadeb74c8f87c52daecb68441c",
+      "statement": "The package is Node-only by design: the admin node's originVetoer rejects browser-origin requests. It is not a framework adapter — there is no reactive state, no session to restore, no signal to update.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/README.md#L81-L93",
+          "version": "repo-lines-v1:sha256:6f163eddb6ac87b8271745214d9e472f989b5a9cff4f8a35810e8a0760969a79:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgwNzNiZDRhZTM1ODY1M2RjMGIwYjExY2VlNjRhM2Q0NGNjYzMzY2Y5M2E3NWRhMTkxNGJlMjRjMGJmMjgyYjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExZWM4YzdmMzZkNjcyM2Y2NDkyYTk1Nzc0OGNiMTJhZDdmYjk1ZWQ1MjJlYmQwOTQ0YjVjMjFhZDgzM2I4ZDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0YWJlNzgyMzMyODNlNmUyMTE1NDEyNzQ2MWU5OTAyMzU0YjRlYmFmMWJkZDU5Y2ZhOTIwZjkxOGQ2Y2Y1MDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkzNmZjZjViMjQwYjUwZjMzYjc3NmY2N2YzN2FkNDhmNzkwZTI4M2Q1YmQxZDFkZmJhNjhmYWMwMWM5MmViM2EifQ"
+        },
+        {
+          "resource": "repo://packages/cli/src/admin.ts#L123-L130",
+          "version": "repo-lines-v1:sha256:6a1ed2416075a13ff6dc954545a196ea0ca888a0deef718468542c1b561fbef8:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjY1N2M5N2M0MzNlOTRmNjY4NDgwNWM4Y2Y3MDYyYjAzMzM5YzU2MTE2YjhmOTQ1MTllMGEwMTAyMWQ0ZjRmZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDg3NmMyMDViOTc5MTM3MTJkZDU3MjhiZDIxZmIwYTIxYTI0NmI1YTExOTczMzI4OTY5YmQxMzAwYTlmMjYwOCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_43879ff5b3fc494baa1cdc4380f18875",
+      "statement": "The http.ts module provides request() for service-node fetch (using native fetch, not apiFetch, because the service URL comes from the server and should not be re-validated), existsOr404() for check operations, and isApiError() for error type discrimination.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/src/http.ts#L19-L81",
+          "version": "repo-lines-v1:sha256:e1ac3addd8290eb7d1186f4f8ab5a7c7aec1b0dd7b72342187bbc7fc2b601aef:eyJzZWxlY3RlZExpbmVDb3VudCI6NjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEzN2Y0YmY5MzliM2NhYjU2NTU3YmZiZDhkZTFlMWFjMGE0YjNkMjViYjQ4Yzc5NGEzMjQzODM0OWUxM2Y0Y2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI5OTViOTcxZWFiNTA4M2ExYTQ0MjUxYjhlY2EzMmMwMmU3NTAyNTRiZmVjYmMzMWJmZTk0MGRlNzk2ZGYxMDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.4.3",
+    "at": "2026-08-28T16:48:53.239Z"
+  }
+}
