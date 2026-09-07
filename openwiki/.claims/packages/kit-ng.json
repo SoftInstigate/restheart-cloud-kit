@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:41ceefcc9d6b5c67d7c3247944f3df83fc2b50315727f23889262e1766fb372c",
+  "claims": [
+    {
+      "id": "claim_a2cf71e33664494f972638cf9645b71e",
+      "statement": "RhAuthService is an Angular root-provided singleton that wraps core kit functions, exposes Angular signals (user, teams, isAuthenticated, hasMultipleTeams), and converts all Promise-based kit calls to Observables.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-ng/src/auth.service.ts#L25-L48",
+          "version": "repo-lines-v1:sha256:dc187bf66b2a058be8d72d7785c1bda6899ee7d398cd871fbb1d7f1c3b342dbd:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVlMTU5ZWMyYmFhODc4NGYxNzU5MzIwMzM3NjY3MWU0ZjQ1MTVhYWFlNTZmODU4OGNmY2NlMzc4MTczMTM1ZmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU1NTQxMjczNWJhNTNhMzExNWVhYmJmMmU2ZTNhNDM4M2MyZGM0YzcyOGViMWFjODdlMzQ2Mjk1ZDBkMDNmYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVkMWUyNzc4MWMxNzg2ZmU2ZGQ3OGJjN2Y0MDdhMjNiMzY3Y2ZlMWY3M2RmMTUwYzVkZGFjMmY1NTQ3YTk1ZTgifQ"
+        },
+        {
+          "resource": "repo://packages/kit-ng/src/auth.service.ts#L7-L18",
+          "version": "repo-lines-v1:sha256:831a154302fc15a6ee7fa275051f4679c804b967a0f6b6e1becf339dc712f1dd:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkNTUyNDRjMGEzM2E5YzEzODgyMTVjMWE2NDVmN2I5YWQ2YTg0ZGRlOTE2NDc1YzQxYzRmZWEyN2ZiMTc5ZjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRlZmE1OTY0ODNjOTZjNzhmMWZlMWFiNjMyN2E2MDI3MWRkMDc3NjIxZGVhY2QwNGYzZTBmYzFiOThlMzcwNDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFmODk4NTUyY2FmMTU0M2RkZmQ2ZWU0ZTA0M2JkZDYyNzc1Y2UyZTI0ZDEyYmJlZjM5NWNhNDA3NzA2MmNjMGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f99f4a3ea4a14695acdedb0ea1107ff1",
+      "statement": "provideRhAuth(config) registers RhAuthService, adds rhAuthInterceptor, and automatically configures httpClientTransport when no explicit transport is provided.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-ng/src/provide-rh-auth.ts#L8-L22",
+          "version": "repo-lines-v1:sha256:08129952060fd0f8355364a67f1e42e265da59b700527bec658ec1c785a764aa:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2NmEwMjgwOTAwNTU3N2Y2Yjk4OTcwZjI1OTlkOGY4NmE4Njc4NGM0OTBiYjUyZGUwMDM1MGZjOTMzNTJiZTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFmOWRiYzdmMmYyNGI1Mjg0MzU3Zjk4NjMwNmZlZjA0MTdjYzZmODFhODNhMDJiZjgxNTBmNzExMmY4ODNiMDkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRlYzYxOGE3NDYxYmRkYWE5N2VmZWRjMmUwZDRjY2VjNDU3ZmY3OGYxYmIwODMxOWU4NjY1ZTYzZTE2MmIxZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f53b494d85af4553af1e116a21d3c86f",
+      "statement": "rhAuthInterceptor attaches the Bearer token only to requests whose URL starts with config.apiBaseUrl, adds No-Auth-Challenge: true and withCredentials: true to those requests, and clears the session on 401 responses except for kit-originated requests marked with RH_KIT_REQUEST.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-ng/src/auth.interceptor.ts#L39-L88",
+          "version": "repo-lines-v1:sha256:07cddc6a60b42333d0c4d236b92c34fa6cae2d3419c3500f6e5992446176c368:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJjZDEwYTZjMTgyZTE1MTk5NzdmMzZjMGRkYzhiMTI4ODI3NjY3ZWE2NmYwMWJjMGQ2NzQ4OTNmZGQyNjZjNzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxY2JkYTU4OTJkZDNkZGMyZjQ5ZTI5YjQ0ZWJkYzA3ODZiZWY3ZDdjNjg3N2E4ZDNiNjlkZGY4M2RiZThmNDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMxN2M5YjUxM2FiMjhkMmQ2Mzc4MjcwMWVjZjdiNzRmYzY5YzZlNDM0YTEzYzVjMWE2OTk4YTMwMTBiYjNjYjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAifQ"
+        },
+        {
+          "resource": "repo://packages/kit-ng/src/tokens.ts#L8-L18",
+          "version": "repo-lines-v1:sha256:e79a529a2ad9215345d1027c9ab81b9df49b65bbd787737ea588699dafaf91ab:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkMjM0NjM1OWRiZWVhMDdiMTlmOTlhODVjNzU3ZDQ4OGZlYjVmZmQxODNiMTNkMTM1NGUxMTgyMmJhZGY0NWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg0NmQ3NTJlYjVlOWMyNzRmMzc2ZjA1Mjg5MjBhY2E5MzliMTI4ZjE0MTA5MmUyZjg4NTE3MTgzMmU2MDVlZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8f5e52b2253a485b932b726ec6adac3b",
+      "statement": "authGuard allows access synchronously when isAuthenticated() is true, otherwise calls checkSession() and redirects to /auth/login on failure; publicGuard does the inverse, redirecting authenticated users to /.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-ng/src/auth.guard.ts#L6-L27",
+          "version": "repo-lines-v1:sha256:0488781423c1145e40124042b729cbe1eb1e9db0cb8bb0795eb12a42c25e56b0:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljODJkMmU1ZjYyNWMzNzdiYTY3MzUzM2E1NzNjYzU4MzcyMTgzYmYxZTBmZWI5YmY4MWNkMjM2NTg3MTg1ZjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJmMTk1MWRiN2UxYWZlYjhlMmRkNmE2NjI2YTg2MWViMTQyMDE1OTM0NGRjMDZkNjQ3OTI3MDRhMjFiNTA0ZTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a7deaac6202c4c7cb14d91e39533013b",
+      "statement": "httpClientTransport is a fetch-compatible transport backed by Angular's HttpClient that reconciles two mismatches: it converts HttpErrorResponse with real responses back into resolved Response objects (matching fetch behavior), and rethrows status-0 network errors as rejected promises.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-ng/src/http-transport.ts#L42-L91",
+          "version": "repo-lines-v1:sha256:e2c9f13b415ff43814b03caecf00782484a03be1b5324d5d1f7857680e151447:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE5ZGQ5N2MyMWFkNDgyOWJiZTQwOTc1ZTk4OTg0MmI1NzcxZmJhNzU2ZWE4NmFjY2E3NjM2YjE0MWY5YmM3OWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_194897b4059f4e3b90cd71d94668e2e9",
+      "statement": "RhPaymentsService is a separate root-provided service for subscription, billing, and order management that automatically loads/reloads the subscription when the user signs in or switches team via an Angular effect watching teamKey.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-ng/src/payments.service.ts#L31-L80",
+          "version": "repo-lines-v1:sha256:d6c4a51eaa9432b3ed7ce42cb93228a3ac7e061f1197e8a37388b9b73178011b:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg5MGYyMTI3MTA5YWExMTU2MzNmNTA4NDhlMjJkNzhiNWJlMDFkZTBkMjlhYmY3ZGQ4ZTQ3YzFjMWJiOWMzODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliNjBmMjQ4MmNiM2VjZmE4NzZkOGM3YmMxOGY0MDg3NGZjNmYxNjRlNjg3NTUwMzk3MTUyNGZiNjU1YTllMzAifQ"
+        },
+        {
+          "resource": "repo://packages/kit-ng/src/payments.service.ts#L57-L61",
+          "version": "repo-lines-v1:sha256:0aef3ad3756bbd4e6be41aa3cf0d182bb0a2d58f8798f8f2cbe5e91e73ce867a:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWU3MTEyN2Y3ZjVmMTcxN2I5NmU3ZTk3NjkwYTdkMTgxYTUwNzIzN2ZjYWQxODg0MGJiYjA5MzQwMjJhOTIwYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmE0OWY5NTdkZjYwNmJhODdkYjgyYjEzMmY4MzVkYWFkYmUzZGIzZmNhMjg5MjgwOWExZTc2NzM4NGEzMTIwNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGY3MGM1MWE2ZGRlNjk5ZjIwMDViNzAyOWVhMWM5ZTA0N2VhYTFkMTBkYjVmNTdhNjQwYmExOWVjMzdkOGE0MiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7154b649f7e14a54a38da41716912c38",
+      "statement": "RhCartService is a root-provided cart service independent of authentication, backed by localStorage, where state and storage move together in the same operation (not via an effect) to prevent lines coming back from storage after removal.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-ng/src/cart.service.ts#L44-L94",
+          "version": "repo-lines-v1:sha256:048231c5d5005c1178afcaa0b1386426014b73d4f7673e35e3b1c31db7f93ec3:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkNTUyNDRjMGEzM2E5YzEzODgyMTVjMWE2NDVmN2I5YWQ2YTg0ZGRlOTE2NDc1YzQxYzRmZWEyN2ZiMTc5ZjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxMWViNTgwZTIwNjE2MzBhMmE5MDkxY2U4Yjc2N2EwNTMxMmNiMWJiMWI1YmIyMjg3OGY2ZWQ3YjhjYTViOGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7f7b6125bac94eeeb1c1f439dfd08087",
+      "statement": "The package re-exports all types and functions from @restheart-cloud/kit so Angular consumers only need to import from @restheart-cloud/kit-ng.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-ng/src/index.ts#L10-L12",
+          "version": "repo-lines-v1:sha256:e1074e07739af32ce12dfc4d6693d16e8719660fc5882d78ef5696558d18216c:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDM5MzM5NzdjNGRiYTM0NWI4ZDliYWMyYWMzZDdjM2MxNjBhZTMxYmM3MGVlNTVmMWVlYTFmZjZkMWQwODEyNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGNlNjM0YTYwYTU3MDU5Y2E3YzVlOTFlNmMwN2VkMWYxODkxNDE2MDE0ZWY3N2FmMmJiMThmZTc4OTk2YmMxNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzE3M2Q2ODIwZmY1OTAwNjE3NmMyODg5ODViMzc2NWFkMjg1MjM2MWMwMjE3ZTY2OWY2ZmRjYmNiMDNlNDQ3NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.0",
+    "at": "2026-09-07T09:33:56.593Z"
+  }
+}

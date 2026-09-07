@@ -1,13 +1,36 @@
 ---
 type: Package
 title: "@restheart-cloud/kit-ng"
-description: Angular adapter for RESTHeart Cloud Kit. Provides RhAuthService with signals, route guards, and HTTP interceptor for Angular applications.
-tags: [package, angular, adapter, signals, guards]
+description: Angular adapter for RESTHeart Cloud Kit. Provides RhAuthService with signals, route guards, HTTP interceptor, payments service, and cart service for Angular applications.
+tags: [package, angular, adapter, signals, guards, payments, cart]
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-09-07T09:33:56.593Z
+sources:
+  - id: openwiki-source-bea1cd7cd3ced08116a2cc29
+    resource: repo://packages/kit-ng/src/auth.guard.ts
+  - id: openwiki-source-25c6d02acaef67e7df8e10df
+    resource: repo://packages/kit-ng/src/auth.interceptor.ts
+  - id: openwiki-source-d04f3d3246ed311e39bd26b3
+    resource: repo://packages/kit-ng/src/auth.service.ts
+  - id: openwiki-source-8b15a7b6614e2bf9d0258e04
+    resource: repo://packages/kit-ng/src/cart.service.ts
+  - id: openwiki-source-171585965a94b593af4c2787
+    resource: repo://packages/kit-ng/src/http-transport.ts
+  - id: openwiki-source-43a67e8351256ecdf1e05cac
+    resource: repo://packages/kit-ng/src/index.ts
+  - id: openwiki-source-00bcb2d4e7095f67f080f8d1
+    resource: repo://packages/kit-ng/src/payments.service.ts
+  - id: openwiki-source-3f72ca81b110e87915dc77c3
+    resource: repo://packages/kit-ng/src/provide-rh-auth.ts
+  - id: openwiki-source-66f30d931d913bd85948b8cd
+    resource: repo://packages/kit-ng/src/tokens.ts
+generated: { by: "openwiki/0.5.0", at: "2026-09-07T09:33:56.593Z" }
 ---
 
 # @restheart-cloud/kit-ng
 
-Angular adapter for `@restheart-cloud/kit`. Wraps the core authentication logic in an Angular service with signals, route guards, and an HTTP interceptor.
+Angular adapter for `@restheart-cloud/kit`. Wraps the core authentication, payments, and cart logic in Angular services with signals, route guards, and an HTTP interceptor.
 
 ## Installation
 
@@ -39,6 +62,7 @@ export const appConfig: ApplicationConfig = {
 This single call:
 - Registers `RhAuthService` as a singleton
 - Adds the HTTP interceptor (attaches Bearer token, handles 401)
+- Configures `httpClientTransport` so kit-originated calls go through the interceptor chain
 - Sets up DI configuration
 
 ### 2. Use in Components
@@ -141,8 +165,9 @@ auth.register(payload: {
   email: string;
   password: string;
   teamName: string;
-  firstName?: string;
-  lastName?: string;
+  firstName: string;
+  lastName: string;
+  [key: string]: unknown;
 }): Observable<void>
 
 // Verify email after registration
@@ -221,11 +246,24 @@ auth.resetPassword(payload: {
 #### Profile Management
 
 ```typescript
-// Update profile fields
+// Update profile fields (refreshes session signal afterward)
 auth.updateProfile(updates: { firstName?: string; lastName?: string }): Observable<void>
 
 // Change password (requires current password)
 auth.changePassword(currentPassword: string, newPassword: string): Observable<void>
+
+// Update arbitrary user fields (admin use)
+auth.updateUser(email: string, updates: Record<string, unknown>): Observable<void>
+```
+
+#### Consents
+
+```typescript
+// Record the signed-in user's acceptance of consents, renew token, update user signal
+auth.acceptConsents(body?: Record<string, unknown>, mode?: LoginMode): Observable<UserInfo>
+
+// Force a new token carrying the current user document
+auth.renewToken(mode?: LoginMode): Observable<string | null>
 ```
 
 #### Session Management
@@ -261,6 +299,139 @@ Rejects with an `ApiError` (`{ status, message }`) on any non-2xx response. See 
 
 **When to use**: Use `auth.api()` for any RESTHeart API call from Angular components or services that is not already covered by a dedicated method (e.g., querying custom collections). For calls that already have a wrapper (e.g., `auth.login()`, `auth.listTeamMembers()`), use the wrapper — it handles signal updates.
 
+## RhPaymentsService
+
+Subscription, billing, and order management. Separated from `RhAuthService` because payments are not authentication.
+
+### Injection
+
+```typescript
+import { RhPaymentsService } from '@restheart-cloud/kit-ng';
+
+payments = inject(RhPaymentsService);
+```
+
+Only active when `config.payments` is `true` — otherwise every method is a no-op and no `/stripe/*` call is ever made.
+
+### Signals
+
+| Signal | Type | Description |
+|--------|------|-------------|
+| `subscription` | `Signal<Subscription \| null>` | Current team's subscription, or `null` |
+| `plan` | `Computed<Plan \| null>` | The subscription's plan, derived from `subscription` |
+| `isSubscribed` | `Computed<boolean>` | `true` when `subscription.active` |
+| `canManageBilling` | `Computed<boolean>` | `true` when user's team role matches `config.ownershipRole` (default `'owner'`) |
+| `seatsAvailable` | `Computed<number \| null>` | Remaining available seats |
+
+### Automatic Loading
+
+Subscription is loaded automatically when the user signs in and reloaded when they switch team (via an Angular `effect` watching the team key). No manual wiring needed.
+
+### Methods
+
+```typescript
+// Reload the team's subscription
+payments.loadSubscription(): Observable<Subscription | null>
+
+// The service's subscription plan catalog (no session required)
+payments.getPlans(): Observable<{ default_plan: string; plans: Plan[] }>
+
+// Start a Stripe Checkout session (rejects with status: 409 if already subscribed)
+payments.createCheckoutSession(plan: string, interval: 'month' | 'year'): Observable<{ url: string }>
+
+// Open the Stripe Customer Portal
+payments.openBillingPortal(): Observable<{ url: string }>
+
+// The team's seat licences (requires canManageBilling)
+payments.getLicenses(): Observable<Licenses>
+
+// Grant a seat licence (rejects with status: 409 when no seat available)
+payments.grantLicense(userId: string): Observable<GrantLicenseResult>
+
+// Revoke a seat licence
+payments.revokeLicense(userId: string): Observable<void>
+
+// Read the product catalog
+payments.getCatalog(opts?: CatalogQuery): Observable<CatalogItem[]>
+
+// Create an order and start Checkout
+payments.createOrder(
+  items: { productId: string; quantity: number }[],
+  email?: string,
+  collection?: string
+): Observable<{ _id: { $oid: string }; checkout_url: string; secret: string }>
+
+// Read an order back
+payments.getOrder(id: string, secret?: string, collection?: string): Observable<Order>
+
+// Poll until the subscription satisfies predicate (for Checkout success page)
+payments.waitForSubscription(
+  predicate: (subscription: Subscription) => boolean,
+  opts?: WaitOptions
+): Observable<Subscription>
+
+// Poll until the order leaves 'pending_payment' (for order success page)
+payments.waitForOrder(
+  id: string,
+  secret?: string,
+  opts?: WaitOptions & { collection?: string }
+): Observable<Order>
+```
+
+## RhCartService
+
+Shopping cart backed by `localStorage`. Independent of authentication — a cart belongs to the browser, not to a session.
+
+### Injection
+
+```typescript
+import { RhCartService } from '@restheart-cloud/kit-ng';
+
+cart = inject(RhCartService);
+```
+
+### Customizing Storage Key
+
+Inject a custom key when two apps share an origin:
+
+```typescript
+import { RH_CART_STORAGE_KEY } from '@restheart-cloud/kit-ng';
+
+providers: [
+  { provide: RH_CART_STORAGE_KEY, useValue: 'my-app-cart' }
+]
+```
+
+Default is `'rh-cart'`.
+
+### Signals
+
+| Signal | Type | Description |
+|--------|------|-------------|
+| `lines` | `Signal<CartLine[]>` | Cart lines in the order they were added |
+| `totalItems` | `Computed<number>` | Unit count (two of one thing counts two) |
+| `subtotal` | `Computed<number>` | Display-only total in minor units |
+| `currency` | `Computed<string>` | First line's currency, or `'eur'` when empty |
+| `orderItems` | `Computed` | The cart as `createOrder` wants it |
+
+### Methods
+
+```typescript
+// Add an item, or increase the line already holding it
+cart.add(item: CartItem, quantity = 1): void
+
+// Set a line's quantity. Zero removes it.
+cart.setQuantity(productId: string, quantity: number): void
+
+// Remove a line
+cart.remove(productId: string): void
+
+// Clear the cart
+cart.clear(): void
+```
+
+State and `localStorage` move together in the same operation — not via an `effect`, which could be skipped or reordered.
+
 ## Route Guards
 
 ### authGuard
@@ -280,7 +451,7 @@ const routes: Routes = [
 ```
 
 **Behavior**:
-1. If `isAuthenticated()` is `true`, allows access immediately
+1. If `isAuthenticated()` is `true`, allows access immediately (synchronous)
 2. Otherwise, calls `checkSession()` to verify token
 3. If session valid, allows access
 4. If no session, redirects to `/auth/login`
@@ -302,7 +473,7 @@ const routes: Routes = [
 ```
 
 **Behavior**:
-1. If `isAuthenticated()` is `false`, allows access immediately
+1. If `isAuthenticated()` is `false`, allows access immediately (synchronous)
 2. Otherwise, calls `checkSession()` to verify token
 3. If session invalid, allows access
 4. If session valid, redirects to `/`
@@ -319,10 +490,22 @@ provideRhAuth({ apiBaseUrl: environment.apiUrl })
 ```
 
 **Behavior**:
-- **Outgoing requests to `apiBaseUrl`**: Bearer token attached automatically; `No-Auth-Challenge: true` header suppresses browser Basic Auth popup; `withCredentials: true` enables cookie-mode compatibility. Requests to other URLs pass through untouched (still get 401 handling).
+- **Outgoing requests to `apiBaseUrl`**: Bearer token attached automatically (unless caller already set `Authorization`); `No-Auth-Challenge: true` header suppresses browser Basic Auth popup; `withCredentials: true` enables cookie-mode compatibility. Requests to other URLs pass through untouched (still get 401 handling).
 - **Kit-originated requests**: Marked with `RH_KIT_REQUEST` context token by `httpClientTransport` so the interceptor does NOT clear the session on their 401s (e.g., wrong current password in `changePassword`).
-- **401 responses on app requests**: Automatically clears session (token, refresh timer, signals)
-- **Error propagation**: Re-throws error after cleanup
+- **401 responses on app requests**: Calls `clearToken()`, `cancelRefresh()`, and `auth.clearSession()` to fully clear session state.
+- **Non-401 errors**: Pass through without clearing the session.
+- **Error propagation**: Re-throws error after cleanup.
+
+**Manual Registration** (if not using `provideRhAuth`):
+
+```typescript
+import { rhAuthInterceptor } from '@restheart-cloud/kit-ng';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+
+providers: [
+  provideHttpClient(withInterceptors([rhAuthInterceptor]))
+]
+```
 
 ### httpClientTransport
 
@@ -339,18 +522,12 @@ provideRhAuth({
 });
 ```
 
-This is exported because it is the bridge that makes `rhAuthInterceptor` see kit-originated requests. Without it, cross-cutting concerns written as interceptors are quietly partial.
+**Note**: `provideRhAuth()` automatically applies `httpClientTransport` when no explicit `transport` is provided, so most applications do not need to call this directly. The function is exported for cases where the transport must be created separately.
 
-**Manual Registration** (if not using `provideRhAuth`):
+**Two mismatches with `fetch` are reconciled**:
 
-```typescript
-import { rhAuthInterceptor } from '@restheart-cloud/kit-ng';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
-
-providers: [
-  provideHttpClient(withInterceptors([rhAuthInterceptor]))
-]
-```
+1. **`HttpClient` throws on non-2xx responses.** `fetch` resolves and lets the caller read the status, which is what the core does to build its `ApiError`. So an `HttpErrorResponse` carrying a real response is turned back into a resolved `Response`.
+2. **`status === 0` is not a response** — it is a network or CORS failure. The original error is rethrown, surfacing as a rejected promise exactly as a failed `fetch` would.
 
 ## Token Delivery Modes
 
@@ -393,95 +570,88 @@ await auth.switchTeam(teamId, 'cookie');
 
 ### Login Flow
 
-```
-User enters credentials
-        │
-        ▼
-auth.login(email, password)
-        │
-        ▼
-RhAuthService.login()
-        │
-        ▼
-kit.login() → POST /token
-        │
-        ▼
-Token stored in localStorage
-        │
-        ▼
-Proactive refresh scheduled (80% TTL)
-        │
-        ▼
-User signal updated
-        │
-        ▼
-Teams loaded via kit.getTeams()
-        │
-        ▼
-Teams signal updated
-        │
-        ▼
-Observable emits UserInfo
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant C as Component
+    participant S as RhAuthService
+    participant K as kit
+    participant API as RESTHeart
+
+    U->>C: Enter credentials
+    C->>S: auth.login(email, password)
+    S->>K: kit.login(config, email, password)
+    K->>API: POST /token
+    API-->>K: Token (header or body)
+    K-->>S: UserInfo
+    S->>S: _user.set(u)
+    S->>K: kit.getTeams(config)
+    K->>API: GET /teams
+    API-->>K: TeamMembership[]
+    K-->>S: teams
+    S->>S: _teams.set(ts)
+    S->>K: Schedule proactive refresh (80% TTL)
+    S-->>C: Observable emits UserInfo
 ```
 
 ### Page Reload Flow
 
-```
-App initializes
-        │
-        ▼
-provideRhAuth() registers service
-        │
-        ▼
-auth.checkSession() called (e.g., in guard)
-        │
-        ▼
-kit.getToken() reads localStorage
-        │
-        ▼
-If token exists and not expired:
-        │
-        ▼
-kit.checkSession() → GET /users/me
-        │
-        ▼
-User signal updated
-        │
-        ▼
-Teams loaded
-        │
-        ▼
-Session restored
+```mermaid
+sequenceDiagram
+    participant A as App
+    participant P as provideRhAuth
+    participant S as RhAuthService
+    participant K as kit
+    participant API as RESTHeart
+
+    A->>P: Bootstrap
+    P->>P: Register RhAuthService singleton
+    P->>P: Add rhAuthInterceptor
+    P->>P: Configure httpClientTransport
+    Note over S: e.g. in authGuard
+    A->>S: auth.checkSession()
+    S->>K: kit.getToken()
+    alt Token exists and not expired
+        K-->>S: token
+        S->>K: kit.checkSession(config)
+        K->>API: GET /users/me
+        API-->>K: UserInfo
+        K-->>S: UserInfo
+        S->>S: _user.set(u)
+        S->>K: kit.getTeams(config)
+        K->>API: GET /teams
+        API-->>K: TeamMembership[]
+        S->>S: _teams.set(ts)
+        S-->>A: Observable emits UserInfo
+    else No token or expired
+        K-->>S: null
+        S->>S: _user.set(null), _teams.set([])
+        S-->>A: Observable emits null
+    end
 ```
 
 ### 401 Handling Flow
 
-```
-API request returns 401
-        │
-        ▼
-rhAuthInterceptor catches error
-        │
-        ▼
-kit.clearToken() called
-        │
-        ▼
-kit.cancelRefresh() called
-        │
-        ▼
-auth.clearSession() called
-        │
-        ▼
-User signal set to null
-        │
-        ▼
-Teams signal set to []
-        │
-        ▼
-Error re-thrown
-        │
-        ▼
-User sees "logged out" state
+```mermaid
+sequenceDiagram
+    participant App as App Request
+    participant I as rhAuthInterceptor
+    participant K as kit
+    participant S as RhAuthService
+
+    App->>I: HTTP request
+    I->>I: Forward to server
+    I->>I: Receives 401 response
+    alt Is kit-originated request (RH_KIT_REQUEST)?
+        I-->>App: Error passes through (no session clear)
+    else Is app request
+        I->>K: clearToken()
+        I->>K: cancelRefresh()
+        I->>S: auth.clearSession()
+        S->>S: _user.set(null)
+        S->>S: _teams.set([])
+        I-->>App: Re-throw error
+    end
 ```
 
 ## Type Definitions
@@ -646,9 +816,12 @@ rm -rf .angular/cache
 
 | File | Purpose |
 |------|---------|
-| `src/auth.service.ts` | Main service with signals and all auth methods |
+| `src/auth.service.ts` | Main auth service with signals and all auth methods |
 | `src/auth.guard.ts` | Route guards (`authGuard`, `publicGuard`) |
-| `src/auth.interceptor.ts` | HTTP interceptor (401 handling) |
+| `src/auth.interceptor.ts` | HTTP interceptor (bearer token, 401 handling) |
+| `src/payments.service.ts` | Payments service (`RhPaymentsService`) for subscriptions, billing, orders |
+| `src/cart.service.ts` | Cart service (`RhCartService`) with localStorage persistence |
+| `src/http-transport.ts` | `httpClientTransport` — routes kit calls through Angular `HttpClient` |
 | `src/provide-rh-auth.ts` | DI provider setup function |
-| `src/tokens.ts` | Injection token for `AuthConfig` |
+| `src/tokens.ts` | Injection tokens (`RH_AUTH_CONFIG`, `RH_KIT_REQUEST`) |
 | `src/index.ts` | Public API re-exports |

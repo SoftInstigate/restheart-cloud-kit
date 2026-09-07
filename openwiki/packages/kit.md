@@ -1,13 +1,40 @@
 ---
 type: Package
 title: "@restheart-cloud/kit"
-description: Core authentication package with zero dependencies. Provides all auth flows, token management, team operations, consents gating, and password reset functionality.
-tags: [package, core, authentication, typescript]
+description: Core framework-agnostic package with zero dependencies. Provides authentication, token management, team operations, consents gating, password reset, payments, orders, cart, and money formatting.
+tags: [package, core, authentication, payments, orders, cart, typescript]
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-09-07T09:33:56.593Z
+sources:
+  - id: openwiki-source-d846911884642122d8dd6179
+    resource: repo://packages/kit/src/auth.ts
+  - id: openwiki-source-7dbc4364bd37edb52c104a4d
+    resource: repo://packages/kit/src/cart.ts
+  - id: openwiki-source-e7bfea41ff94b3acb0b72ff3
+    resource: repo://packages/kit/src/client.ts
+  - id: openwiki-source-58f1051310aebc9b339b995d
+    resource: repo://packages/kit/src/consents.ts
+  - id: openwiki-source-dc6fb97d2a3901aa8aa09a70
+    resource: repo://packages/kit/src/index.ts
+  - id: openwiki-source-77978ac75e6e04d6df6d024a
+    resource: repo://packages/kit/src/invite.ts
+  - id: openwiki-source-fa0d4a25d3019b33ad2d58a3
+    resource: repo://packages/kit/src/money.ts
+  - id: openwiki-source-346f417d59a26ce09dba770f
+    resource: repo://packages/kit/src/orders.ts
+  - id: openwiki-source-814dd157639abb9facf8f99b
+    resource: repo://packages/kit/src/password.ts
+  - id: openwiki-source-9aeb2b476e021464e50a1e8f
+    resource: repo://packages/kit/src/payments.ts
+  - id: openwiki-source-42dfd0defa8189243ef19509
+    resource: repo://packages/kit/src/types.ts
+generated: { by: "openwiki/0.5.0", at: "2026-09-07T09:33:56.593Z" }
 ---
 
 # @restheart-cloud/kit
 
-The core authentication package for RESTHeart Cloud. Framework-agnostic, zero dependencies, Promise-based API.
+The core framework-agnostic package for RESTHeart Cloud. Zero dependencies, Promise-based API. Provides authentication, token management, team operations, consents gating, password reset, payments, orders, cart, and money formatting.
 
 ## Installation
 
@@ -20,7 +47,7 @@ npm install @restheart-cloud/kit
 ## Quick Start
 
 ```typescript
-import { checkSession, login, logout } from '@restheart-cloud/kit';
+import { checkSession, login, logout, getUserInfo, renewToken, applyBearerDelivery } from '@restheart-cloud/kit';
 
 const config = { apiBaseUrl: 'https://api.example.com' };
 
@@ -29,6 +56,12 @@ const user = await checkSession(config);  // UserInfo | null
 
 // Login
 await login(config, 'user@example.com', 'secret');
+
+// Get user info (requires valid session)
+const userInfo = await getUserInfo(config);
+
+// Renew token (e.g., after consents acceptance)
+const newToken = await renewToken(config);
 
 // Logout
 await logout(config);
@@ -45,6 +78,8 @@ interface AuthConfig {
   setToken?: (token: string) => void;              // SSR token sink
   transport?: (url: string, init?: RequestInit) => Promise<Response>;  // Custom fetch (e.g., Angular HttpClient)
   onError?: (error: ApiError) => void;             // Global error observer
+  payments?: boolean;                              // Opt-in to subscription and payment features (default: false)
+  ownershipRole?: string;                          // Role that grants billing management rights (default: 'owner')
 }
 ```
 
@@ -55,6 +90,10 @@ The optional `getToken`/`setToken` callbacks support SSR runtimes (Next.js, Nuxt
 **`onError`**: Observes every failure, including session-restoration calls no caller is waiting on. It cannot swallow errors — the error is thrown either way. Use it for cross-cutting concerns like offline banners or consent gates.
 
 **Validation**: `apiBaseUrl` must be a RESTHeart Cloud service URL (`*.restheart.com`). Invalid URLs throw an `ApiError`.
+
+**`payments`**: When `true`, adapters load the team's subscription on `checkSession`, `login` and `switchTeam`, and expose subscription-related reactive state. When `false` or absent (the default), no call to `/stripe/*` is ever made — a service without the `stripe` plugin would respond `404` on those paths, and this flag prevents that from happening on every app startup.
+
+**`ownershipRole`**: The role that grants billing management rights. Used to derive `canManageBilling`: `true` when the current user's team role matches this value. Defaults to `'owner'`. Must match the service's `accountsConfig.ownership-role` — if the deployment overrides it, hardcoding `'owner'` here would show the billing button to the wrong people and hide it from the right ones.
 
 ## Authentication Flows
 
@@ -130,6 +169,18 @@ if (user) {
 
 **Unverified accounts**: If the server returns a user whose roles include `$unauthenticated` (i.e., the account was registered but never email-verified), `checkSession()` clears the token and returns `null` rather than returning an unusable user object.
 
+### Get User Info
+
+```typescript
+import { getUserInfo } from '@restheart-cloud/kit';
+
+// Read the authenticated user from GET /users/me
+const user = await getUserInfo(config);
+// Returns the full user document (including application-level fields)
+```
+
+**Note**: Unlike `checkSession`, `getUserInfo` makes no local expiry check and does not clear the session on failure. Use this when you need the full user document after a write operation.
+
 ### Logout
 
 ```typescript
@@ -144,7 +195,7 @@ await logout(config);
 ### Manual Token Operations
 
 ```typescript
-import { setToken, getToken, clearToken, getTokenExpiry } from '@restheart-cloud/kit';
+import { setToken, getToken, clearToken, getTokenExpiry, getTokenClaims, isValidApiBaseUrl } from '@restheart-cloud/kit';
 
 // Store token (e.g., after OAuth redirect)
 setToken(token);
@@ -157,18 +208,30 @@ clearToken();
 
 // Get token expiration in milliseconds
 const expMs = getTokenExpiry(token);
+
+// Get token claims (unverified - for client-side decisions only)
+const claims = getTokenClaims();
+if (claims) {
+  console.log(claims.sub); // User id
+}
+
+// Validate API base URL
+const isValid = isValidApiBaseUrl('https://api.example.com.restheart.com');
 ```
 
 ### Proactive Refresh
 
 ```typescript
-import { scheduleRefresh, cancelRefresh } from '@restheart-cloud/kit';
+import { scheduleRefresh, cancelRefresh, renewToken } from '@restheart-cloud/kit';
 
 // Schedule refresh at 80% of TTL (called automatically by login)
 scheduleRefresh(config);
 
 // Cancel pending refresh
 cancelRefresh();
+
+// Force token renewal (e.g., after consents acceptance)
+const newToken = await renewToken(config);
 ```
 
 **Refresh Strategy**:
@@ -176,6 +239,26 @@ cancelRefresh();
 - Refresh scheduled at 80% of TTL (~12 minutes)
 - Automatic rescheduling after successful refresh
 - Graceful degradation on failure (token expires naturally)
+
+### Token Renewal
+
+```typescript
+import { renewToken, applyBearerDelivery } from '@restheart-cloud/kit';
+
+// Renew token (bearer mode - default)
+const token = await renewToken(config);
+// Returns the new token string
+
+// Renew token (cookie mode)
+const nullResult = await renewToken(config, 'cookie');
+// Returns null - backend updates cookie
+
+// Extract token from auto-login response
+const extractedToken = await applyBearerDelivery(config, response);
+// Used internally by activate, resetPassword, switchTeam
+```
+
+**Token Claims**: `getTokenClaims()` returns the stored token's claims without signature verification. These are **not verified** — a JWT payload is base64, and anyone holding the token can change it. Read them for what the client does next, never for an access decision — the server re-checks the signature on every request.
 
 ## Team Operations
 
@@ -260,20 +343,20 @@ const invitation = await getInvitation(config, email, token);
 import { activate } from '@restheart-cloud/kit';
 
 // Bearer mode (default)
-await activate(config, {
+const token = await activate(config, {
   email: 'newuser@example.com',
   token: 'invitation-token',
   password: 'new-password'
 });
-// Sets password, logs in, stores token
+// Sets password, logs in, stores token, returns the fresh bearer token
 
 // Cookie mode
-await activate(config, {
+const nullResult = await activate(config, {
   email: 'newuser@example.com',
   token: 'invitation-token',
   password: 'new-password'
 }, 'cookie');
-// Backend sets cookie, no token in response
+// Backend sets cookie, no token in response, returns null
 ```
 
 ### Accept Invitation (Existing User)
@@ -301,6 +384,7 @@ import { listInvitations } from '@restheart-cloud/kit';
 const invitations = await listInvitations(config);
 // Returns: PendingInvitation[]
 // Each has: email, role, isNewUser, createdAt, expiresAt, expired
+// Owner/admin only
 ```
 
 ## Password Management
@@ -320,20 +404,20 @@ await forgotPassword(config, 'user@example.com');
 import { resetPassword } from '@restheart-cloud/kit';
 
 // Bearer mode (default)
-await resetPassword(config, {
+const token = await resetPassword(config, {
   email: 'user@example.com',
   token: 'reset-token',
   password: 'new-password'
 });
-// Resets password, logs in, stores token
+// Resets password, logs in, stores token, returns the fresh bearer token
 
 // Cookie mode
-await resetPassword(config, {
+const nullResult = await resetPassword(config, {
   email: 'user@example.com',
   token: 'reset-token',
   password: 'new-password'
 }, 'cookie');
-// Backend sets cookie, no token in response
+// Backend sets cookie, no token in response, returns null
 ```
 
 ## Profile Management
@@ -355,36 +439,381 @@ await updateUser(config, 'user@example.com', { preferences: { theme: 'dark' } })
 await changePassword(config, 'current-password', 'new-password');
 ```
 
-## Consents Gating
+## Payments & Subscriptions
 
-The consents pattern lets you gate access behind the user's acceptance of terms of service, privacy policy, or any other consent.
+The payments module handles Stripe subscriptions, checkout sessions, billing portal, and seat licences. Enable it by setting `payments: true` in `AuthConfig`.
 
-**How it works**: A [Guards rule](../architecture/overview.md) blocks requests from users who have not accepted the current consents. An ACL permission on `PATCH /users/{userId}` — scoped with `bson-request-whitelist` — exempts the one request that records the acceptance.
+**Important**: Payments have a different relationship to the session than other kit modules. There is no token renewal — the `@subscription` ACL variable is resolved server-side from the database on every request. An upgrade is effective immediately with no re-login.
 
-**The server decides what is written.** The permission's `mergeRequest` stamps the versions being accepted and the timestamp. The body sent by the client carries the whitelisted key and nothing meaningful: a client that stated the version itself could accept terms it was never shown.
+**The redirect back from Checkout races the webhook.** Stripe sends the buyer back to `successUrl` over the browser; it reports the payment over a separate server-to-server webhook, with no ordering guarantee between the two. Use `waitForSubscription` on the success page instead of a bare `getSubscription`.
 
-**The renewal is not optional.** The token the user holds is a snapshot taken before the acceptance; without a new token the guard keeps blocking them.
+### Plans & Subscription
 
 ```typescript
-import { acceptConsents } from '@restheart-cloud/kit';
+import { getPlans, getSubscription } from '@restheart-cloud/kit';
 
-// After the user ticks the consent box
-const user = await acceptConsents<{ latestConsents?: { tos: string; pp: string; acceptedAt?: { $date: number } } }>(
-  config,
-  session.user._id
-);
-// user.latestConsents now carries the server-stamped versions
+// Get available plans (no session required - safe for public pricing pages)
+const { default_plan, plans } = await getPlans(config);
+
+// Get current team's subscription
+const subscription = await getSubscription(config);
+console.log(subscription.plan, subscription.active, subscription.seats);
 ```
 
-**Parameters**:
-- `config` — `AuthConfig`
-- `userId` — The user's email (the `_id` field)
-- `body` — The request body. Defaults to `{ consents: [] }`, matching a permission whitelisted on `consents`. Pass custom keys when your ACL permission whitelists a different field.
-- `mode` — `'bearer'` (default) or `'cookie'`. Must match how the session was established.
+### Checkout & Billing Portal
 
-**Returns**: The user document as it is after the acceptance (`UserInfo<E>`).
+```typescript
+import { createCheckoutSession, openBillingPortal } from '@restheart-cloud/kit';
 
-**Test**: `packages/kit/src/__tests__/integration/consents.test.ts`
+// Start Stripe Checkout (requires canManageBilling)
+const { url } = await createCheckoutSession(config, 'gold', 'month');
+window.location.href = url;
+
+// Open Stripe Customer Portal (requires canManageBilling)
+const { url: portalUrl } = await openBillingPortal(config);
+window.location.href = portalUrl;
+```
+
+**Error handling**:
+- `createCheckoutSession` rejects with `status: 409` when the team already has an active subscription
+- `openBillingPortal` rejects with `status: 402` for a team that has never checked out
+
+### Seat Licences
+
+```typescript
+import { getLicenses, grantLicense, revokeLicense } from '@restheart-cloud/kit';
+
+// Get current licences (requires canManageBilling)
+const licenses = await getLicenses(config);
+
+// Grant a seat licence (requires canManageBilling)
+const result = await grantLicense(config, 'user@example.com');
+// Returns: 'granted' | 'already-licensed'
+
+// Revoke a seat licence (requires canManageBilling)
+await revokeLicense(config, 'user@example.com');
+```
+
+### Waiting for Webhook
+
+```typescript
+import { waitForSubscription, WaitTimeoutError } from '@restheart-cloud/kit';
+
+try {
+  // Poll until condition is met (e.g., on Checkout success page)
+  const subscription = await waitForSubscription(
+    config,
+    s => s.plan === 'gold' && s.active,
+    { timeoutMs: 30000, intervalMs: 1000 }
+  );
+  // Subscription is active
+} catch (error) {
+  if (error instanceof WaitTimeoutError) {
+    // Payment may have succeeded; webhook may just be late
+    // Show a "please wait" message, not an error
+  }
+}
+```
+
+**Test**: `packages/kit/src/__tests__/integration/payments.test.ts`
+
+## Orders & Products
+
+The orders module handles product catalogs, order creation, checkout, and order tracking. Prices come from the service's own catalog at checkout time — a tampered line changes what the buyer *sees* and nothing about what they are charged.
+
+### Catalog
+
+```typescript
+import { getCatalog } from '@restheart-cloud/kit';
+
+// Get product catalog (access controlled by deployment's ACL)
+const products = await getCatalog(config);
+
+// With pagination and filtering
+const filtered = await getCatalog(config, {
+  pagesize: 10,
+  page: 1,
+  filter: { category: 'desk' },
+  sort: '-_id'
+});
+```
+
+### Orders
+
+```typescript
+import { createOrder, getOrder } from '@restheart-cloud/kit';
+
+// Create order and start checkout
+const { _id, checkout_url, secret } = await createOrder(config, [
+  { productId: 'tee-classic', quantity: 2 },
+  { productId: 'mug-logo', quantity: 1 }
+]);
+window.location.href = checkout_url;
+
+// Get order (authenticated or with secret for guest checkout)
+const order = await getOrder(config, orderId, secret);
+```
+
+### Order Reference (Guest Checkout)
+
+```typescript
+import { readOrderRef, clearOrderRef, waitForOrder } from '@restheart-cloud/kit';
+
+// Read order reference from URL (after Checkout redirect)
+const ref = readOrderRef();
+if (ref) {
+  clearOrderRef(); // Strip secret from address bar
+  const order = await waitForOrder(config, ref.id, ref.secret);
+  if (order.status === 'paid') {
+    // Show confirmation
+  }
+}
+```
+
+**Test**: `packages/kit/src/__tests__/integration/orders.test.ts`
+
+## Cart
+
+The cart module provides pure functions for managing a shopping cart. Nothing here talks to a server — a cart is a list the buyer is building, and it becomes an order in one call via `toOrderItems` → `createOrder`.
+
+```typescript
+import { addToCart, setCartQuantity, removeFromCart, cartTotals, toOrderItems } from '@restheart-cloud/kit';
+
+// Add item to cart
+const cart = addToCart([], { productId: 'tee-classic', name: 'Classic T-shirt', unitAmount: 2500 });
+
+// Update quantity
+const updated = setCartQuantity(cart, 'tee-classic', 3);
+
+// Remove item
+const reduced = removeFromCart(updated, 'tee-classic');
+
+// Calculate totals
+const totals = cartTotals(cart);
+console.log(totals.totalItems, totals.subtotal, totals.currency);
+
+// Convert to order items for createOrder
+const orderItems = toOrderItems(cart);
+await createOrder(config, orderItems);
+```
+
+### Cart Persistence
+
+```typescript
+import { loadCart, saveCart, clearStoredCart, DEFAULT_CART_STORAGE_KEY } from '@restheart-cloud/kit';
+
+// Save cart to localStorage
+saveCart(cart);
+
+// Load cart from localStorage
+const savedCart = loadCart();
+
+// Clear saved cart
+clearStoredCart();
+```
+
+**Test**: `packages/kit/src/__tests__/integration/cart.test.ts`
+
+## Money Formatting
+
+```typescript
+import { formatPrice } from '@restheart-cloud/kit';
+
+// Format amount in minor units (cents for EUR/USD)
+formatPrice(1990, 'eur');        // "19,90 €" (browser default locale)
+formatPrice(500, 'jpy', 'ja-JP'); // "¥500"
+formatPrice(19900, 'bhd', 'en-BH'); // "BHD 19.900"
+```
+
+**Note**: Stripe amounts are always in the currency's *minor* unit. `amount / 100` is a bug for currencies like JPY (0 decimals) or BHD (3 decimals). This function uses `Intl.NumberFormat` to handle all currencies correctly.
+
+## Payments & Subscriptions
+
+The payments module handles Stripe subscriptions, checkout sessions, billing portal, and seat licences. Enable it by setting `payments: true` in `AuthConfig`.
+
+**Important**: Payments have a different relationship to the session than other kit modules. There is no token renewal — the `@subscription` ACL variable is resolved server-side from the database on every request. An upgrade is effective immediately with no re-login.
+
+**The redirect back from Checkout races the webhook.** Stripe sends the buyer back to `successUrl` over the browser; it reports the payment over a separate server-to-server webhook, with no ordering guarantee between the two. Use `waitForSubscription` on the success page instead of a bare `getSubscription`.
+
+### Plans & Subscription
+
+```typescript
+import { getPlans, getSubscription } from '@restheart-cloud/kit';
+
+// Get available plans (no session required - safe for public pricing pages)
+const { default_plan, plans } = await getPlans(config);
+
+// Get current team's subscription
+const subscription = await getSubscription(config);
+console.log(subscription.plan, subscription.active, subscription.seats);
+```
+
+### Checkout & Billing Portal
+
+```typescript
+import { createCheckoutSession, openBillingPortal } from '@restheart-cloud/kit';
+
+// Start Stripe Checkout (requires canManageBilling)
+const { url } = await createCheckoutSession(config, 'gold', 'month');
+window.location.href = url;
+
+// Open Stripe Customer Portal (requires canManageBilling)
+const { url: portalUrl } = await openBillingPortal(config);
+window.location.href = portalUrl;
+```
+
+**Error handling**:
+- `createCheckoutSession` rejects with `status: 409` when the team already has an active subscription
+- `openBillingPortal` rejects with `status: 402` for a team that has never checked out
+
+### Seat Licences
+
+```typescript
+import { getLicenses, grantLicense, revokeLicense } from '@restheart-cloud/kit';
+
+// Get current licences (requires canManageBilling)
+const licenses = await getLicenses(config);
+
+// Grant a seat licence (requires canManageBilling)
+const result = await grantLicense(config, 'user@example.com');
+// Returns: 'granted' | 'already-licensed'
+
+// Revoke a seat licence (requires canManageBilling)
+await revokeLicense(config, 'user@example.com');
+```
+
+### Waiting for Webhook
+
+```typescript
+import { waitForSubscription, WaitTimeoutError } from '@restheart-cloud/kit';
+
+try {
+  // Poll until condition is met (e.g., on Checkout success page)
+  const subscription = await waitForSubscription(
+    config,
+    s => s.plan === 'gold' && s.active,
+    { timeoutMs: 30000, intervalMs: 1000 }
+  );
+  // Subscription is active
+} catch (error) {
+  if (error instanceof WaitTimeoutError) {
+    // Payment may have succeeded; webhook may just be late
+    // Show a "please wait" message, not an error
+  }
+}
+```
+
+**Test**: `packages/kit/src/__tests__/integration/payments.test.ts`
+
+## Orders & Products
+
+The orders module handles product catalogs, order creation, checkout, and order tracking. Prices come from the service's own catalog at checkout time — a tampered line changes what the buyer *sees* and nothing about what they are charged.
+
+### Catalog
+
+```typescript
+import { getCatalog } from '@restheart-cloud/kit';
+
+// Get product catalog (access controlled by deployment's ACL)
+const products = await getCatalog(config);
+
+// With pagination and filtering
+const filtered = await getCatalog(config, {
+  pagesize: 10,
+  page: 1,
+  filter: { category: 'desk' },
+  sort: '-_id'
+});
+```
+
+### Orders
+
+```typescript
+import { createOrder, getOrder } from '@restheart-cloud/kit';
+
+// Create order and start checkout
+const { _id, checkout_url, secret } = await createOrder(config, [
+  { productId: 'tee-classic', quantity: 2 },
+  { productId: 'mug-logo', quantity: 1 }
+]);
+window.location.href = checkout_url;
+
+// Get order (authenticated or with secret for guest checkout)
+const order = await getOrder(config, orderId, secret);
+```
+
+### Order Reference (Guest Checkout)
+
+```typescript
+import { readOrderRef, clearOrderRef, waitForOrder } from '@restheart-cloud/kit';
+
+// Read order reference from URL (after Checkout redirect)
+const ref = readOrderRef();
+if (ref) {
+  clearOrderRef(); // Strip secret from address bar
+  const order = await waitForOrder(config, ref.id, ref.secret);
+  if (order.status === 'paid') {
+    // Show confirmation
+  }
+}
+```
+
+**Test**: `packages/kit/src/__tests__/integration/orders.test.ts`
+
+## Cart
+
+The cart module provides pure functions for managing a shopping cart. Nothing here talks to a server — a cart is a list the buyer is building, and it becomes an order in one call via `toOrderItems` → `createOrder`.
+
+```typescript
+import { addToCart, setCartQuantity, removeFromCart, cartTotals, toOrderItems } from '@restheart-cloud/kit';
+
+// Add item to cart
+const cart = addToCart([], { productId: 'tee-classic', name: 'Classic T-shirt', unitAmount: 2500 });
+
+// Update quantity
+const updated = setCartQuantity(cart, 'tee-classic', 3);
+
+// Remove item
+const reduced = removeFromCart(updated, 'tee-classic');
+
+// Calculate totals
+const totals = cartTotals(cart);
+console.log(totals.totalItems, totals.subtotal, totals.currency);
+
+// Convert to order items for createOrder
+const orderItems = toOrderItems(cart);
+await createOrder(config, orderItems);
+```
+
+### Cart Persistence
+
+```typescript
+import { loadCart, saveCart, clearStoredCart, DEFAULT_CART_STORAGE_KEY } from '@restheart-cloud/kit';
+
+// Save cart to localStorage
+saveCart(cart);
+
+// Load cart from localStorage
+const savedCart = loadCart();
+
+// Clear saved cart
+clearStoredCart();
+```
+
+**Test**: `packages/kit/src/__tests__/integration/cart.test.ts`
+
+## Money Formatting
+
+```typescript
+import { formatPrice } from '@restheart-cloud/kit';
+
+// Format amount in minor units (cents for EUR/USD)
+formatPrice(1990, 'eur');        // "19,90 €" (browser default locale)
+formatPrice(500, 'jpy', 'ja-JP'); // "¥500"
+formatPrice(19900, 'bhd', 'en-BH'); // "BHD 19.900"
+```
+
+**Note**: Stripe amounts are always in the currency's *minor* unit. `amount / 100` is a bug for currencies like JPY (0 decimals) or BHD (3 decimals). This function uses `Intl.NumberFormat` to handle all currencies correctly.
 
 ## Authenticated Fetch (`apiFetch`)
 
@@ -444,7 +873,7 @@ try {
 ### UserInfo
 
 ```typescript
-interface UserInfo {
+type UserInfo<E extends object = Record<never, never>> = {
   _id: string;
   roles: string[];
   team?: {
@@ -456,7 +885,14 @@ interface UserInfo {
     surname?: string;
     avatarUrl?: string;
   };
-}
+} & E;
+```
+
+**Generic parameter**: Applications whose users collection has a JSON Schema can extend this with their own fields. For example:
+```typescript
+type MyUser = UserInfo<{
+  latestConsents?: { tos: string; pp: string; acceptedAt?: { $date: number } };
+}>;
 ```
 
 ### TeamMembership
@@ -507,6 +943,231 @@ interface PendingInvitation {
 }
 ```
 
+### Plan
+
+```typescript
+interface Plan {
+  id: string;
+  name: string;
+  description?: string;
+  seats?: {
+    mode: 'capped' | 'per_seat' | 'unlimited';
+    max?: number;  // Seat cap for 'capped', or ceiling for 'per_seat'
+  };
+  limits?: Record<string, number | boolean | string>;  // Arbitrary limits
+  prices?: Record<string, PlanPrice>;  // Keyed by interval ('month', 'year')
+}
+```
+
+### PlanPrice
+
+```typescript
+interface PlanPrice {
+  price_id: string;
+  amount: number | null;  // In minor units (cents for EUR/USD)
+  currency: string | null;
+}
+```
+
+### Subscription
+
+```typescript
+interface Subscription {
+  plan: string;
+  active: boolean;
+  licensed: boolean;  // Whether the caller holds a seat licence
+  cancel_at_period_end: boolean;
+  status?: string;
+  trial_end?: { $date: number };
+  current_period_end?: { $date: number };
+  seats: {
+    limit: number | null;  // null means unlimited
+    licensed: number;
+    available: number | null;  // null means unlimited
+    over_limit: boolean;
+    over_limit_since?: { $date: number };
+    over_limit_days?: number;
+  };
+}
+```
+
+### Licenses
+
+```typescript
+interface Licenses {
+  licensed: string[];  // User ids (emails) currently holding a seat
+  seats: {
+    limit: number | null;
+    licensed: number;
+    available: number | null;
+  };
+}
+```
+
+### CatalogItem
+
+```typescript
+interface CatalogItem {
+  _id: string;
+  type: 'physical' | 'digital';
+  name: string;
+  description?: string;
+  image_url?: string;
+  unit_amount: number;  // In minor units
+  currency?: string;
+  purchasable: boolean;
+  tax_code?: string;
+  stripe_price_id?: string;  // Present when item has its own Stripe Price
+}
+```
+
+### Order
+
+```typescript
+interface Order {
+  _id: { $oid: string };
+  stripe_session_id: string;
+  stripe_payment_intent?: string | null;
+  secret?: string;  // For guest checkout lookup
+  checkout_url: string;
+  buyer_id?: string | null;
+  buyer_email?: string | null;
+  payer: {
+    type: 'team' | 'guest';
+    id?: { $oid: string } | null;
+    stripe_customer_id?: string | null;
+  };
+  status: OrderStatus;
+  requires_shipping?: boolean;
+  line_items: OrderLineItem[];
+  currency: string;
+  amount_subtotal: number;
+  amount_tax?: number;
+  amount_shipping?: number;
+  amount_total: number;
+  amount_refunded: number;
+  shipping_address?: {
+    name?: string;
+    line1?: string;
+    line2?: string;
+    city?: string;
+    state?: string;
+    postal_code?: string;
+    country?: string;
+  } | null;
+  created_at: { $date: number };
+  paid_at?: { $date: number } | null;
+  expires_at: { $date: number };
+}
+```
+
+### OrderLineItem
+
+```typescript
+interface OrderLineItem {
+  product_id: string;
+  type: 'physical' | 'digital';
+  name: string;
+  unit_amount: number;
+  quantity: number;
+  subtotal: number;
+  tax_code?: string;
+}
+```
+
+### OrderStatus
+
+```typescript
+type OrderStatus = 'pending_payment' | 'paid' | 'failed' | 'expired';
+```
+
+### CartLine
+
+```typescript
+interface CartLine {
+  productId: string;
+  quantity: number;
+  name: string;  // Display only
+  unitAmount: number;  // Display only, minor units
+  currency: string;
+  options?: Record<string, string>;  // Variant choices
+  image?: string;  // For display
+}
+```
+
+### CartItem
+
+```typescript
+type CartItem = Omit<CartLine, 'quantity' | 'currency'> & { currency?: string };
+```
+
+### CartTotals
+
+```typescript
+interface CartTotals {
+  totalItems: number;
+  subtotal: number;  // Minor units, single-currency only
+  currency: string;  // First line's currency, or 'eur' for empty cart
+}
+```
+
+### OrderRef
+
+```typescript
+interface OrderRef {
+  id: string;
+  secret?: string;  // Absent when deployment only interpolates {ORDER_ID}
+}
+```
+
+### CatalogQuery
+
+```typescript
+interface CatalogQuery {
+  collection?: string;  // Default: 'catalog'
+  pagesize?: number;
+  page?: number;
+  filter?: Record<string, unknown>;  // MongoDB query
+  sort?: string;  // e.g., '-_id' for newest first
+}
+```
+
+### OrderItem
+
+```typescript
+interface OrderItem {
+  productId: string;
+  quantity: number;
+  metadata?: Record<string, string>;  // Shop's own labels (variant, gift message, etc.)
+}
+```
+
+### WaitOptions
+
+```typescript
+interface WaitOptions {
+  timeoutMs?: number;  // Default: 30000
+  intervalMs?: number;  // Default: 1000
+  signal?: AbortSignal;
+}
+```
+
+### WaitTimeoutError
+
+```typescript
+class WaitTimeoutError extends Error {
+  name: 'WaitTimeoutError';
+  // Thrown by waitForSubscription/waitForOrder when condition never became true in time
+  // Timing out is not a failed payment — webhook may just be late
+}
+```
+
+### GrantLicenseResult
+
+```typescript
+type GrantLicenseResult = 'granted' | 'already-licensed';
+```
+
 ## Internal Architecture
 
 ### Module Structure
@@ -520,6 +1181,10 @@ src/
 ├── password.ts    # Password reset
 ├── consents.ts    # Consents gating (acceptConsents)
 ├── profile.ts     # Profile and user document updates (updateProfile, updateUser, changePassword)
+├── payments.ts    # Subscriptions, checkout, billing portal, seat licences
+├── orders.ts      # Catalog, orders, checkout, order tracking
+├── cart.ts        # Cart management (pure functions)
+├── money.ts       # Price formatting (formatPrice)
 ├── types.ts       # TypeScript interfaces (generic UserInfo<E>)
 └── index.ts       # Public API exports
 ```
@@ -566,6 +1231,12 @@ npm test -w packages/kit
 npm test -w packages/kit && ./packages/kit/open-report.sh
 ```
 
+**Test files**:
+- `packages/kit/src/__tests__/integration/consents.test.ts`
+- `packages/kit/src/__tests__/integration/payments.test.ts`
+- `packages/kit/src/__tests__/integration/orders.test.ts`
+- `packages/kit/src/__tests__/integration/cart.test.ts`
+
 ## Source Map
 
 | File | Purpose |
@@ -577,5 +1248,9 @@ npm test -w packages/kit && ./packages/kit/open-report.sh
 | `src/password.ts` | Forgot password, reset password |
 | `src/consents.ts` | Consents gating (`acceptConsents`) |
 | `src/profile.ts` | Profile updates, user document updates, password change |
+| `src/payments.ts` | Subscriptions, checkout, billing portal, seat licences |
+| `src/orders.ts` | Catalog, orders, checkout, order tracking |
+| `src/cart.ts` | Cart management (pure functions) |
+| `src/money.ts` | Price formatting (`formatPrice`) |
 | `src/types.ts` | TypeScript interfaces for all data structures |
 | `src/index.ts` | Public API re-exports |

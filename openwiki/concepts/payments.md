@@ -3,9 +3,6 @@ type: concept
 title: Payments & E-commerce
 description: The payments and e-commerce subsystem covering subscriptions, Stripe Checkout/Portal, seat licences, product catalog, orders, guest checkout, and the client-side cart.
 tags: [payments, stripe, subscriptions, orders, cart, e-commerce, checkout]
-verified:
-  - by: openwiki/0.4.3
-    at: 2026-08-28T16:48:53.239Z
 sources:
   - id: openwiki-source-e7a0b8cb7be6a8386aa66fdb
     resource: repo://docs/ADAPTER_CONTRACT.md

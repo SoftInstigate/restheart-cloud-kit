@@ -1,13 +1,44 @@
 ---
 type: Package
 title: "@restheart-cloud/kit-react"
-description: React adapter for RESTHeart Cloud Kit. Provides context, hooks, and route guards, plus a /next subpath for Next.js SSR support.
-tags: [package, react, adapter, hooks, nextjs]
+description: React adapter for RESTHeart Cloud Kit. Provides context, hooks, and route guards for authentication, payments, and cart, plus a /next subpath for Next.js SSR support.
+tags: [package, react, adapter, hooks, nextjs, payments, cart]
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-09-07T09:33:56.593Z
+sources:
+  - id: openwiki-source-54f8315d21086325777bcf77
+    resource: repo://packages/kit-react/package.json
+  - id: openwiki-source-627a62714caeaf0818b017ca
+    resource: repo://packages/kit-react/src/cart.tsx
+  - id: openwiki-source-0edf9c48025b350dd4dc49de
+    resource: repo://packages/kit-react/src/context.tsx
+  - id: openwiki-source-1ffd6dbbbd5dbf3d4a0fd215
+    resource: repo://packages/kit-react/src/guards.tsx
+  - id: openwiki-source-e8909520a0f757ab53473101
+    resource: repo://packages/kit-react/src/index.ts
+  - id: openwiki-source-bc22523d3c783f09f2affd17
+    resource: repo://packages/kit-react/src/next/actions.ts
+  - id: openwiki-source-ab0e16d9c69fdb6b401a994c
+    resource: repo://packages/kit-react/src/next/cookies.ts
+  - id: openwiki-source-44195c1f7c6fbcc439227a7a
+    resource: repo://packages/kit-react/src/next/index.ts
+  - id: openwiki-source-5321394b8ed758b691213eb5
+    resource: repo://packages/kit-react/src/next/middleware.ts
+  - id: openwiki-source-95a5e3152fdcea16ca8b4feb
+    resource: repo://packages/kit-react/src/next/route.ts
+  - id: openwiki-source-ead1481a6bb944d947c0c7dc
+    resource: repo://packages/kit-react/src/next/session.ts
+  - id: openwiki-source-b3642fbb09acb4042ba72b5a
+    resource: repo://packages/kit-react/src/next/sync.tsx
+  - id: openwiki-source-cb4e00ba25df046ed879c14f
+    resource: repo://packages/kit-react/src/payments.tsx
+generated: { by: "openwiki/0.5.0", at: "2026-09-07T09:33:56.593Z" }
 ---
 
 # @restheart-cloud/kit-react
 
-React adapter for `@restheart-cloud/kit`. Wraps the core authentication logic in React context with hooks and route guards. A `/next` subpath adds Next.js SSR support.
+React adapter for `@restheart-cloud/kit`. Wraps core authentication, payments, and cart logic in React context with hooks and route guards. A `/next` subpath adds Next.js SSR support.
 
 ## Installation
 
@@ -67,6 +98,10 @@ import { AuthGuard, PublicGuard } from '@restheart-cloud/kit-react';
 |--------|------|-------------|
 | `useAuth()` | Hook | Access all auth state and methods (see below) |
 | `RhAuthProvider` | Component | Context provider, runs `checkSession` on mount |
+| `usePayments()` | Hook | Access payments state and methods (see below) |
+| `RhPaymentsProvider` | Component | Payments context provider, loads subscription on auth |
+| `useCart()` | Hook | Access cart state and methods (see below) |
+| `RhCartProvider` | Component | Cart context provider, persists to `localStorage` |
 | `AuthGuard` | Component | Redirects unauthenticated users to `/auth/login` |
 | `PublicGuard` | Component | Redirects authenticated users into the app |
 
@@ -82,8 +117,8 @@ await auth.checkSession();              // → UserInfo | null
 auth.clearSession();                    // clear token, cancel refresh, reset state
 
 // Registration & verification
-await auth.register({ email, password, teamName, firstName?, lastName? });
-await auth.verify(email, token, delivery?);
+await auth.register({ email, password, teamName, firstName, lastName });
+await auth.verify(email, token, delivery?);  // delivery: 'cookie' | 'fragment'
 
 // Login / logout
 await auth.login(email, password, mode?);   // mode: 'bearer' (default) | 'cookie'
@@ -96,6 +131,11 @@ await auth.changePassword(currentPassword, newPassword);
 
 // Profile
 await auth.updateProfile({ firstName?, lastName? });
+await auth.updateUser(email, updates);     // update any user field
+
+// Consents & token renewal
+await auth.acceptConsents(body?, mode?);   // record consent acceptance, renew token
+await auth.renewToken(mode?);              // force a new token
 
 // Teams
 await auth.loadTeams();                 // → TeamMembership[]
@@ -141,6 +181,115 @@ Rejects with an `ApiError` (`{ status, message }`) on any non-2xx response. See 
 **When to use**: Use `auth.api()` for any RESTHeart API call from React components that is not already covered by a dedicated method (e.g., querying custom collections).
 
 Methods that perform auto-login (`login`, `activate`, `resetPassword`, `switchTeam`) accept an optional `mode` parameter (`'bearer'` | `'cookie'`) that maps to the backend's `delivery` query parameter.
+
+## Payments
+
+The `RhPaymentsProvider` and `usePayments()` hook provide a complete payments surface for Stripe-based subscriptions, licenses, and orders.
+
+### Setup
+
+```tsx
+import { RhAuthProvider, RhPaymentsProvider } from '@restheart-cloud/kit-react';
+
+<RhAuthProvider config={config}>
+  <RhPaymentsProvider config={config}>
+    <App />
+  </RhPaymentsProvider>
+</RhAuthProvider>
+```
+
+**Important**: `RhPaymentsProvider` must be placed inside `RhAuthProvider` — it reads the current user from `useAuth()` to derive `canManageBilling`.
+
+### Reactive State
+
+```tsx
+const payments = usePayments();
+
+payments.subscription;      // Subscription | null
+payments.plan;              // string | null (plan id from subscription)
+payments.isSubscribed;      // boolean (has active subscription)
+payments.canManageBilling;  // boolean (user.team.role === ownershipRole)
+payments.seatsAvailable;    // number | null (available seats)
+```
+
+### Methods
+
+```tsx
+// Subscription management
+await payments.loadSubscription();                          // reload subscription
+await payments.getPlans();                                  // get plan catalog
+await payments.createCheckoutSession(plan, interval);       // start Stripe Checkout
+await payments.openBillingPortal();                         // open Stripe Customer Portal
+
+// Seat licenses
+await payments.getLicenses();                               // get team's licenses
+await payments.grantLicense(userId);                        // grant seat (returns 'granted' | 'already-licensed')
+await payments.revokeLicense(userId);                       // revoke seat
+
+// Catalog & orders
+await payments.getCatalog(opts?);                           // read product catalog
+await payments.createOrder(items, email?, collection?);     // create order & start Checkout
+await payments.getOrder(id, secret?, collection?);          // read order
+
+// Polling helpers (for success pages)
+await payments.waitForSubscription(predicate, opts?);       // poll until subscription matches
+await payments.waitForOrder(id, secret?, opts?);            // poll until order leaves 'pending_payment'
+```
+
+### Automatic Behavior
+
+- **On sign-in/team switch**: loads the subscription automatically
+- **On sign-out**: clears subscription state
+- **`waitForSubscription`** and **`waitForOrder`** poll until the predicate is satisfied or timeout (useful for Checkout success pages where the redirect races the webhook)
+
+## Cart
+
+The `RhCartProvider` and `useCart()` hook provide a client-side shopping cart that persists to `localStorage`.
+
+### Setup
+
+```tsx
+import { RhCartProvider } from '@restheart-cloud/kit-react';
+
+<RhCartProvider>
+  <App />
+</RhCartProvider>
+```
+
+**Important**: `RhCartProvider` is independent of `RhAuthProvider` — a cart belongs to the browser, not to a session. A shop that requires sign-in before adding items loses most users there. The cart becomes an order when `orderItems` is handed to `createOrder`.
+
+### State
+
+```tsx
+const cart = useCart();
+
+cart.lines;         // CartLine[] (in order added)
+cart.totalItems;    // number (units, not lines)
+cart.subtotal;      // number (minor units, meaningful when all lines share currency)
+cart.currency;      // string (first line's currency, or 'eur' when empty)
+cart.orderItems;    // OrderItem[] (ready for createOrder)
+```
+
+### Methods
+
+```tsx
+cart.add(item, quantity?);                 // add item or increase existing line
+cart.setQuantity(productId, quantity);     // set line quantity (0 removes)
+cart.remove(productId);                    // remove line
+cart.clear();                              // empty cart
+```
+
+### Persistence
+
+Cart state is persisted to `localStorage` under the key `'rh-cart'` by default. Use the `storageKey` prop to change this when two apps share an origin:
+
+```tsx
+<RhCartProvider storageKey="my-app-cart">
+  <App />
+</RhCartProvider>
+```
+
+State and storage move together in one place: every operation writes the array it just produced rather than reacting to a change afterwards, which prevents a reload from resurrecting a removed line.
 
 ## Next.js Subpath (`/next`)
 
@@ -198,6 +347,8 @@ Uses the core's [pluggable token source and sink](../architecture/overview.md#pl
 |-------------|---------------|
 | `src/context.tsx` | `RhAuthProvider`, `useAuth`, full `RhAuth` interface |
 | `src/guards.tsx` | `AuthGuard`, `PublicGuard` components |
+| `src/payments.tsx` | `RhPaymentsProvider`, `usePayments`, full `RhPayments` interface |
+| `src/cart.tsx` | `RhCartProvider`, `useCart`, full `RhCart` interface |
 | `src/index.ts` | SPA barrel export |
 | `src/next/middleware.ts` | `rhAuthMiddleware` |
 | `src/next/route.ts` | `createSessionRoute` |
@@ -210,5 +361,6 @@ Uses the core's [pluggable token source and sink](../architecture/overview.md#pl
 ## See Also
 
 - [Core Kit](kit.md) — API reference for `@restheart-cloud/kit`
+- [Payments](../concepts/payments.md) — Payments subsystem overview
 - [Adapter Contract](../testing/guide.md#adapter-unit-tests) — Shared test checklist
 - [Token Delivery](../architecture/token-delivery.md) — Bearer vs cookie modes

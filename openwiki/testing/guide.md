@@ -3,9 +3,6 @@ type: Guide
 title: Testing Guide
 description: Testing guide for RESTHeart Cloud Kit and CLI. Covers integration tests, kit unit tests, CLI unit tests, adapter unit tests, environment configuration, running tests, and writing new tests.
 tags: [testing, integration, unit, vitest, guide]
-verified:
-  - by: openwiki/0.4.3
-    at: 2026-08-28T16:48:53.239Z
 sources:
   - id: openwiki-source-e7a0b8cb7be6a8386aa66fdb
     resource: repo://docs/ADAPTER_CONTRACT.md

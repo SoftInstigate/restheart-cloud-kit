@@ -3,9 +3,6 @@ type: Documentation
 title: RESTHeart Cloud Kit - Quickstart
 description: Entry point for understanding the RESTHeart Cloud Kit monorepo, its architecture, packages, and how to get started with development.
 tags: [quickstart, overview, getting-started]
-verified:
-  - by: openwiki/0.4.3
-    at: 2026-08-28T16:48:53.239Z
 sources:
   - id: openwiki-source-92450a7065eb85e0f30b5461
     resource: repo://packages/cli/package.json

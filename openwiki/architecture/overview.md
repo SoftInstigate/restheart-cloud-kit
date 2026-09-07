@@ -4,8 +4,8 @@ title: Architecture Overview
 description: Technical architecture of the RESTHeart Cloud Kit monorepo, including package structure, layering, payments subsystem, CLI tooling, and design principles.
 tags: [architecture, monorepo, design, layering, payments, cli]
 verified:
-  - by: openwiki/0.4.3
-    at: 2026-08-28T16:48:53.239Z
+  - by: openwiki/0.5.0
+    at: 2026-09-07T09:33:56.593Z
 sources:
   - id: openwiki-source-e7a0b8cb7be6a8386aa66fdb
     resource: repo://docs/ADAPTER_CONTRACT.md
@@ -23,6 +23,14 @@ sources:
     resource: repo://packages/cli/src/session.ts
   - id: openwiki-source-adaf11e7b024654cc8e44e29
     resource: repo://packages/cli/src/setup.ts
+  - id: openwiki-source-8b15a7b6614e2bf9d0258e04
+    resource: repo://packages/kit-ng/src/cart.service.ts
+  - id: openwiki-source-171585965a94b593af4c2787
+    resource: repo://packages/kit-ng/src/http-transport.ts
+  - id: openwiki-source-627a62714caeaf0818b017ca
+    resource: repo://packages/kit-react/src/cart.tsx
+  - id: openwiki-source-4035918f075932cd10bbcaf3
+    resource: repo://packages/kit-vue/src/create-cart.ts
   - id: openwiki-source-7dbc4364bd37edb52c104a4d
     resource: repo://packages/kit/src/cart.ts
   - id: openwiki-source-dc6fb97d2a3901aa8aa09a70
@@ -33,7 +41,7 @@ sources:
     resource: repo://packages/kit/src/payments.ts
   - id: openwiki-source-42dfd0defa8189243ef19509
     resource: repo://packages/kit/src/types.ts
-generated: { by: "openwiki/0.4.3", at: "2026-08-28T16:48:53.239Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-09-07T09:33:56.593Z" }
 ---
 
 # Architecture Overview
@@ -61,13 +69,16 @@ restheart-cloud-kit/
 │   │   │   ├── types.ts        # TypeScript interfaces (generic UserInfo<E>)
 │   │   │   └── index.ts        # Public API exports
 │   │   └── __tests__/
-│   │       └── integration/    # Integration tests (live RESTHeart Cloud)
+│   │       ├── integration/    # Integration tests (live RESTHeart Cloud)
+│   │       └── unit/           # Unit tests
 │   │
 │   ├── kit-ng/                 # @restheart-cloud/kit-ng (Angular)
 │   │   ├── src/
 │   │   │   ├── auth.service.ts     # Angular service (signals, Observable methods)
 │   │   │   ├── auth.guard.ts       # Route guards (authGuard, publicGuard)
 │   │   │   ├── auth.interceptor.ts # HTTP interceptor (bearer token, 401 handling)
+│   │   │   ├── payments.service.ts # Payments service (subscription, billing)
+│   │   │   ├── cart.service.ts     # Cart service (localStorage persistence)
 │   │   │   ├── http-transport.ts   # HttpClient transport (routes kit calls through interceptor)
 │   │   │   ├── provide-rh-auth.ts  # DI setup (provideRhAuth)
 │   │   │   ├── tokens.ts           # Injection tokens (RH_AUTH_CONFIG, RH_KIT_REQUEST)
@@ -78,7 +89,9 @@ restheart-cloud-kit/
 │   │
 │   ├── kit-react/              # @restheart-cloud/kit-react (React)
 │   │   ├── src/
-│   │   │   ├── context.tsx     # React context + provider
+│   │   │   ├── context.tsx     # React auth context + provider
+│   │   │   ├── payments.tsx    # React payments context + provider
+│   │   │   ├── cart.tsx        # React cart context + provider
 │   │   │   ├── guards.tsx      # Auth/public guard components
 │   │   │   ├── __tests__/      # SPA unit tests
 │   │   │   ├── next/           # /next subpath (Next.js SSR)
@@ -95,10 +108,17 @@ restheart-cloud-kit/
 │   │
 │   ├── kit-vue/                # @restheart-cloud/kit-vue (Vue)
 │   │   ├── src/
-│   │   │   ├── create.ts       # Vue plugin creation
-│   │   │   ├── store.ts        # Reactive state (refs)
+│   │   │   ├── create.ts       # Vue auth plugin creation
+│   │   │   ├── store.ts        # Auth reactive state (refs)
+│   │   │   ├── create-payments.ts  # Vue payments plugin creation
+│   │   │   ├── payments.ts     # Payments reactive state (refs)
+│   │   │   ├── create-cart.ts  # Vue cart plugin creation
+│   │   │   ├── cart-store.ts   # Cart reactive state (refs)
 │   │   │   ├── use-auth.ts     # useAuth composable
+│   │   │   ├── use-payments.ts # usePayments composable
+│   │   │   ├── use-cart.ts     # useCart composable
 │   │   │   ├── guards.ts       # Navigation guards
+│   │   │   ├── keys.ts         # Injection keys
 │   │   │   ├── __tests__/      # SPA unit tests
 │   │   │   ├── nuxt/           # /nuxt subpath (Nuxt SSR)
 │   │   │   │   ├── middleware.ts
@@ -166,6 +186,7 @@ The monorepo follows a strict layered architecture:
 - Payments (orders): `getCatalog`, `createOrder`, `getOrder`, `waitForOrder`, `readOrderRef`, `clearOrderRef`
 - Cart: `addToCart`, `setCartQuantity`, `removeFromCart`, `cartTotals`, `toOrderItems`, `loadCart`, `saveCart`, `clearStoredCart`
 - Utilities: `isValidApiBaseUrl`, `formatPrice`
+- Error handling: `WaitTimeoutError` (thrown by `waitForSubscription` and `waitForOrder` on timeout)
 
 ### Layer 2: Framework Adapters
 
@@ -241,6 +262,8 @@ interface AuthConfig {
   setToken?: (token: string) => void;                        // custom token sink
   transport?: (url: string, init?: RequestInit) => Promise<Response>;  // custom fetch (e.g., Angular HttpClient)
   onError?: (error: ApiError) => void;                       // global error observer
+  payments?: boolean;                                        // opt-in to payment features
+  ownershipRole?: string;                                    // role for billing management (default: 'owner')
 }
 ```
 
@@ -251,6 +274,10 @@ interface AuthConfig {
 - `setToken` captures the token so the server action can write it into a response cookie
 
 When `setToken` is provided, localStorage and the refresh timer are both bypassed. This lets SSR frameworks manage first-party session cookies without leaking into shared module globals or scheduling `setTimeout` on the server.
+
+**Transport customization**: The `transport` callback replaces `fetch` with a framework's HTTP client. `kit-ng` uses `httpClientTransport` to route calls through Angular's `HttpClient` so the interceptor chain applies to kit-originated requests.
+
+**Error observation**: The `onError` callback sees every failure, including session-restoration calls no caller is waiting on. It cannot swallow errors — the error is thrown either way. Use it for cross-cutting concerns like offline banners or consent gates.
 
 ### 4. Proactive Token Refresh
 
@@ -440,6 +467,16 @@ Adapter payments tests are covered by section E of `docs/ADAPTER_CONTRACT.md` (E
 - **Reload on the team, not on the user**: the subscription belongs to the team, so it loads on sign-in and reloads on `switchTeam`, but must not reload on `updateProfile` or `acceptConsents`
 - **`canManageBilling` is configurable**: it compares the user's team role against `config.ownershipRole` (default `'owner'`)
 
+### Cart as a Separate Surface
+
+The cart is independent of both auth and payments in every adapter. A cart belongs to the browser, not to a session, and a shop that requires a sign-in before a basket loses most of visitors at that door.
+
+- **Angular**: `RhCartService` — owns `lines`, `totalItems`, `subtotal`, `currency`, `orderItems` and the mutation methods
+- **React**: `useCart()` under `RhCartProvider`
+- **Vue**: `useCart()` under `createRhCart()`
+
+Each reads from `localStorage` on mount and writes back on every mutation in the same operation (not via an effect), so a reload never resurrects a line somebody removed.
+
 ## Token Storage Architecture
 
 ### Bearer Mode
@@ -518,31 +555,49 @@ export const authGuard: CanActivateFn = () => {
 
 ### Interceptor Pattern
 
+The interceptor authenticates application `HttpClient` requests and clears the session on 401 responses. Key design decisions:
+
+- **Only requests to `apiBaseUrl` are touched** — the token is a credential and must not be attached to third-party hosts
+- **Kit's own requests are marked** with `RH_KIT_REQUEST` context token — the kit owns 401s on its own endpoints (e.g., `PATCH /auth/change-password` returns 401 for wrong current password)
+- **Async token support** — the token source may be async (SSR cookie reads), so the interceptor handles both sync and Promise token sources
+- **`No-Auth-Challenge` header** suppresses RESTHeart's WWW-Authenticate challenge on 401 to prevent the browser's native Basic Auth popup
+
 ```typescript
 export const rhAuthInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(RhAuthService);
   const config = inject(RH_AUTH_CONFIG);
-
-  // Kit's own requests (marked with RH_KIT_REQUEST context) own their 401s
-  // — change-password and token answer 401 for wrong *supplied* credentials.
   const ownsIts401s = req.context.get(RH_KIT_REQUEST);
 
-  // Only attach bearer token to requests targeting apiBaseUrl
+  const onError = (source: Observable<unknown>) =>
+    source.pipe(
+      catchError((err: unknown) => {
+        if (!ownsIts401s && err instanceof HttpErrorResponse && err.status === 401) {
+          clearToken(); cancelRefresh(); auth.clearSession();
+        }
+        return throwError(() => err);
+      })
+    );
+
+  // Only requests to apiBaseUrl get the bearer token
   if (!req.url.startsWith(config.apiBaseUrl)) {
-    return next(req).pipe(/* 401 cleanup on non-kit requests too */);
+    return next(req).pipe(onError);
   }
 
-  return next(req.clone({
-    setHeaders: { Authorization: `Bearer ${token}`, 'No-Auth-Challenge': 'true' },
-    withCredentials: true,
-  })).pipe(
-    catchError((err) => {
-      if (!ownsIts401s && err.status === 401) {
-        clearToken(); cancelRefresh(); auth.clearSession();
-      }
-      return throwError(() => err);
-    })
-  );
+  const withCredentials = (token: string | null) =>
+    next(req.clone({
+      setHeaders: {
+        ...(token && !req.headers.has('Authorization')
+          ? { Authorization: `Bearer ${token}` }
+          : {}),
+        ...(req.headers.has('No-Auth-Challenge') ? {} : { 'No-Auth-Challenge': 'true' }),
+      },
+      withCredentials: true,
+    })).pipe(onError);
+
+  const token = readToken(config); // May be async
+  return isPromise(token)
+    ? from(token).pipe(switchMap(withCredentials))
+    : withCredentials(token);
 };
 ```
 
@@ -617,19 +672,36 @@ All framework adapters are implemented and unit-tested:
 @restheart-cloud/kit
         │
         ├── @restheart-cloud/kit-ng     (Angular — signals, guards, interceptor)
+        │       ├── RhAuthService       (auth: signals, Observable methods)
+        │       ├── RhPaymentsService   (payments: subscription, billing)
+        │       └── RhCartService       (cart: localStorage persistence)
+        │
         ├── @restheart-cloud/kit-react  (React — hooks, context, guards)
+        │       ├── RhAuthProvider      (auth: context, hooks)
+        │       ├── RhPaymentsProvider  (payments: subscription, billing)
+        │       ├── RhCartProvider      (cart: localStorage persistence)
         │       └── /next               (Next.js — middleware, route handlers, server actions)
+        │
         └── @restheart-cloud/kit-vue    (Vue — composables, navigation guards)
+                ├── createRhAuth        (auth: composables, navigation guards)
+                ├── createRhPayments    (payments: subscription, billing)
+                ├── createRhCart        (cart: localStorage persistence)
                 └── /nuxt               (Nuxt — server middleware, handler, bridge)
 ```
 
-### Payments Surfaces
+### Payments & Cart Surfaces
 
-Payments are a separate reactive surface from auth in every SPA adapter. A subscription is not a session, so it does not live on the auth store:
+Payments and cart are separate reactive surfaces from auth in every SPA adapter. A subscription is not a session, and a cart belongs to the browser:
 
+**Payments**:
 - **Angular**: `RhPaymentsService` — owns `subscription`, `plan`, `isSubscribed`, `canManageBilling`, `seatsAvailable` and the methods that go with them
 - **React**: `usePayments()` under `RhPaymentsProvider`
 - **Vue**: `usePayments()` under `createRhPayments(config, rhAuth)`
+
+**Cart**:
+- **Angular**: `RhCartService` — owns `lines`, `totalItems`, `subtotal`, `currency`, `orderItems` and mutation methods
+- **React**: `useCart()` under `RhCartProvider`
+- **Vue**: `useCart()` under `createRhCart()`
 
 Each reads the user from the auth surface only to derive `canManageBilling`. The cart functions (`addToCart`, `cartTotals`, etc.) are pure kit exports that adapters wrap without reimplementing.
 

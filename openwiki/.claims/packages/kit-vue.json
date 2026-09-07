@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:77bcd40029feadb504d258c77f07e3ac7bc7d25f5e3bc0b7c49b0bcfe253fc99",
+  "claims": [
+    {
+      "id": "claim_fd943bf630554acdae1a70e2df68b8d5",
+      "statement": "The package exports three Vue plugin families — auth (`createRhAuth`/`useAuth`), payments (`createRhPayments`/`usePayments`), and cart (`createRhCart`/`useCart`) — each with its own injection key and reactive store.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-vue/src/index.ts",
+          "version": "repo-file-v1:sha256:e0faaa4d482f0cb81d76c9f7213debb92f2a58e5ed00a8db6028d19da30f2aa9"
+        }
+      ]
+    },
+    {
+      "id": "claim_4323976c0aca4cec9c9269aaeef50ee9",
+      "statement": "`createRhAuth` creates a Vue plugin that provides the `RhAuthStore` via `RH_AUTH_KEY`, runs `checkSession()` once at creation to restore the session, and returns `authGuard`/`publicGuard` navigation guards bound to the same store.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-vue/src/create.ts",
+          "version": "repo-file-v1:sha256:620c1cda81d048737186493172cfb195c470a42976f7e71d639bdcd42516e421"
+        },
+        {
+          "resource": "repo://packages/kit-vue/src/store.ts#L221-L228",
+          "version": "repo-lines-v1:sha256:810d40cc0ad3307766bd574e71df4e81559649c723d0a2002fd1b1c426c7a767:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODRlYjE4OWEyM2U1NThiNjI3NDI2OWM2MjA5NmQ2ZmFlMTEyMWJmZjI5NDkxYTA3MzRjYWZjYTcyMmZjYjYyZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDNjOTM3MjRmNGZjN2QxNzRiY2YxYjRkZjc0NjBiOTVhMDhlMWU3ZGJhYWI0NTZhYjliYWI2NTU1ZjY1ZTkyMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2RkNGVlMjZkYjgyMDllNTczZjA3ZDQxMTFkNjcyYWM5ZTdmYjZlMTBjMjQ5Yzc0NmU0NGYyZDY1MThjYTUyZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c457247419ba4158bc01cce45cd19a4a",
+      "statement": "The auth store's `initializing` ref starts `true` and flips to `false` once the initial `checkSession()` settles (whether it succeeds or fails), so guards can await it.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-vue/src/store.ts#L222-L226",
+          "version": "repo-lines-v1:sha256:5496fd630a14be4c3630f0cb32e9296e3098ff511d33f4c07141e949a2ffc337:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDQxNTlkM2U4ZDQ0YjRhZDA4NzhkM2ZhODM4MWM3ZmRlNTg2Njc2OWIxMmY5MDMxZmRmNTEzOTBjNTdmY2UzNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjJkMTFjYWY0M2U5N2VmMzY5ZTZiZWVkMWEyNjhiZDA1ODM4ZjI5YjlkZDI1NGJmNjliYTY0ODg0MTQ3MjM0YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjgyMzExMzFkZjQzOWU1Y2VmMjk5NWJjNzQzMDIwNGQ3ZjU5ZGI5MzAzMTEzNjkzMmY5MmE1ZmY0MzI0MzM1MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODFmMzljNjYwYzAyNzY3NmUyOTY2NGUyZTkzMmFjMjdlZTIwYmNjNWI0MmNlOGJhODIyNDI4MDRkNDg0MWZiZSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e14cb79c2ca44625b0d70e79d5432466",
+      "statement": "`useAuth()`, `usePayments()`, and `useCart()` inject the store via their typed injection key and throw a descriptive error if the corresponding plugin was not registered.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-vue/src/use-auth.ts",
+          "version": "repo-file-v1:sha256:b043b4ded926f248797f71b1d95e419c9ac5ae0a1a287ae8d4ec88f2708bfd25"
+        },
+        {
+          "resource": "repo://packages/kit-vue/src/use-cart.ts",
+          "version": "repo-file-v1:sha256:4aaf63b9987c7db47534e0e299f9840cdb57b557fd5deb8912a387fde0c58c7b"
+        },
+        {
+          "resource": "repo://packages/kit-vue/src/use-payments.ts",
+          "version": "repo-file-v1:sha256:8c4dca9a0c7fd1ff02ea6f8033faf140c2365aa5104d9df56fe608e04e5cdd18"
+        }
+      ]
+    },
+    {
+      "id": "claim_e4ec5f715f2145cfba3c3bcc09393635",
+      "statement": "`createRhPayments` accepts either the `RhAuth` plugin object or the bare `RhAuthStore`, then watches the auth store's `user.team._id.$oid` — not the user object itself — to load/clear the subscription on sign-in/team-switch without triggering on profile edits or consent acceptances.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-vue/src/create-payments.ts#L37-L41",
+          "version": "repo-lines-v1:sha256:9acdeaf766b85b81e2e07f3df6298a64cc12efeec338a9b24bc242d0a2d42a67:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWE4MzdjNTFhZTQwMjNiODQ4OTI1MjMyZDI5MDA3NzlkOGIzZTVlYTA0ZTdhZGM3ZGI3MzQzZDA2YmVjNTNiYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDAyZGU1NzU5NzdhNDZlNjY2ZGQwYmY1NWYxNDhmYjgzZThjM2Y1YmQ3NTFkMTg3MWRlNDMzZGQ2ODUyMWU4MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzRkOGRjOTk4OTY3ZWY1NGY5ZDQ4MTA1Y2U5OWZkNDE1ZGYzMzA3MjMwZjA2NDc3MjMyN2YzZTNiZTFkNmIyNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODc3OTQ1ZmYxNDg3YWI1YTk3MzkyMGRlYmFkOWJkYTlhYmMwM2VhM2YzOWQzYjFhZmY0ZGExZTk4ODAwOTU1NCJ9"
+        },
+        {
+          "resource": "repo://packages/kit-vue/src/payments.ts#L140-L151",
+          "version": "repo-lines-v1:sha256:95427acc980a050a3f48586f5fa71c4bc48b7b6ebabafcb63606483733a74cc7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkYzYyYzNkYjdhOGM2NjJmN2NiZTVmNmZkMmEzNmU2MTg0ZGVjNmM1ZjlhM2M5ZGNkYzMwNGExMDU5ZGYxNTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU1ZGY5MzM4Mzg0ZThjOTAxMzRiYWEyNzlkYzA0ZjJjMmZlZjRhMGE1YWFiMDZiZmZlM2JjNjJhZDQ5NmZiNGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdlNTViNzM3OWJlYTk2Mjc2NzljM2RlMzI1ZTU3MThlY2UwOTM0N2EyZGViMDkzYjFlOTcxMGM5MzFmMDAxMzYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_82c7e8e713484a84ae53a8d45c86b39d",
+      "statement": "The payments store is disabled when `config.payments` is not `true` — `loadSubscription` returns `null` and the team-key watcher never fires, so no `/stripe/*` call is made.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-vue/src/payments.ts#L114-L115",
+          "version": "repo-lines-v1:sha256:496be5b9f7b68fef86d3690d193731c14ae0c89969a5533b66232791dd462d3a:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTk3NjYxNWNmY2Y0NGJkY2M1YWJlNmE1MTM4OTE2NzdkOGExZWEyMmM4YjQ2ZmRkNDUyNjJhMGY3ODFlZThkOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2ZiMjUyYjc1YTE3NGM4NDI2NWI0NDhlM2Y4OWVkYjViNTIzMDhjNmQzMjFmZjNlZjY5YmVjYThjMzA5OTcxZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTRmYzI5YzI1N2NhOGIxMGRkNjBjYWE0MWZkN2I3MTkxOGFiZjMwMzUxZDNmMzgxNGRjZjY0YTM2NGIyZmEyNyJ9"
+        },
+        {
+          "resource": "repo://packages/kit-vue/src/payments.ts#L143-L151",
+          "version": "repo-lines-v1:sha256:a67b6b593e2c224afc039de7643548fd3d3eaf5627331140f1d4bac58f28f52d:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDBjZmE3OGY5MWE1NTU0N2JkY2QyM2YxNGNiNmI0ZTgzZmQ4YWFkN2FhZTgzZDVjMTU3NjIxZTk4ZDNhZTZiZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTc0MjBkNWFmNDNjYzVlNjUyMTVmMzE5MTFmMjg2YjU4MjgzOWQwNzc3Nzc5YzNlZWFhZmNhM2EzN2RmNWVjOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiN2U1NWI3Mzc5YmVhOTYyNzY3OWMzZGUzMjVlNTcxOGVjZTA5MzQ3YTJkZWIwOTNiMWU5NzEwYzkzMWYwMDEzNiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_3258267f52c641a7a7ad320cc0f11c0e",
+      "statement": "`canManageBilling` is a computed that compares `user.team.role` against `config.ownershipRole` (default `'owner'`), not a hardcoded string.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-vue/src/payments.ts#L113-L118",
+          "version": "repo-lines-v1:sha256:705d7d0c22077bc47016eb9e35e30b5255847f9f58bca28a2107f2d2945e4a5d:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzQwNmYxZDNiYTNlNGIxMmFmMWM0NWU3NDVlOTdiNmRlZDI2ZDI2NTBkMzdhZDdhODdjM2U2MTFmYjhhOWQ0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTcwMmFlYzY2NTk4OGFmYjYwMjg1MjY4NDI5NTg4Njk2NDc2NmNmNGQ5MWNhOWQwOThkYzk1MDZjMmUzNzIwZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjI2MmE1MjJjOTk1MjE5YjE4Y2ZjZGQxN2FkZTA3ZDQyMTc5ZDNiNTFmYzBkODZkM2VkOThlMmMwZjlhZmU2OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWUxMGZkNDE5ODRlOTJkYTM4NmE2Y2M5NDc2MTg1ZDQ2ZTAwYzczODJlNDU0OGJkNGZjMGQ3OGQ5MzA1ZDhmMSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_df5be24d758b42d7ba3059402dc3fd69",
+      "statement": "The cart store is independent of auth (no injection dependency), persists to `localStorage` synchronously alongside state updates — not via a `watch` — and reads as empty on the server where `localStorage` does not exist.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-vue/src/cart-store.ts#L58-L74",
+          "version": "repo-lines-v1:sha256:11d3c0db4cb016c07049e38036fbf756c36cd3a24948e919dcbde2e002cccc4e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3OTFhZTVjNzZlMzcwYzA1NTJjMGRiZWU5YjY5MTg5MTVhZjgzYmFkYmJmMTU0YzAwZGJhYmFlZmI3YWI4ZTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdjZmQ1MTdkMjk2ZjY5NjZkMmQzOWU4ZTZmOTI1MWRkZDg3NGYyM2E3MDUzMjE4YjViOGM1ZmI2NWQ2NzZiOTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYyOTU5M2Q4NWMwNzk1YjZjYjA4ZWJmMDFjZTU1N2E1ZmFmNjY1ZTZmYzY4OTYwNmE0Nzc5MjMzOTdlZTgyNmIifQ"
+        },
+        {
+          "resource": "repo://packages/kit-vue/src/create-cart.ts",
+          "version": "repo-file-v1:sha256:4052cc5b94c4e2f0ad7c3fc934c9cefd96468e570d37025f964082a338979656"
+        }
+      ]
+    },
+    {
+      "id": "claim_f4fd8274a998419eb5072b24dc79c1bf",
+      "statement": "Navigation guards check the in-memory `isAuthenticated` computed first and only fall back to a `checkSession()` round trip when it is `false`; `authGuard` redirects to `loginPath` and `publicGuard` redirects to `appPath`.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-vue/src/guards.ts#L28-L44",
+          "version": "repo-lines-v1:sha256:c064bcecab14960b3b6cfa11d181d1e160b1cdb14a7b21d1e855b76c73dfee3f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmNzFmMjdjZGQ5ZGQ5NTU0NmQyNTA5M2M2NWE0Mjg5ZDM4ZGRiYmI1NDdjYjBlZTk2ZjJmMTVlMDg1MmRkYmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1YjM3ZTIwZTFiOWQ0ODYwOTM5NTZkZDYwZDg4OWUyNmU2ZDhjMzM3NmQ2YTRkZDIxMzk0ZWE2YzExYWQxZjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNlZDc3ZDViMWMzZTgyNTAyZTY1NjE2OWU3NTcwYzMwMmQ0MDA5MjY0ODYxZTA1MDkyMWVlMzRjOTg4YmI2OGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8bd75861aa9c4a6c92e84ff7c7223951",
+      "statement": "Nuxt server actions (`rhLogin`, `rhSwitchTeam`, `rhActivate`, `rhResetPassword`) use a `runCapturing` helper that overrides `getToken`/`setToken` on the config to capture the newly issued token into the response cookie instead of writing to `localStorage`.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-vue/src/nuxt/actions.ts#L31-L60",
+          "version": "repo-lines-v1:sha256:e60bf47b4a4508717db2832b691e7eb3013febb4c3dc5b31e9232b931b4111a6:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJlOTY4ZmMwMzg3ZDQ2ZjA5NmM1Zjg3N2Y1MWIxOTZiZDZhODNjM2Y2MjIwNTUxMTFkZGM1NmFmMzBmNDU3NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRiMDUxYWQ4NDhmMWYxYWI0OWFjNTBlNTBhMGVkMmZhNzI3M2M3YjRkYTY3MTQxMzViMGE3NjhhNThiZTdhNWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdjNGMwOTYzMDFmOTQ3OWExYWJiZWViNGRkZmYzOTdkZTgxNWU2YjdiNDYwZjUyY2M4YzI4NjVkMGI5NTY2MjIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e469ca129fbf40439c4daeec4ca3bc8e",
+      "statement": "`rhAuthServerMiddleware` proactively renews the token when the current time has passed the configurable threshold fraction (default 0.8) of the token's TTL, writes the renewed token back to the cookie, and deletes expired tokens.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-vue/src/nuxt/middleware.ts#L35-L44",
+          "version": "repo-lines-v1:sha256:fed1463db6a80c910b52ec07f53f4938cb88e54818d3a0d18eb31eb60931c191:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNmYjdkZWI2ZWUwNTUyZjQ5Y2IyMzg0MDNhOWUyNGIyMjljOGQ4Yjg3Zjg1ODkzYzQwMGU5MGYwZTRkODdmMmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNmNGExOTM5YWUyMGRmYzJmZjZiNmQ4MzA2NWY0MzI4YzFiYTUxMTkxZDgwZWU3OGU3ODk3OTlhOTM4ODYzNjMifQ"
+        },
+        {
+          "resource": "repo://packages/kit-vue/src/nuxt/middleware.ts#L86-L103",
+          "version": "repo-lines-v1:sha256:bd3916b9bc1b80e07d5fee38ffc08c73de6b07e8fa8f3a468736bcc7c1a35786:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNmMTM2YTRjMGNiMDk1NWNjYmNlYzQ2M2NhMTBiOTliN2UyNmYyZmM3ZTI0YjY0NDZiNWU1YzM5Y2RkZDdmZTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlhZTBhOTJhMWViODE5ZmZiMzk5YWRlYzNmOGY3ZmFhNmEwMzlhM2RjYjBlZWI5MWYzOTcyNGVhZmUxYWZkZDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJmNGNjZThiYjc4MDZlZGRkOWQzZTBmN2UwMmMwYTM4NDlhZDZiNTQ2MjUzNWVkMjhjMmI4YjdiMGFmZjdmNmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0df3966d420b4e79a91ade7d48621114",
+      "statement": "The SPA barrel (`src/index.ts`) re-exports all of `@restheart-cloud/kit`, so Vue apps only need `@restheart-cloud/kit-vue` to access both the adapter and core kit types/functions.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-vue/src/index.ts#L20-L22",
+          "version": "repo-lines-v1:sha256:ab65390fb35d402750876190dead56c8cfaff05fcdbade7726a19dfc3103dfd7:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGY4ZjhjMGYzMGY5ZWIwY2JhZDE0NmIyODBjYTg0NWZkNjZkZWU3MmMxNmNiOWFmNzFmZDljNzE2MGQ3Y2I2ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGNlNjM0YTYwYTU3MDU5Y2E3YzVlOTFlNmMwN2VkMWYxODkxNDE2MDE0ZWY3N2FmMmJiMThmZTc4OTk2YmMxNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTdiMzE2YWJiM2MwMWM0ZjM5OTJmZjQ0YWIxNTg3MzNkNGM0ZTQzMWZhYTEwYmM2MGQ2ZDQyMmZmMGViMGFmNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_d934fa23eba0498992e4c5a838d2faa1",
+      "statement": "The `RhAuthStore` interface includes `acceptConsents(body?, mode?)` (returns `UserInfo`), `renewToken(mode?)` (returns `string | null`), and `updateUser(email, updates)` — methods not present on all other adapters.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-vue/src/store.ts#L50-L50",
+          "version": "repo-lines-v1:sha256:46caa0470d652ed2b2b2cf7698724d346d0a79926d92720ef500b926f493f27b:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDZjYWEwNDcwZDY1MmVkMmIyYjJjZjc2OTg3MjRkMzQ2ZDBhNzk5MjZkOTI3MjBlZjUwMGI5MjZmNDkzZjI3YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDZjYWEwNDcwZDY1MmVkMmIyYjJjZjc2OTg3MjRkMzQ2ZDBhNzk5MjZkOTI3MjBlZjUwMGI5MjZmNDkzZjI3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWJiZjgwY2MwNDcwNWQyZWEyZWRmNjc1MTYwYTJhMjI3OWJjNjY0Zjg4MzBmNDExNGJmY2YzMmQ2MzExMDQ2NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmIwNDE1NzU1ZTQzMWEyMmQ4YmJmNTQ0YzljNDgyOWMyOTJlYjY5MmRjMmE1MjA5NDk1ZTJhMGFiODM5MTEyNCJ9"
+        },
+        {
+          "resource": "repo://packages/kit-vue/src/store.ts#L66-L71",
+          "version": "repo-lines-v1:sha256:8501c323cdebb1d208ad4c29055b8a5213bb0fecf0e02f8278ed4da862505601:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWM0M2VjYzE5NDY3MGY3OTg0ZDNiNTUwMmVhOGJkN2I1ZjNiZDAzODMxMDk5YjMzZTk0NDM0Mzg3MjVhY2U5MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzAxNDg2OWZiOGViMTJhZTljZDQwNTRiMzYxY2Y3YTY5ZmMzMTU3OTVhYzMzMTg0OGQ0ZmM4MGJiNTY5MDZkYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmQ1ZDdmN2ZkY2I0NWZkNDZjZWQ4YzM1ZDcwN2Q3NzJkZDA1MWYxYjY4ZGZkNDY0Y2JmMjVlMGUwYmE2Yjc3YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWM0MTA1ZDUwOTA2NDg0ZGUzZGM4M2E2ODQ0MWEyYjA2ZjhmZTY4ZDczNjZmOTVkZjQ0NGUwYmIxNWI2NTUyYSJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.0",
+    "at": "2026-09-07T09:33:56.593Z"
+  }
+}

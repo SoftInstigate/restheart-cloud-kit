@@ -3,9 +3,6 @@ type: Package
 title: "@restheart-cloud/cli"
 description: CLI tool and library for idempotent, file-driven configuration of RESTHeart Cloud services. Provides the rhc command, admin and service clients, session management, environment variable secret resolution, and a step-based setup runner.
 tags: [package, cli, configuration, infrastructure-as-code, setup, idempotent]
-verified:
-  - by: openwiki/0.4.3
-    at: 2026-08-28T16:48:53.239Z
 sources:
   - id: openwiki-source-92450a7065eb85e0f30b5461
     resource: repo://packages/cli/package.json

@@ -1,8 +1,25 @@
 ---
 type: Guide
 title: Release Process
-description: Tag-driven release process for RESTHeart Cloud Kit. Covers version management, CI/CD pipeline, and npm publishing.
+description: Tag-driven release process for RESTHeart Cloud Kit. Covers version management, CI/CD pipeline, and npm publishing for all five packages.
 tags: [release, deployment, ci-cd, npm, github-actions]
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-09-07T09:33:56.593Z
+sources:
+  - id: openwiki-source-4d1d392666be6dfdd7a91a2e
+    resource: repo://.github/workflows/release.yml
+  - id: openwiki-source-92450a7065eb85e0f30b5461
+    resource: repo://packages/cli/package.json
+  - id: openwiki-source-01685a6829395c2a4f8d6b98
+    resource: repo://packages/kit-ng/package.json
+  - id: openwiki-source-54f8315d21086325777bcf77
+    resource: repo://packages/kit-react/package.json
+  - id: openwiki-source-3b715d0672cc288b21ea6330
+    resource: repo://packages/kit-vue/package.json
+  - id: openwiki-source-46339ee0e97e6859bc5ea428
+    resource: repo://packages/kit/package.json
+generated: { by: "openwiki/0.5.0", at: "2026-09-07T09:33:56.593Z" }
 ---
 
 # Release Process
@@ -16,7 +33,7 @@ RESTHeart Cloud Kit uses a **tag-driven release process**:
 1. Create a version tag
 2. Push tag to GitHub
 3. CI runs integration tests
-4. If tests pass, all four packages published to npm
+4. If tests pass, all five packages published to npm
 5. If tests fail, nothing is published
 
 **No manual versioning step needed** — the tag determines the version.
@@ -25,7 +42,7 @@ RESTHeart Cloud Kit uses a **tag-driven release process**:
 
 ### Version Strategy
 
-- All packages (`kit`, `kit-ng`, `kit-react`, `kit-vue`) share the same version
+- All packages (`kit`, `kit-ng`, `kit-react`, `kit-vue`, `cli`) share the same version
 - Versions follow [Semantic Versioning](https://semver.org/)
 - Current development version: `0.0.0` (in git)
 
@@ -54,6 +71,7 @@ During release, the workflow updates:
 2. `packages/kit-ng/package.json` — `version` and `dependencies.@restheart-cloud/kit`
 3. `packages/kit-react/package.json` — `version` and `dependencies.@restheart-cloud/kit`
 4. `packages/kit-vue/package.json` — `version` and `dependencies.@restheart-cloud/kit`
+5. `packages/cli/package.json` — `version` and `dependencies.@restheart-cloud/kit`
 
 All values move together to ensure consistency.
 
@@ -93,44 +111,70 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - run: npm install -g npm@latest
-      
+
       - name: Set version from tag
         run: |
           npm pkg set version=${{ github.ref_name }} -w packages/kit
           npm pkg set version=${{ github.ref_name }} -w packages/kit-ng
           npm pkg set version=${{ github.ref_name }} -w packages/kit-react
           npm pkg set version=${{ github.ref_name }} -w packages/kit-vue
+          npm pkg set version=${{ github.ref_name }} -w packages/cli
           npm pkg set dependencies.@restheart-cloud/kit=${{ github.ref_name }} -w packages/kit-ng
           npm pkg set dependencies.@restheart-cloud/kit=${{ github.ref_name }} -w packages/kit-react
           npm pkg set dependencies.@restheart-cloud/kit=${{ github.ref_name }} -w packages/kit-vue
+          npm pkg set dependencies.@restheart-cloud/kit=${{ github.ref_name }} -w packages/cli
       
       - run: npm install
       - run: npm run build
-      - run: npm test -w @restheart-cloud/kit
+
+      - run: mkdir -p packages/kit/test-results
+
+      - name: Integration tests
+        run: npm test -w @restheart-cloud/kit
         env:
           RH_TEST_API_URL: ${{ secrets.RH_TEST_API_URL }}
           RH_TEST_ADMIN_PASSWORD: ${{ secrets.RH_TEST_ADMIN_PASSWORD }}
-      
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: packages/kit/test-results/
+
       - name: Publish
+        if: success()
         run: |
           npm publish --access public -w packages/kit
           npm publish --access public packages/kit-ng/dist
           npm publish --access public -w packages/kit-react
           npm publish --access public -w packages/kit-vue
+          npm publish --access public -w packages/cli
 ```
+
+**Key details:**
+
+- The `Set version from tag` step uses `npm pkg set` (not `npm version`) to edit package.json files without reifying. A single `npm install` afterwards resolves the workspace in one shot.
+- `kit-ng` publishes from its `dist` directory directly (`packages/kit-ng/dist`) because it uses ng-packagr to build.
+- Test results are uploaded as artifacts even on failure (`if: always()`), so you can inspect them from the Actions run.
+- The `Publish` step only runs on success (`if: success()`), gating all five publishes behind the integration test.
 
 ### Step 3: Pipeline Execution
 
 1. **Checkout**: Clone repository at tag
 2. **Setup Node**: Install Node.js 22
 3. **Update npm**: Install latest npm
-4. **Set Versions**: Update all package.json files with tag version (kit + 3 adapters)
+4. **Set Versions**: Update all package.json files with tag version (kit + 4 adapters)
 5. **Install Dependencies**: `npm install` to reify workspace
 6. **Build**: Build all packages (`npm run build`)
 7. **Integration Tests**: Run core tests against RESTHeart Cloud
-8. **Publish**: Publish all four packages to npm (if tests pass)
+8. **Publish**: Publish all five packages to npm (if tests pass)
 
 ### Step 4: Publication
 
@@ -139,6 +183,7 @@ If integration tests pass:
 - `@restheart-cloud/kit-ng` published to npm
 - `@restheart-cloud/kit-react` published to npm
 - `@restheart-cloud/kit-vue` published to npm
+- `@restheart-cloud/cli` published to npm
 - All packages have same version
 
 If integration tests fail:
@@ -214,10 +259,12 @@ npm view @restheart-cloud/kit versions
 npm view @restheart-cloud/kit-ng versions
 npm view @restheart-cloud/kit-react versions
 npm view @restheart-cloud/kit-vue versions
+npm view @restheart-cloud/cli versions
 
 # Test installation
 npm install @restheart-cloud/kit@1.2.3
 npm install @restheart-cloud/kit-react@1.2.3
+npm install @restheart-cloud/cli@1.2.3
 ```
 
 ## Hotfix Releases
@@ -273,6 +320,7 @@ If a release has critical issues:
 ```bash
 npm deprecate @restheart-cloud/kit@1.2.3 "Critical bug, use 1.2.4"
 npm deprecate @restheart-cloud/kit-ng@1.2.3 "Critical bug, use 1.2.4"
+npm deprecate @restheart-cloud/cli@1.2.3 "Critical bug, use 1.2.4"
 ```
 
 ### 2. Publish Fixed Version
@@ -453,6 +501,6 @@ After release:
 - [ ] Tag created with correct version
 - [ ] Tag pushed to GitHub
 - [ ] CI workflow completed successfully
-- [ ] Packages published to npm
+- [ ] All five packages published to npm
 - [ ] Installation tested
 - [ ] Starter app updated (if needed)

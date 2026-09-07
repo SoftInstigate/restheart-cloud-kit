@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:47e910b6a7e9ec2c8ab897807dc941e1c2cc40fe5bea1bf38543565eef4b5783",
+  "claims": [
+    {
+      "id": "claim_5e4cb92e81ae4505af14b9e634ca1d2a",
+      "statement": "The monorepo uses npm workspaces (`packages/*`) with five packages: kit (core), kit-ng (Angular adapter), kit-react (React adapter), kit-vue (Vue adapter), and cli (CLI tool).",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L1-L18",
+          "version": "repo-lines-v1:sha256:26d855cc1bac2c1b9b83ca514f24a06bae4d05307fd80f62de42f5a6bf625299:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/cli/package.json",
+          "version": "repo-file-v1:sha256:08bb2546a3b324bb438e7e95a8bf9acc237befc1688d2bf055e8d4dc6a109c85"
+        }
+      ]
+    },
+    {
+      "id": "claim_4800d0f64b7d4e568d790815992aad50",
+      "statement": "The root `npm run build` script builds packages sequentially — kit → kit-ng → kit-react → kit-vue → cli — because adapters and cli depend on kit being compiled first.",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L8-L8",
+          "version": "repo-lines-v1:sha256:492c53d6a9b569d040b82ac9ed2179a3b8baabc77c471c9c3ca5438b38a5c229:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDkyYzUzZDZhOWI1NjlkMDQwYjgyYWM5ZWQyMTc5YTNiOGJhYWJjNzdjNDcxYzljM2NhNTQzOGIzOGE1YzIyOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDkyYzUzZDZhOWI1NjlkMDQwYjgyYWM5ZWQyMTc5YTNiOGJhYWJjNzdjNDcxYzljM2NhNTQzOGIzOGE1YzIyOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjI2OGExZmNlOTQzNGUxNGZlOGUxODE2Mzk3NGJiNTlhMTA4YzQ1MzA1ZjI5YWZiNzkxNmMxZTkzNjNiZjk2NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmJlYjE4NWUwYmMwNjUyNTdhODkxMzg4YWU1MjkzOGJiNjVlN2QxNWMwZTcxYzliYTEzMDViZTA5ZTk1OGVhOCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_ece00a9d90ad4205ac30644b094d210c",
+      "statement": "All adapters and the CLI declare `@restheart-cloud/kit` at exact version `0.0.0`, which forces npm to resolve from the local workspace rather than the registry. The release workflow rewrites these pins to the tag version before publishing.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/release.yml#L36-L44",
+          "version": "repo-lines-v1:sha256:6a1a1fb41797beb78f9724e81fc21d04b3372900d36ea63d2657096ca968ca56:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTEzOTJiNDZmMTVjODIwYzg1ODVkNGVhMWI3MDBmZTc0M2VkMjA0MjAwZDYxNmIwZWIxMzQzOWNhNjE0ZjFmNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWM1NmIzMDk1YzgyZmEyYTZmNjg1MWQyNjA4ODBlODBiZDg1NzQwMDc5MDc2ZTA0NDA4MWM4OTliNDVmMmJjNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmZkYjlmMWQ3N2IwNTdhNjc2OGUzZTIyMjEwMGY4ZmRkODlhZGRiZGU0YTkyNWQzM2MzYzNkOGZlNTZiNDMxNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmE1OGEyZTQwYWVlN2MxMzBiNGVkMmVhY2FjODU1ZDhmYmM1NDQ3YmI5ZjYxMmNjMjI5M2UzODI2Nzc3MWY5YiJ9"
+        },
+        {
+          "resource": "repo://packages/cli/package.json#L35-L37",
+          "version": "repo-lines-v1:sha256:1224e1299300a630cadbb42da4929c1ede5f90a6fa9d82e62b74d829b72d7e34:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmEzYjQ2OWQ5ZTA5NzU3MjI0NjY2NzM0YzllZjdiMjU0ZDg4NTM0ZjVkNWJiNzA5ODk2MDgwNWM1NTNkYzMwNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmQ1NDlmZjYyYWUzZWUxMzEyZGFiNWRjZTI3MTY1YzdhMTgwYWY4NmE2NzE3MzZmNTI2NTQ0YThiMTAxZTZhMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGNiN2IxYzNjOTBiMzg0ZDE1MWViNjhhNTE3ZjZkNmMzYTU0YmIwZjlhY2QyYjhhZmQwMWRlYzY0MjBjNzMyZiJ9"
+        },
+        {
+          "resource": "repo://packages/kit-ng/package.json#L17-L19",
+          "version": "repo-lines-v1:sha256:1224e1299300a630cadbb42da4929c1ede5f90a6fa9d82e62b74d829b72d7e34:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmEzYjQ2OWQ5ZTA5NzU3MjI0NjY2NzM0YzllZjdiMjU0ZDg4NTM0ZjVkNWJiNzA5ODk2MDgwNWM1NTNkYzMwNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzIzOTNkYzhhYzE0ODdiOTlmOGEwYjc3MTQxMzcyNzc3N2QxNDFkZDM4ZWIwYjhkZjYxNmVlMWYzZjM5MDE1MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjdiOTI3ZTZjNmIwZDc5NTMzMDcyYWZlNjE2NjVjMTI1OGUyNzUwYjRjNGZjZTZjNDRiMGE5OWVmOWQ5ODU2MSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_1641509c51f441e391dad2665fabd600",
+      "statement": "The `rebuild-kit-ng.sh` script (a zsh script) builds only kit and kit-ng (not all packages), then links kit globally, links kit-ng from its dist directory, links both into the starter app path, and clears the Angular cache.",
+      "evidence": [
+        {
+          "resource": "repo://rebuild-kit-ng.sh",
+          "version": "repo-file-v1:sha256:a96c4fd119c3ece5e58950ac6d8b41bfac989fdb18919eaf937c073088b6cd47"
+        }
+      ]
+    },
+    {
+      "id": "claim_43d97aed9460401086dc20fdce4fe12c",
+      "statement": "The shared `tsconfig.base.json` sets target ES2022, module ESNext, moduleResolution bundler, strict mode, skipLibCheck, declaration, declarationMap, and sourceMap. Each package extends it with its own outDir/rootDir and framework-specific settings.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/tsconfig.json",
+          "version": "repo-file-v1:sha256:acf4e9da23bbb6f2ca655d80b868802441c452d56b0629f79b217643653fe4e6"
+        },
+        {
+          "resource": "repo://packages/kit-ng/tsconfig.json",
+          "version": "repo-file-v1:sha256:dc143b5e19a4f15c57b0c4f3bad9af650797a7158858c633a7bbc77f350ee93b"
+        },
+        {
+          "resource": "repo://packages/kit-react/tsconfig.json",
+          "version": "repo-file-v1:sha256:cb62a8b473830ecd0a497762e28273aaecfb39133862078a814945c975e4aef5"
+        },
+        {
+          "resource": "repo://tsconfig.base.json",
+          "version": "repo-file-v1:sha256:583da374d820c3b3ca9265e68cc02d046191a63633dfe5eb3be82480d5ad550f"
+        }
+      ]
+    },
+    {
+      "id": "claim_d13a105c30554a8b90a741a58ab008e7",
+      "statement": "kit-ng uses ng-packagr for building and the Angular CLI (`ng test kit-ng`) for testing with Vitest as the runner, configured via `angular.json`.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-ng/angular.json#L15-L28",
+          "version": "repo-lines-v1:sha256:8994e73dded64b60c307c47a81af495171df0943a40dedcda9c94ae63696344f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4MDA1ZDU3MTA2YTM2MmViMDAwZGFmM2RhNDY3NGM4MmI1MThmZjVhMmUyZjY3ZWU4ZTc1N2EzMzNjMmFmNjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhmMWUyNjkyNjk5YmU4ZjcyNDAyNWU1YmY0YjJlYWJlMmUxOGE5ZWQ2NWRmYTI0N2FhMWIxY2MyNjdmYTIwNzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRmNzM5YTA2YzFjYmIxMjQ0ZTMzNjNkMzhiY2Y5ZmE1MGNlODRmZWQzOTljMjE5M2EzYzdmMDhkNTk5MThiMmEifQ"
+        },
+        {
+          "resource": "repo://packages/kit-ng/ng-package.json",
+          "version": "repo-file-v1:sha256:c71dc3e640f5f8d74f30c407b74c82289bf2c481547e21af90e174de7b23ef93"
+        },
+        {
+          "resource": "repo://packages/kit-ng/package.json#L35-L38",
+          "version": "repo-lines-v1:sha256:72ed4aea6c97867ac7bc23fec87195787c971f7020451f4fb88d45d0d0298817:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MzNkNTk0OWMwM2E0MGNhOTUyNDkxNjEwYTY2NTk2NDRiM2FhNDY2MzYyZjc5OTAyMGRiZjE5ODE1NDdkYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2ZjM2NhNzJmN2ZkYzY5YzUxYWI4YTNlYmYyNWI0MTMyODkyYWI0MDZiOTRlNmVlMGE5YmIwZGEwYjdmZTlkYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_0206ad0eb5294a3b834a60374f9f5346",
+      "statement": "CI unit tests run on every push/PR against kit-react, kit-vue, kit-ng, and cli — but not kit, whose tests are integration tests requiring a live RESTHeart Cloud instance.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/unit-tests.yml#L30-L35",
+          "version": "repo-lines-v1:sha256:6dc13293eae3268b7dc3e4077147e46155433fd6ac0752209a1c40b7680df162:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2UzNjIxZTkwMGYzYzY1YjEwYWE5ZWM0MjdjMmE0YTM5NWUwYjU1YjZmYWI1NTYyNTg1ZGI0N2JmODE0NzEzYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzBmYzc4MDNkY2MxZTcxZTZmNjBmNGU4MjM2NTI5MmQzZTFkZmMxNzc1MmI3NjhmNzM1NWI3Zjk2ZGUwYjg4MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzlkNzI3OTNiZjVlZGMwNmVjYzdlMzUyMmE3MzFjY2VjZTVmMjA1MGYwMWExOTdjODE1NjRhMTM0YTkzNGUwMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_46669cba37234373acf58e8ff19ddfde",
+      "statement": "kit integration tests require RH_TEST_API_URL and RH_TEST_ADMIN_PASSWORD environment variables, use Vitest with sequential execution, and produce junit and html reports.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/vitest.config.ts",
+          "version": "repo-file-v1:sha256:10a065bbb26b2e42f99ed01de24a1025ada0f0aa2b622d1e6a0cb36d36a75c91"
+        }
+      ]
+    },
+    {
+      "id": "claim_f576573534c44612a618d507cfbe0e8b",
+      "statement": "Node.js 22.22.3+ is required specifically because Angular 22's CLI enforces it for kit-ng tests; all other workspace packages work on any Node 22.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/unit-tests.yml#L24-L26",
+          "version": "repo-lines-v1:sha256:f3ffee50b7b7e1d4bc62d42bffa41d3ee930aa968f006e5c7e60e125a94fe75e:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGIzMmI5ODcyNjNkZjIxNjNlNzI2ZDQ4YjkyZjZmOTY1MTQ4Y2I2YjZkMjgzMTc5MTUxNGM5MzlmODM3YTE0MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmMwM2E4ZmViZjRiMTA2NjkzYmY2N2VjNGE5YjQ1ZmZmZTYxNDUwMDhiY2QzMTdiZDhjZjY4N2IzNzQxNjI5NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWJjN2RjZjdmZmUzY2FjMWQ0NGZlYjJiYThiMDllMzExMzAxMzcyMWUxMWZiZmU0M2E0OWE0ZDZlZTIwNzcwYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzlkNzI3OTNiZjVlZGMwNmVjYzdlMzUyMmE3MzFjY2VjZTVmMjA1MGYwMWExOTdjODE1NjRhMTM0YTkzNGUwMyJ9"
+        },
+        {
+          "resource": "repo://packages/kit-ng/package.json#L21-L22",
+          "version": "repo-lines-v1:sha256:17b26c29d0628cfec9f5b3baadcbfb59ce31345c03ec351425ba5831e5fd613a:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2RiYTRjYmZmY2YxYmJhODUxZjQzMzQyNDlhMzgzYjljNGNjMDBkZjE2YzZkMGM1MDhjYjQ3OGRhOTZiMDkzOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjA0NjRkYTZjNzlmZGUzNWQ1ZmI1Mjg5OWRlYWFmZDAwODEyYTU5ZDZjZmZhMWUxNGY0NzA1MGYxOThmMmI1MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWY5YmU0NGQyODAzYTc4NWUzYzg2NzM0YTJlMWNlMDU2Y2E5ZTcyM2Q0ZGM3ZmU3YTg4ZWIxMzg3OGEzNzJkOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWEyOWFhZWZjMDU2ZWU2NWJhNjg5MGM5ZTE2ODI4ZDgwYWQzZDBiYjJiM2U2YWEwNzliZWNmZmZjZWU3OTQ1YyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_5c27237b23c541f59eecbf116443db9e",
+      "statement": "The CLI package exposes a `rhc` binary via its `bin` field, pointing to `./dist/cli.js`.",
+      "evidence": [
+        {
+          "resource": "repo://packages/cli/package.json#L12-L14",
+          "version": "repo-lines-v1:sha256:1d5b49c5745eff45cf6276e142527a8fa658548741036baa11e7206f2e0b6168:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDBjOGRmZmU1ZGIxNWZlZWNkODZhOWIwOGYyYzcyYjIzZjFiODlhNDJkNGM2MjFhMDM2OGYyMTU0MTc3ZGFkZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzgwMTIzYzg1ZDJlYTBjZjIzMjlhMWE0ZmRiNjJjZjMxZWYzMDg1ZjAwNjQzNjZiZjYwZGUyZGMzMmRmZmYxMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWU0NDAyMjAzYzlkOGNlMjQ2MTZhZjBmZDk5YTlkNjU2NjRlODA5MDI1OWRmMjE2MzI0ZmYwZGUxYmZjN2ZjMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTEwODZmZjMzMjM2MmM1M2E0N2FjZjU0YmM0OTEwMGY0YWYyNDBkNjRjNTg5MWQ0ODZmNDdhODdlMmU4ZGE3MiJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.0",
+    "at": "2026-09-07T09:33:56.593Z"
+  }
+}
