@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:6ea09118c9c6afbbdbb0e23f929230b58b1f2531ae1a780df582001139e79bdc",
+  "claims": [
+    {
+      "id": "claim_a7ad67a4c30f41539466368125d8fe2d",
+      "statement": "The @restheart-cloud/kit package exports authentication, token management, team operations, consents gating, password reset, payments, orders, cart, and money formatting functions",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/index.ts",
+          "version": "repo-file-v1:sha256:b39b338894832a31d917234a39afb2b950198b72952b55a3cd0efeb3495427e0"
+        }
+      ]
+    },
+    {
+      "id": "claim_d784e7a65d8d45f395b54076a49e6df2",
+      "statement": "The AuthConfig interface includes apiBaseUrl, getToken, setToken, transport, onError, payments, and ownershipRole fields",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/types.ts#L8-L106",
+          "version": "repo-lines-v1:sha256:4b2095aad44f4f946d73ae2a7142566f236a89ff27b23c6065cc0cedd671aa0e:eyJzZWxlY3RlZExpbmVDb3VudCI6OTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1YzM5YmFjMGMwMWY0ZDNiYWMzMDIzM2M4Y2VlODRlNzFlYzk2MGFlODY5YjFlM2M2NmM5YmExZjFlMjI0ZDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM2YzM3ZjJhNDA2ZjA5MmExOGMwMTMyMDlhY2NhZjQ3NDJjOTZjMWNmZTQxZjYyMzlmZWMwOTUwYmUyMzcxNGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY2ODQwZTZkNjFmODBiZTBlMDQ0NTliMDhlYjU0MWE4MDJiNDFjMWE3NjRiZWUxY2QzMWQyZjRjMzdhMGVkMWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d97aeb4c4a5b4fac8ca642fbd45cf42d",
+      "statement": "The UserInfo type is generic and can be extended with application-specific fields",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/types.ts#L131-L140",
+          "version": "repo-lines-v1:sha256:b1fdde9c20924bab84514c4d64cc93bc5f2472fb1201b0c778891773346ac65b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiNmQ2YzhlMDcwMGZjYjUzY2Y3NWY1YzcyMDhjYzhlZjdlMmZmODNjNzNlMWJhY2FlNjRiZjg4NzQxZWY3NTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0YTFmZjM5YTQwYTg0NGVhMjkwODEwMDkyODBlYzZkMDMyMDAwNTIyOWNmMDk5NzYwYjlmYTdlZGE3MmY0NTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5ZTllYTliZmMxZWIwMTUzMzgxZWMyMzU4NzAzMDE1NzVmMWU5MTRjZTNhNWYxZmY4ZmZiYjc4ZjM3ZWExNDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZjNjJkYmYzNzQwZjNlM2Y0MmQyNzU2NTI1YzI0YzE0OGFlMjk0ZGMyOWI3MzdkMTc5YzA0MTNmNjRkNDMzOWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9ab4bdce8e8e4c95a18e390a6f07d3aa",
+      "statement": "The payments module handles Stripe subscriptions, checkout sessions, billing portal, and seat licences",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/payments.ts",
+          "version": "repo-file-v1:sha256:102f9b679b6c9f2b0acdbc8dae59854159401270121f0ab19a1a6ab09bbdb3cd"
+        }
+      ]
+    },
+    {
+      "id": "claim_f02fa36b572a4646ac305a8b02701c58",
+      "statement": "The orders module handles product catalogs, order creation, checkout, and order tracking",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/orders.ts",
+          "version": "repo-file-v1:sha256:c48a10897e7d79d2a8aaa9ae7dea7cd7a788e8a72c17b87ca2188659e8fb97ed"
+        }
+      ]
+    },
+    {
+      "id": "claim_59df0e7b05524447a6d151a88683c834",
+      "statement": "The cart module provides pure functions for managing a shopping cart without server communication",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/cart.ts",
+          "version": "repo-file-v1:sha256:f8e3bc8f96dc86abb14f3034950a5844f87cc9b3703607d5c39c2dfa96eeaaf7"
+        }
+      ]
+    },
+    {
+      "id": "claim_80e2dc69678d4ba0a7e71bd2370ba14d",
+      "statement": "The formatPrice function correctly handles currencies with different decimal places using Intl.NumberFormat",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/money.ts",
+          "version": "repo-file-v1:sha256:27990e1a5bb12ed55e3666fbe38e66fb5b12290556db574efb2d791a916255f3"
+        }
+      ]
+    },
+    {
+      "id": "claim_c7128f2768194e469de8ccfc3b321904",
+      "statement": "The apiFetch function attaches Bearer tokens, sets Content-Type headers, suppresses browser Basic Auth popups, and throws ApiError on non-2xx responses",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/client.ts#L141-L222",
+          "version": "repo-lines-v1:sha256:70ee4a6d10333b5153b34aecf18980a76ba20be9177cf5b87a5c5ec9ce17e617:eyJzZWxlY3RlZExpbmVDb3VudCI6ODIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhlNTlmNDA0MGJhZGE5M2JjMzcwMjRhZDQ0YTIxOGZhYTNhNjE5ODUzYWQ5MGUyYzg3YjM0Y2Q1OWJiZmE0YTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY0M2I0NzI4ODZhMTMzMTZiOGNjY2IwYjhlNjFiZTAxODM5ODIwYmJkYjI5NDMyMjM5ZDIzNTg4Y2JkMGNlYWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c0e7271940e544598dbb0f899c719bbc",
+      "statement": "The checkSession function checks token expiry locally before calling the server and returns null for unverified accounts",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/auth.ts#L275-L307",
+          "version": "repo-lines-v1:sha256:60c715e8c17c6a80547dc8ee19a3f27dbcc21d37455e203e9e291b17ff894300:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5ZWUwMzI5Y2Q5NWIyMjJhZTY2MmVkMWRlNTE0MGFlODY2NzA2M2ZhNzgxMmMwNGNlOTFmODY1ZWY4NmE3ZjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcxMGFiNmQyYjU1ZDYwYmI5NWY0MWQ0YzBkYjk2MzI0ZWIzMzVkNDU3YmNiZjY2MjJhNDRmNDkwNGFjYTZiMGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2c7c5f0ae76e46e0b30061b317bf3285",
+      "statement": "The login function supports both bearer and cookie modes, with bearer mode storing tokens in localStorage",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/auth.ts#L216-L258",
+          "version": "repo-lines-v1:sha256:f20ace276a5a14e40a5a7cc1dc2ebc3a8e45980565854944a91fee35ce2dff65:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYzMDcyY2M4Zjk5MmU2MTYzMjgwNzRlZjE1ZmUwM2YxYzc5YWY5MWY4NmZhNWVmZDczMWJiZDU4ZTcxOTk1NmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5YjBkZGViZTNiNmI2Y2ZjMWJjZTQ3YWE1OWI3NDAxNzRiZGVjNmNmMGZiNzJmNzEyOTI4ZjFlMGNjYmNmNWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyNWNjYTYxZmVkZDI2NGJiOGUzMTBkZTFkYzc0YmI4NmJmNzhhOTA1MzMwZjVkZmNhN2Q2YTYwZWU2MTBhZTgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4936dd007ef94e6c881c8811a8ef82bc",
+      "statement": "The proactive refresh system schedules token renewal at 80% of TTL with automatic rescheduling",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/auth.ts#L13-L35",
+          "version": "repo-lines-v1:sha256:88bd6f5cd6c35c7f570a673506b86d7c70301cdc247ace6b622ceb056272ac38:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhiY2RhYzUxNjU0NjgxNmEzOTU5MDI2ZmRkZmE1ZGU3MDBhZmZkMDNkNjBiMDI1MTZkMmY5Mjk4NGM2ZTRjZTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ2YzAwM2E1ZjFiZTViNWI3YTlmY2VhYzVjZTg4N2QxMzAyMzExNWVkMjQ4Y2Y1MWE0ZmMzMzU5ZDc3YjEzNTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM2YmQwZTk3YjAzNTA4NWEzNzdiOWU5OGQ2NTA1NjY1MjE4OTkzNzZjMmVkZTVhOWU4NTNlYjY2ZTI4NDUwOWIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e2992869f0ab490d965c1ae2545ecca8",
+      "statement": "The consents pattern uses Guards rules to block requests from users who haven't accepted current consents",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/consents.ts",
+          "version": "repo-file-v1:sha256:08d29a610291fa5beffa64bb9cd847fd7dbb100c744b4df0b9a6e07a1a96b3a4"
+        }
+      ]
+    },
+    {
+      "id": "claim_e6caa1b76b6a4d9ba9b9f9adf11cf5e5",
+      "statement": "The activate and resetPassword functions return the fresh bearer token in bearer mode or null in cookie mode",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/invite.ts#L38-L54",
+          "version": "repo-lines-v1:sha256:6368dccacecac2c9e6730088560ad33b196571381491cf19b72da5dfcb4282af:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4YTVmMjY2MTZjMmRlMTcxNTVhZTdlOWQ0MjRiM2Y3YjljZmNiMGNkZTdhYTNiNzlkYzQ0YjhlMTc5ZWViMzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2YTJlYjlhZjk3MGFjZDQ3ZTc4YzI0NGJhMTBkZmFkZTVjOWMyNWExMmRkNWRjZWM0MDA1ZDQ1ODE5NjBlZTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUzMDg0YmI2YWY4ZDk0OWU5YWFjMWI3NDQzM2QzODcwNTgxZTU1ZWMwNmUzNjIwZTFjMzA4ZGQ5YmYyODY3MDQifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/password.ts#L22-L38",
+          "version": "repo-lines-v1:sha256:c0cde428e7a6d303fe44348be7e589946837bdeb3bddbe5f74850463e70febe6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJiY2E3NjA2YzMxZTAyNzlkNGIxZGQ2YzdkZDk2OWRiNDQ3MTMxMWE3MzQ0MjYzYzg5ODg0ZTlmY2MwMzNiZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2YTJlYjlhZjk3MGFjZDQ3ZTc4YzI0NGJhMTBkZmFkZTVjOWMyNWExMmRkNWRjZWM0MDA1ZDQ1ODE5NjBlZTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b5d2566b71f447b0b79d6890dd7759e3",
+      "statement": "The waitForSubscription and waitForOrder functions poll until conditions are met, throwing WaitTimeoutError on timeout",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/orders.ts#L264-L285",
+          "version": "repo-lines-v1:sha256:6a8165f77ba681f146241babad29f2b0fd8333e8baeb0ff61fceb7afb82c084a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1NTE1MTdlYjhlOWExYmQxMzQzNWIxMWM3Zjc5YjcyY2I3NDM1MjU4ZGM0YmRjMzk4NjczNzY1ZGY2MTQ1MmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYwNGYwNmUyMmVmYTdmOTY4NGYxZWU2MGI1YmQyYWFhMmU3NWRhNTI5YTY1YmE3ZDhkZGM3MDQxNTM3NWYxMGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/payments.ts#L174-L194",
+          "version": "repo-lines-v1:sha256:6f10d6a1dde2553375fa50a5b44ed75d90ed8d69509d2dc4c15fcf013d6f26c5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmMWI4MDdjZTc1M2E5ZGU3ZTU4YjNlYWYzZDZlODc5NGUyMmQ3OTc0YjNkNmViNWNmYTA2ZjE1ZTY1NGQ1YWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzYzZkNTVlZGRiYjkwMjI1ZWFhMTg3ZjUwYTViOTFlMmFkYjRiNjhjYmJhNjFhYjIyN2ViMzRlZTE2M2Q2MTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZhMTZjZjc0NmQyMzRkMmIxZWE2NmY3YThiZjMyMjhiNTMxYTRiZjI3NDJmOWM4OWJkNTAyMTU5NzRhZjE2YTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_26de982d42e04bb6ac428c0a663bab44",
+      "statement": "The cart functions are pure and take lines as parameters, making them suitable for any state management approach",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/cart.ts",
+          "version": "repo-file-v1:sha256:f8e3bc8f96dc86abb14f3034950a5844f87cc9b3703607d5c39c2dfa96eeaaf7"
+        }
+      ]
+    },
+    {
+      "id": "claim_6e740420c54146a697aef5a875be206e",
+      "statement": "The readOrderRef function reads order references from URL fragments first, then query strings, for security reasons",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/orders.ts#L190-L214",
+          "version": "repo-lines-v1:sha256:b64d688304e0d52b78a64a0db779dfc76cc2cee6d8977f33b1377dfbfc9e4428:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwOWNkYmJmMGExNjg1Mjk5YTRkZjA2YzE3OThjZjdiZmU3Njc0NTI1YzI5OGYyZWVmZDU4MGJlYjJmMTMzMjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE3MzVjOGZjNmUyOTk1ZmM0MTdkYzM0NGYwMzI4YTRhMTNkOWRkYzEwMmI1OGQ2YzI2M2MwZmM0ZDkyZTA0MWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwMWQwOTQ5NjAwYmM0YWUyNjFlNjM3YWMzMjc5ZGM3MDI3MzcyZjAxNjRiZjUzYmFmN2FiZjRhM2Y3MDkyOTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_18d6a76fed684b5fba22802c0f80a722",
+      "statement": "The token storage uses localStorage with in-memory fallback for environments where localStorage is unavailable",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/client.ts#L49-L81",
+          "version": "repo-lines-v1:sha256:ef779293f25a0047ea50ce9e455aad0bed1bb5d2afbfb9bf945f1b3ac5d80bc8:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhNTE0NDQ1MzFmOWY3YmZhYzIyNzljNzliN2Y1ZGY4NTI4YjQ4YmZlMWNiZWVlMzk2ZDVlYThiYzVmYzQyZTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2e15a3b2a25f4691a37283345be1f0a7",
+      "statement": "The apiBaseUrl validation requires URLs to end with .restheart.com",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/client.ts#L101-L117",
+          "version": "repo-lines-v1:sha256:f844f265a1dda2687ba02d6d338234a0544c98b7b0355c7a55c7ccd6b8578d52:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3MzIxOWFlY2U4ZWFmMjEwZjNkNjQyZTdhYzI4YTIzNjgyOTZkYTBmOTc1MzQxNzgxN2U3Yjg3MTVlYzU5YTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJlZTUxMmY5MzRkY2M1MzJlZmNlNzU1ZmY5N2QxYWYzYzIyNmEwNGE0M2M3YTkyOGM4NzE4NjY0NDcwOTQwYzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg0YzAyMjg3MDYxZmVjYjc4YzBmY2FhNDg3ZTRlYWZiN2RiOGFiNTc4NDY3ZjAwMzA2NzExYWNmNmRlMWQ4NDAifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.0",
+    "at": "2026-09-07T09:33:56.593Z"
+  }
+}

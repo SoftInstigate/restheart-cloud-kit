@@ -3,6 +3,37 @@ type: Guide
 title: Contributing & Development
 description: Development setup guide for RESTHeart Cloud Kit. Covers local development, workspace configuration, building packages, and debugging tips.
 tags: [contributing, development, setup, debugging]
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-09-07T09:33:56.593Z
+sources:
+  - id: openwiki-source-4d1d392666be6dfdd7a91a2e
+    resource: repo://.github/workflows/release.yml
+  - id: openwiki-source-da5ce9b2f007ceacfe51e34a
+    resource: repo://.github/workflows/unit-tests.yml
+  - id: openwiki-source-5b54a58d1b51cd490b0e7162
+    resource: repo://package.json
+  - id: openwiki-source-92450a7065eb85e0f30b5461
+    resource: repo://packages/cli/package.json
+  - id: openwiki-source-0b4887a994e66924f073c267
+    resource: repo://packages/cli/tsconfig.json
+  - id: openwiki-source-4d6cb4e0ccb252a2a197ab08
+    resource: repo://packages/kit-ng/angular.json
+  - id: openwiki-source-f02fe869e879d7a4e2ba5dfe
+    resource: repo://packages/kit-ng/ng-package.json
+  - id: openwiki-source-01685a6829395c2a4f8d6b98
+    resource: repo://packages/kit-ng/package.json
+  - id: openwiki-source-e9c640fee8f826ca12a30d21
+    resource: repo://packages/kit-ng/tsconfig.json
+  - id: openwiki-source-3a32f455ba8d38700cf6d96e
+    resource: repo://packages/kit-react/tsconfig.json
+  - id: openwiki-source-e2eb24b148aef310c446f420
+    resource: repo://packages/kit/vitest.config.ts
+  - id: openwiki-source-e79b0aa7b4f168ddb0be2dd4
+    resource: repo://rebuild-kit-ng.sh
+  - id: openwiki-source-df1e4d0dc0a35c64fd0e652b
+    resource: repo://tsconfig.base.json
+generated: { by: "openwiki/0.5.0", at: "2026-09-07T09:33:56.593Z" }
 ---
 
 # Contributing & Development
@@ -39,17 +70,17 @@ This installs all dependencies for all workspace packages using npm workspaces.
 npm run build
 ```
 
-Builds `kit` first, then all adapters (order matters due to dependency).
+Builds `kit` first, then `kit-ng`, `kit-react`, `kit-vue`, and finally `cli` (order matters due to dependency).
 
 > **Node ≥ 22.22.3** is required — the Angular 22 CLI that runs `kit-ng`'s tests enforces it. The rest of the workspace is fine on any Node 22.
 
 ### 4. Run Tests
 
-**Adapter unit tests** (no backend needed):
+**Adapter and CLI unit tests** (no backend needed):
 
 ```bash
 npm run build   # adapters resolve @restheart-cloud/kit from its built dist
-npm test -w packages/kit-react -w packages/kit-vue -w packages/kit-ng
+npm test -w packages/kit-react -w packages/kit-vue -w packages/kit-ng -w packages/cli
 ```
 
 **Integration tests** (requires RESTHeart Cloud instance):
@@ -73,7 +104,9 @@ restheart-cloud-kit/
 │   ├── kit/                    # Core package
 │   │   ├── src/                # Source code
 │   │   ├── dist/               # Compiled output (gitignored)
-│   │   ├── __tests__/          # Integration tests
+│   │   ├── __tests__/          # Integration and unit tests
+│   │   ├── vitest.config.ts    # Integration test config
+│   │   ├── vitest.unit.config.ts # Unit test config
 │   │   ├── package.json
 │   │   └── tsconfig.json
 │   │
@@ -92,10 +125,17 @@ restheart-cloud-kit/
 │   │   ├── package.json
 │   │   └── tsconfig.json
 │   │
-│   └── kit-vue/                # Vue adapter
+│   ├── kit-vue/                # Vue adapter
+│   │   ├── src/                # Source + unit tests
+│   │   ├── src/nuxt/           # /nuxt subpath (Nuxt SSR)
+│   │   ├── vitest.config.ts
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
+│   └── cli/                    # CLI tool (@restheart-cloud/cli)
 │       ├── src/                # Source + unit tests
-│       ├── src/nuxt/           # /nuxt subpath (Nuxt SSR)
-│       ├── vitest.config.ts
+│       ├── dist/               # Compiled output (gitignored)
+│       ├── vitest.unit.config.ts
 │       ├── package.json
 │       └── tsconfig.json
 │
@@ -129,7 +169,7 @@ The monorepo uses npm workspaces:
 
 ### Dependency Resolution
 
-All adapters depend on `kit` at exact version `0.0.0`:
+All adapters and the CLI depend on `kit` at exact version `0.0.0`:
 
 ```json
 {
@@ -141,7 +181,7 @@ All adapters depend on `kit` at exact version `0.0.0`:
 
 **Why `0.0.0`?**
 - Prevents npm from resolving `kit` from the registry
-- Ensures adapters always use local workspace `kit`
+- Ensures adapters and CLI always use local workspace `kit`
 - Release workflow rewrites to tag version before publishing
 
 **If resolution looks wrong**:
@@ -162,6 +202,7 @@ npm install
     "module": "ESNext",
     "moduleResolution": "bundler",
     "strict": true,
+    "skipLibCheck": true,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true
@@ -170,20 +211,21 @@ npm install
 ```
 
 **Package configs** extend base:
-- `packages/kit/tsconfig.json` — Standard TypeScript
-- `packages/kit-ng/tsconfig.json` — Angular-specific settings
-- `packages/kit-react/tsconfig.json` — React JSX settings
-- `packages/kit-vue/tsconfig.json` — Vue settings
+- `packages/kit/tsconfig.json` — Standard TypeScript; excludes test directory from compilation
+- `packages/kit-ng/tsconfig.json` — Angular-specific: experimental decorators, dom lib, strict Angular compiler options
+- `packages/kit-react/tsconfig.json` — React JSX (`react-jsx`), dom lib
+- `packages/kit-vue/tsconfig.json` — Vue settings, dom lib
+- `packages/cli/tsconfig.json` — Node.js target with `@types/node`
 
 ## Building
 
-### Build Both Packages
+### Build All Packages
 
 ```bash
 npm run build
 ```
 
-**Order**: kit → kit-ng, kit-react, kit-vue (adapters depend on kit)
+**Order**: kit → kit-ng → kit-react → kit-vue → cli (adapters and CLI depend on kit)
 
 ### Build Individual Packages
 
@@ -193,6 +235,9 @@ npm run build -w packages/kit
 
 # Build kit-ng only (requires kit to be built first)
 npm run build -w packages/kit-ng
+
+# Build cli only (requires kit to be built first)
+npm run build -w packages/cli
 ```
 
 ### Build Output
@@ -216,6 +261,11 @@ npm run build -w packages/kit-ng
 - `packages/kit-vue/dist/` — ES modules
 - Entry point: `packages/kit-vue/dist/index.js`
 - `/nuxt` subpath: `packages/kit-vue/dist/nuxt/`
+
+**cli**:
+- `packages/cli/dist/` — ES modules
+- Entry point: `packages/cli/dist/index.js`
+- Binary: `packages/cli/dist/cli.js` (exposed as `rhc` command)
 
 ### Watch Mode
 
@@ -251,20 +301,21 @@ rm -rf .angular/cache
 
 ### Using rebuild-kit-ng.sh
 
-The `rebuild-kit-ng.sh` script automates linking:
+The `rebuild-kit-ng.sh` script automates linking for the Angular starter app:
 
 ```bash
 ./rebuild-kit-ng.sh
 ```
 
 **What it does**:
-1. Builds all packages
-2. Links `kit` globally
-3. Links `kit-ng` from dist directory
-4. Links both into starter app
-5. Clears Angular cache
+1. Builds `kit` (workspace root)
+2. Builds `kit-ng` (workspace root)
+3. Links `kit` globally
+4. Links `kit-ng` from its dist directory
+5. Links both into the starter app
+6. Clears Angular cache
 
-**Note**: Update `STARTER_DIR` in script to match your starter app path.
+**Note**: Update `STARTER_DIR` in the script to match your starter app path.
 
 ### Unlink Packages
 
@@ -279,13 +330,13 @@ cd packages/kit-ng/dist && npm unlink
 
 ## Testing
 
-### Adapter Unit Tests
+### Adapter and CLI Unit Tests
 
 No backend needed — run on every push:
 
 ```bash
 npm run build
-npm test -w packages/kit-react -w packages/kit-vue -w packages/kit-ng
+npm test -w packages/kit-react -w packages/kit-vue -w packages/kit-ng -w packages/cli
 ```
 
 See [Testing Guide](../testing/guide.md) and `docs/ADAPTER_CONTRACT.md` for the shared test checklist.
@@ -397,234 +448,3 @@ Then attach debugger in VS Code or Chrome DevTools.
 - ESNext modules
 - Explicit return types (recommended)
 - No `any` types (use `unknown` if needed)
-
-### Naming Conventions
-
-- **Files**: `kebab-case.ts` (e.g., `auth.service.ts`)
-- **Classes**: `PascalCase` (e.g., `RhAuthService`)
-- **Functions**: `camelCase` (e.g., `checkSession`)
-- **Constants**: `UPPER_SNAKE_CASE` (e.g., `TOKEN_KEY`)
-- **Interfaces**: `PascalCase` (e.g., `UserInfo`)
-
-### Imports
-
-```typescript
-// Good: Use .js extension for ESM
-import { apiFetch } from './client.js';
-
-// Good: Type-only imports
-import type { AuthConfig, UserInfo } from './types.js';
-
-// Bad: Missing .js extension
-import { apiFetch } from './client';
-```
-
-### Error Handling
-
-```typescript
-// Good: Throw ApiError
-throw { status: 400, message: 'Invalid input' } satisfies ApiError;
-
-// Good: Catch and handle
-try {
-  await someOperation();
-} catch (error) {
-  if (error.status === 401) {
-    // Handle 401
-  }
-}
-```
-
-## Git Workflow
-
-### Branch Strategy
-
-- **main**: Production-ready code
-- **feature/***: New features
-- **bugfix/***: Bug fixes
-- **hotfix/***: Critical production fixes
-
-### Commit Messages
-
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
-
-```
-feat: add team management methods
-fix: handle localStorage unavailable
-docs: update API reference
-test: add integration tests for invitations
-refactor: extract token management
-```
-
-### Pull Requests
-
-1. Create feature branch from main
-2. Make changes
-3. Run tests locally
-4. Push branch and create PR
-5. Wait for CI to pass
-6. Request review
-7. Merge to main
-
-## Common Development Tasks
-
-### Adding New API Endpoint
-
-1. **Add to kit**:
-   - Add function to appropriate module (`auth.ts`, `team.ts`, etc.)
-   - Export from `index.ts`
-   - Add type definitions to `types.ts`
-
-2. **Add to kit-ng**:
-   - Add method to `RhAuthService`
-   - Update signals if needed
-
-3. **Add tests**:
-   - Create test in `__tests__/integration/`
-   - Test both bearer and cookie modes
-
-4. **Update documentation**:
-   - Update `packages/kit/README.md`
-   - Update `packages/kit-ng/README.md`
-   - Update wiki docs
-
-### Adding New Type
-
-1. Add to `packages/kit/src/types.ts`
-2. Export from `packages/kit/src/index.ts`
-3. Use in relevant functions
-
-### Updating Angular Service
-
-1. Edit `packages/kit-ng/src/auth.service.ts`
-2. Update signals if needed
-3. Rebuild: `npm run build -w packages/kit-ng`
-4. Test in starter app
-
-### Modifying Build Configuration
-
-1. Edit `tsconfig.json` or `ng-package.json`
-2. Rebuild: `npm run build`
-3. Verify output in `dist/`
-
-## Troubleshooting
-
-### Issue: npm install fails
-
-**Solution**:
-```bash
-# Clear cache
-npm cache clean --force
-
-# Remove node_modules and reinstall
-rm -rf node_modules packages/*/node_modules
-npm install
-```
-
-### Issue: Build fails with type errors
-
-**Solution**:
-```bash
-# Check TypeScript version
-npx tsc --version
-
-# Rebuild from scratch
-rm -rf packages/*/dist
-npm run build
-```
-
-### Issue: Tests fail with connection errors
-
-**Solution**:
-- Verify `RH_TEST_API_URL` is correct
-- Check RESTHeart Cloud instance is running
-- Verify network connectivity
-
-### Issue: Linking doesn't work
-
-**Solution**:
-```bash
-# Unlink everything
-npm unlink -w packages/kit
-cd packages/kit-ng/dist && npm unlink
-
-# Rebuild and relink
-npm run build
-npm link -w packages/kit
-cd packages/kit-ng/dist && npm link
-```
-
-### Issue: Angular can't find kit-ng
-
-**Solution**:
-```bash
-# Clear Angular cache
-rm -rf .angular/cache
-
-# Verify linking
-ls -la node_modules/@restheart-cloud/
-
-# Relink if needed
-npm link @restheart-cloud/kit @restheart-cloud/kit-ng
-```
-
-## IDE Setup
-
-### VS Code
-
-Recommended extensions:
-- TypeScript and JavaScript Language Features
-- ESLint
-- Prettier
-
-**Settings** (`settings.json`):
-
-```json
-{
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
-}
-```
-
-### WebStorm/IntelliJ
-
-- Enable TypeScript service
-- Configure npm workspaces
-- Set up run configurations for tests
-
-## Performance Tips
-
-### Faster Builds
-
-```bash
-# Build only changed package
-npm run build -w packages/kit
-
-# Use TypeScript incremental builds
-# (enabled by default in tsconfig)
-```
-
-### Faster Tests
-
-```bash
-# Run specific test file
-npx vitest run src/__tests__/integration/auth.test.ts
-
-# Skip cleanup for faster iteration
-# (edit global-setup.ts temporarily)
-```
-
-### Faster Iteration
-
-1. Use `npm link` for local development
-2. Use watch mode for TypeScript compilation
-3. Use Angular CLI with hot reload
-
-## Resources
-
-- **[Architecture Overview](../architecture/overview.md)** — Technical architecture
-- **[Testing Guide](../testing/guide.md)** — Integration testing
-- **[Release Process](../deployment/release.md)** — Tag-driven releases
-- **[RESTHeart Cloud Docs](https://cloud.restheart.com)** — Backend documentation
-- **[Starter App](https://github.com/SoftInstigate/restheart-cloud-starter-ng)** — Angular starter template

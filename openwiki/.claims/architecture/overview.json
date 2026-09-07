@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:7aaf8075817ae6c67b8eeb8f32f65e3714758c38a3e58c121a2d300b7a49a4a2",
+  "pageVersion": "sha256:ea765ec92bbb8fd6a620fed9de378dc7210c71ae5f3ec2694515f92fab190e64",
   "claims": [
     {
       "id": "claim_6f93d57989544af49c8650048226eefb",
@@ -50,15 +50,15 @@
     },
     {
       "id": "claim_a59f35d418ac4117a9a4f74d9f7e9bba",
-      "statement": "The CLI's ServiceClient authenticates against a service node using a token minted lazily from the admin client's /jwt endpoint, caches it, and renews it one minute before expiry. It provides idempotent operations for collections, indexes, permissions, users, and schemas, using ?wm=upsert for document PUTs.",
+      "statement": "The core AuthConfig accepts optional callbacks for customization: getToken (custom token source), setToken (custom token sink), transport (custom fetch, e.g., Angular HttpClient), onError (global error observer), payments (opt-in to payment features), and ownershipRole (role for billing management, default 'owner'). When setToken is provided, localStorage and the refresh timer are both bypassed for SSR runtimes.",
       "evidence": [
         {
-          "resource": "repo://packages/cli/src/service.ts#L42-L56",
-          "version": "repo-lines-v1:sha256:2b7b75eb030bdb6b362fc2997fc832629a77aa571bf98a028970972c18e010d6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMyODZlZjY2MzM3MzQ0N2U3YmE0NWY4NjY1ZDZiMWFkNmY1N2QzYmYwMDdlZjU2ZGUzMjUxMGMxNTIwZGI4ZTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMyNGQxMzY4NWQ5MGQxZTI4ZDc1YzkxMTA0NWY2OGIxZWEwZmZhYWQxMDNlODdhZmY0YmZmNGIwNDNkMTQ0NDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI5NDE0MjRhMmQ4NzNlMTg2OTI0NjE2ODU2MDdjMWNhYWY0NDBkZjdkYTk3YzY1YTJhN2FiNjNiNDRkZmNkYWMifQ"
+          "resource": "repo://packages/kit-ng/src/http-transport.ts#L41-L91",
+          "version": "repo-lines-v1:sha256:92f459ec1cc75d0e892c3147034a52589b4dad6f77d51348b50231ed13580f2d:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkMGYyZDNhM2FhZGEyNzU4NjQ1NzhkMGE0MzkxNTYzOGQ1NDNmZWNhMmM5NDg1OGRiOTQxMjExZTg2Y2VmMmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://packages/cli/src/service.ts#L57-L177",
-          "version": "repo-lines-v1:sha256:752102d210e60d8e8d5799079534c169d4b959a00ac31eaabf683e07c6ba7d64:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyMDYwNzA0ODE3MzQ1NzZjMjU5ZmI1YTBiMWIyYTE0NTEwY2UzMDNiMTFkYTI1ODQ0ZDFiNjY0ZmYyYWRhZTRlIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyMjY0NTZjODk2NTQyY2QzMzI5ZTBmNWZiZDViZWI0MWJmZjAyMjZlYzZkMzE5NmU5OGE5ZTM3ZTZiNjg3ZDFkIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/kit/src/types.ts#L8-L106",
+          "version": "repo-lines-v1:sha256:4b2095aad44f4f946d73ae2a7142566f236a89ff27b23c6065cc0cedd671aa0e:eyJzZWxlY3RlZExpbmVDb3VudCI6OTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1YzM5YmFjMGMwMWY0ZDNiYWMzMDIzM2M4Y2VlODRlNzFlYzk2MGFlODY5YjFlM2M2NmM5YmExZjFlMjI0ZDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM2YzM3ZjJhNDA2ZjA5MmExOGMwMTMyMDlhY2NhZjQ3NDJjOTZjMWNmZTQxZjYyMzlmZWMwOTUwYmUyMzcxNGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY2ODQwZTZkNjFmODBiZTBlMDQ0NTliMDhlYjU0MWE4MDJiNDFjMWE3NjRiZWUxY2QzMWQyZjRjMzdhMGVkMWUifQ"
         }
       ]
     },
@@ -180,7 +180,7 @@
     },
     {
       "id": "claim_4fb378c7ad39421f97559efa5f4fb0ef",
-      "statement": "Payments are a separate reactive surface from auth in every SPA adapter: RhPaymentsService (Angular), usePayments() under RhPaymentsProvider (React), usePayments() under createRhPayments (Vue). Each owns subscription, plan, isSubscribed, canManageBilling, seatsAvailable and reads the user from the auth surface only to derive canManageBilling.",
+      "statement": "Payments and cart are separate reactive surfaces from auth in every SPA adapter. Payments: RhPaymentsService (Angular), usePayments() under RhPaymentsProvider (React), usePayments() under createRhPayments(config, rhAuth) (Vue). Cart: RhCartService (Angular), useCart() under RhCartProvider (React), useCart() under createRhCart() (Vue). Each reads the user from the auth surface only to derive canManageBilling.",
       "evidence": [
         {
           "resource": "repo://docs/ADAPTERS.md#L176-L194",
@@ -189,6 +189,18 @@
         {
           "resource": "repo://docs/ADAPTER_CONTRACT.md#L66-L100",
           "version": "repo-lines-v1:sha256:6420c50772a55e1fbd599a05e9332446a2b9bb499fa1fbbace722cc6b07fd9d9:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxNTUxMzQ0ZWI1NmM4ODY0NDE2ODkyMjA3N2NjZWFmZDJjZGMxZGJjYWNjN2ZjNzY3ZTY1OWRlZGNmNDUyODYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1ZDI2Mzg5NDQyZDQ3NjFiYTVlOGRjNzRlMGRhMmY5OGI4MjI2Y2UyY2M4YWFjYzEyOGYzZDlkOTQ4MDZiYTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlY2MyM2FiYTFjMzk3NmRmZmEyM2I5NzU2ZDVmNTcxNzI2Y2UzOTE0NjEzOGM3NWExNDJhMGE3NWUwMmFhM2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJhOWIxNTg5NTdkODkwZjUyYzdmNDJjZTI3ZjAwNjdkOGI3YzJiNGZmNTJlNjY0ZjZkY2ZlMzIwN2U0MjNmMWYifQ"
+        },
+        {
+          "resource": "repo://packages/kit-ng/src/cart.service.ts#L1-L95",
+          "version": "repo-lines-v1:sha256:3ccb9addbbf470cfc84e24a2d0b0f8e48724ea977667e414388d5a2c83e76c68:eyJzZWxlY3RlZExpbmVDb3VudCI6OTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRhNmI5YWNmZGFiZDk0ZTRiMjkwNDkzY2FjMDA4Yjc1ZWFmNWI3MDk2ZTJkNzFmMDdhODQ5Y2M3NWE2ZjkwMDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/cart.tsx#L1-L100",
+          "version": "repo-lines-v1:sha256:b0596f80cf39e042d33a7c17c3e56f80ab87a8714ca39fe71e3be3a69b2d30ca:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlODIwMDk2NGE5Nzg2MzU1MjJiMmFiMDkwYzY1MDY1ZDhlZjhlODVjNDczMGJiMmViMDQ2MGQzNGM2NzdkZGJiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI5NWVmMDFiYzA4ZGJjM2I2M2U0ZTc1ZWEzZDI2YTViOTQxODkxODc3ZTI3YWQ4OTEzMjljODQxMWQ3ZDhkYzRkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI0NjM2MzU5YzM0YWJjMmViMWI1NGEzYjAzMGQxYTRjY2ZiNDdjYmFiMDgyNzI4Y2IzNTQ0ZWYyZjY2ZGI5NjY0In0"
+        },
+        {
+          "resource": "repo://packages/kit-vue/src/create-cart.ts#L1-L38",
+          "version": "repo-lines-v1:sha256:4052cc5b94c4e2f0ad7c3fc934c9cefd96468e570d37025f964082a338979656:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4NmNkYTE1Mjc1Mjk3MjVjOGU2ODA4OTExYmRhNGQ1YjIwMTU5ZTEyN2ZiNTgyOWFhNGE4ODZkYjJiYTVlMWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -246,7 +258,7 @@
     }
   ],
   "verification": {
-    "by": "openwiki/0.4.3",
-    "at": "2026-08-28T16:48:53.239Z"
+    "by": "openwiki/0.5.0",
+    "at": "2026-09-07T09:33:56.593Z"
   }
 }

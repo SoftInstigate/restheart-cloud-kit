@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:2bdb916869a26e0091be4d78c8940512424ad4285003db9dc8f2fd3910c54887",
+  "claims": [
+    {
+      "id": "claim_052e7c730f284d558f4f996e69cfb5d4",
+      "statement": "@restheart-cloud/kit-react is a React adapter for @restheart-cloud/kit that provides context, hooks, and route guards for authentication, payments, and cart functionality, plus a /next subpath for Next.js SSR support.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-react/package.json",
+          "version": "repo-file-v1:sha256:9ba739ae2c1e33db240646f65918f1b953833c94e01cbac46805e5236204e492"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/index.ts",
+          "version": "repo-file-v1:sha256:367716e8413bfbd2cde8b9c40b5863fb8cc16246ee809fb4c65fbec13c31e295"
+        }
+      ]
+    },
+    {
+      "id": "claim_7b5edc56c8d64c9ea473921b24acce58",
+      "statement": "RhAuthProvider is a React context provider that wraps the core authentication logic, runs checkSession on mount to restore sessions, and provides the useAuth hook with reactive auth state and methods.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-react/src/context.tsx",
+          "version": "repo-file-v1:sha256:5b25ec2298a8ae6eafdd1688979580d672204c838b487a05f8a48b2cf5062f9d"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/context.tsx#L128-L394",
+          "version": "repo-lines-v1:sha256:56b27ce651429305c210c16d66a266639d611eb2427f8d5e0f8b5492cd87bfff:eyJzZWxlY3RlZExpbmVDb3VudCI6MjY3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI2MGNjNGI3Yzc0ZDM3NjZiZmQzNmZkMDU4ZjkyMzc4ODFlNDE2YzQxM2I3OWY3ZWJhNDNlZTY3YjE2NzVmZTljIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI4OGM0MjJmYzc3MGU3YmJlMGYxYzNiNDNjNjNiMDM4MGMxZGQ3N2UzMjAzZTkxYzIwZDVlMzA2NmJjYzYxZTJhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIyNTdjMWRjYjZkY2M1ZjcwZmM0Mzc1YTYxZGY4ZmEzNzYyMjVhYmVlZDkzNDU2OTEyZDFlYjgzZTBhMDFjMWVlIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_94234128d255401ca0ca46aa121aab7a",
+      "statement": "useAuth() hook returns the RhAuth interface with reactive state (user, teams, isAuthenticated, hasMultipleTeams, initializing) and methods for session management, authentication flows, team operations, and authenticated fetch.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-react/src/context.tsx#L30-L107",
+          "version": "repo-lines-v1:sha256:018b2b91cdce9cc98fd2a51773d18853eafa5d9eb2b369caa8d3e402e526780f:eyJzZWxlY3RlZExpbmVDb3VudCI6NzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVjZGNmOTRlMTY4NmJhYTVjNTA2Y2Y5MDIzMzNjZTAzNzllNjM5MTQ3ZjVjZjJiNGE3YTJmOGM0MTU4ZjJkZTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYxZTE1NjA3NGYzYjg2YmU4ZGM3NmIxOTQ4MjhiMTJmMTkzMmUwMjA5MmRjYThkNDEzOGMxMjAyMGFlZGQwN2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYwOTFjMDM0MWY1ZmZmMDFlNGJkMGYyYTQzMTY0ZWFiYmIyYTMxODFiZDM0YzdkZDFjY2YxYTViYjg1Nzk3N2YifQ"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/context.tsx#L396-L410",
+          "version": "repo-lines-v1:sha256:9a23fcc86c33fe0922dde590f4363c5ad73de575a86179777988e006633ed662:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyODdmY2M3ZTY3YjQyZGZlMzNhYmI1MTE0MjQ3YWE4ZTU4NzE1OGY0MWEzOTg2Y2JiMDliODRlOTA3NDM1OTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQwOWY4NTMyMTE0NGJmZDllYjgzN2U0ZmU1YjNkMWY0NDg3NWQwNDAwYjFlM2FiZjYxZjM5OGNkZGU5OWQ2ZjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_13186a3fab8340f690fd56163bc73040",
+      "statement": "RhPaymentsProvider provides payments context (subscription, plan, isSubscribed, canManageBilling, seatsAvailable) and methods for Stripe-based subscriptions, licenses, and orders. It must be placed inside RhAuthProvider and automatically loads subscription on sign-in/team switch and clears it on sign-out.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-react/src/payments.tsx#L135-L280",
+          "version": "repo-lines-v1:sha256:4c35f012561d62b7c2f4bed1a8ed9f32a258b22bab2442f6f8318f69c2d74692:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQ2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJiNGY3N2ViYWZiZmY3MTk0ODQ1ZTRmMTY1Y2Q5ZTU0MDNlYjllZWVlMjBmMmQ4Nzk2N2FhZWFiODlhOTM0OGZlIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlMDk3ZjFlMzUyNGM2MGE3NTg5YWJmNDZkNDNlOGQ3NjA4ZGQxMDhmMTc5Y2FmNTY1Nzk4MTRiY2EyMjJkYzkyIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJmZDg5YmRjM2M5NzJiODg4NTFjZjcwMWE4ZmM5Yzc0MmM2MzZiOGMzNDJkOTBiZGVlYzM2YjY0MzhiYzEyYTY3In0"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/payments.tsx#L174-L181",
+          "version": "repo-lines-v1:sha256:efba04dc094f50834018445fb79dfa661c2d2210d7732571c35f6d7520582f2c:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTk2NmZiZmE4ODk5OGRhNzQ2NTZjNTAxOTQ5NTZjMjVmMDg0OTQ1NzY2MGMwMDlmZTYzZDFlOWZhOWRjOTMxYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWMzMzNlY2E3NDg5OWM2YTdjMGM4NTEwMjg0OWM1NzA4ZmNlOWI4MDMyZmI3YmE3N2QxZTI4YTU3YjMwMjE3NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzViMjA2ZTI5ODAzNDM4YTdkN2QxZTVjOWI3ZTU5MTZiZjdlMzdmMmMwZjY0N2ExMTAyZDdmMWMxZjU3MWY4NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWM4YWZjMDgwZTMyOGZhYmYzNTQxMzU5YmRlMDNkZGE0NGVmNGVhNTQ3ZDg4MzBjMDE0NDY0MDhhZDYyZWNiMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_9e07667552a64480bc3a59e9414c28ec",
+      "statement": "RhCartProvider provides client-side cart state (lines, totalItems, subtotal, currency, orderItems) with methods for cart operations and persists to localStorage. It is independent of RhAuthProvider - a cart belongs to the browser, not to a session.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-react/src/cart.tsx#L26-L31",
+          "version": "repo-lines-v1:sha256:948f9c481d7eef797878e351f7d215850efac3478fd742ae8e408ab5e2cf25f8:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTlhZmYyYzE1MDNkNmI2NDViMDM1YmVjYTUxNDRkNmIxZDY2YjdhMTNmMDU1MmJjMDU2YmNmNDFkMTJkYzg5YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjhmOWMxYzczYjZkOTFmYWFkZTU2YTM2ZTIxM2JlMGQ4ZTE5MmFjMDY5MWQ1NDQzZWQ1ZjBmZWE0N2Y4MjNjZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzcyOWMwMmU1NzRhZDI5MGYwOTJkYTg2OGY5NjVkMDg4M2FiMmQxNjg4N2IwODQxZjkzZTBiMjg4MjI2OGE1MCJ9"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/cart.tsx#L72-L120",
+          "version": "repo-lines-v1:sha256:76a22ef83c1892902e11dea1e8eab8f218218c08ac437ba25f1f6913b6751ac6:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiZTI2YWVhYWNjZjEzYjFjODE4OTk1NjZhMjJmNmY1MmI5YjU2MDkyNmQ0YzYzOWY0Nzg4ZGZhZDhiZTRiODAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFkNTEwZTUyOTllNjY3MmY3YzJlZGFmMTczMzRmMzYyYmY2NDcxYjdhOGZmMzRmYmVlYWI4NWM2ODA4ZTY3MzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZhNWNmMDZmODBmYWE4NGJlYjY0MWJhMGRlNmI4ZGI3NTVmMjFkNzBlNDRlYzZlMjA0MmE3MmRiZjYzYWZhMDgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_91e0e25dabbf455aad9e94718a71bc4e",
+      "statement": "AuthGuard and PublicGuard are React components that protect routes based on authentication state. AuthGuard redirects unauthenticated users to /auth/login, PublicGuard redirects authenticated users to /. Both render a fallback while the initial session check is in flight to avoid flash of unauthenticated content.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-react/src/guards.tsx#L23-L42",
+          "version": "repo-lines-v1:sha256:cd09d5bdd8b523582d2d84469c3c6de8d090bd13ee83716ab776670716873be1:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNkMTZiYjc3OWQzMmY0MTgxMzhiMmM1MDc3NDAyZGU0ZDk5ZDMyMDU1OTdhOTQwOWYzZDdkZmM1MzA0NWFkOTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIwMDNlNTFkMjhjYzk3OWNhNWUxYWZiYTc2NTBkYzAyMjIwODMwOWNmZWEwM2Y5ZWMyYWQ0ZWIzM2ZiMWViOTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1764f08968f6414a9c056f30643b7d63",
+      "statement": "auth.api() provides an authenticated fetch method that automatically attaches the bearer token, serving as the React counterpart to Angular's rhAuthInterceptor for querying RESTHeart collections.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-react/src/context.tsx#L249-L252",
+          "version": "repo-lines-v1:sha256:011c0f594966c02da6b59b6a217618f9e6acbdafb70485cde780be5b92810780:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2NkZjcwYWFhNjQyYzY0NTU3MzQ4ODhlNWNmOWExNTY4MTMwMTQ4OTk1OTIxMjE4Y2QyYTY3NTRiYWUzMTYwYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTVlZjAxYmMwOGRiYzNiNjNlNGU3NWVhM2QyNmE1Yjk0MTg5MTg3N2UyN2FkODkxMzI5Yzg0MTFkN2Q4ZGM0ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTk3NjIyM2Y0ODE4NDI1MmNmNTQzNjBjOGZhMGVlNjM0OThiYjdiNWRhYmQ3NGE0ZTMxYzBiZjA0NGRhYjJkMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzI4YjkxMjI4ZDgxMjRiYzgxNGQ4MjgxYWMyNTE4MzYxNTZiM2EwYTY2NTQxNDRmYjlhMTg4ZDc3NWUwNTkwYyJ9"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/context.tsx#L67-L80",
+          "version": "repo-lines-v1:sha256:e275a20f7e5d3e56e9a61739045c510fa717144cd526f339118c0f12d926b7f1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1ZjNkM2NlN2E2NGIyNjNjZjI5OWI3NDM5ZWFjOWVlNWVjYjJiYTNhYzg2OWUwZmJmMWJhOGRlMTM5ZmVmY2EiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU1MjIyOGQxMzE4NjNhOTk2YmUxNTE5OGFmMjcwMmRlZThhNmJlYTU4ZDNkZjRjODM3ZmRjNjIzZTk4ZjE1ZDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMwY2Y4NmUxNWY4OTE1NjNkNzM3ZGU1ZjMxYzc4MzQ2MDVmZTcyMzVjYWI3NTZlMzRlNmNlY2UzNWMyMTNiOTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_62580913697e4fcfab16bcdcebd5e249",
+      "statement": "The /next subpath exports middleware (rhAuthMiddleware), route handler (createSessionRoute), server actions (rhLogin, rhSwitchTeam, rhActivate, rhResetPassword, rhLogout), fragment-to-cookie bridge (SessionSync), session readers (getServerSession, getServerSessionWithTeams), and cookie utilities for Next.js SSR support.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-react/src/next/actions.ts",
+          "version": "repo-file-v1:sha256:4fdf531c4fd6fcb2433b6135f99ab54ddd0ddd07252533a5e6571034f90883b3"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/next/cookies.ts",
+          "version": "repo-file-v1:sha256:22d8a76c44a172e4161a9fde24ecfb2bdbf5d92b2b84494245dcffe90761c071"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/next/index.ts",
+          "version": "repo-file-v1:sha256:b154d27946dd7f77ba569152e5839023777fd8f5f6495e8eb6da2f5d6a36f4ca"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/next/middleware.ts",
+          "version": "repo-file-v1:sha256:bf9d8ac0c370515c752a3c399c1ad712d2c1ec7dd2659ba6d8b936c9c654b1bd"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/next/route.ts",
+          "version": "repo-file-v1:sha256:f5569a116ff2fcec3dc945abceff9cacd2ee00522c1267df844040dcc8708ca0"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/next/session.ts",
+          "version": "repo-file-v1:sha256:ef98cf78214bf956319d2c644fdbc726d5309d27864504ac63489b77777507f6"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/next/sync.tsx",
+          "version": "repo-file-v1:sha256:53aa2ae2ffe6f76d1f7b8f8847d5f4f0580effa0dead6cc06415add42579c328"
+        }
+      ]
+    },
+    {
+      "id": "claim_b570fb3ca481417d9747b273b60015fa",
+      "statement": "rhAuthMiddleware proactively renews tokens at 80% of their TTL to prevent expiration mid-navigation, and handles protected/public path redirects before render to avoid flash of unauthenticated content.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-react/src/next/middleware.ts#L70-L100",
+          "version": "repo-lines-v1:sha256:797f3426a9e1df1a45a7971b7147d05d45f249bd698ce91375d9719d38a6e4f3:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0MzNkZmY2NzQ3OWY2ODE0YjYxYjAxMjI5OWI2MzgyMTJiMWM2MjFhOTEwZTZiYzE1Y2RlYjZlMWRiOWY2NDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQzZDg1ZGM0MGFjOGM2Y2UzZDk2MjAyYTc2NGYwNjU2ZmIwMjVjN2M4OWVlNDRjMTI5ZWU2ODVkNGY3NTA5YjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNjNDMxMjk5NzRmM2QwZDMzMjNmMzExYmY3NmUzNGQ3YThhMzIxNjNhMTM0NmFhMjk1NDU0MzIxNzRmNmE3MmIifQ"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/next/middleware.ts#L87-L95",
+          "version": "repo-lines-v1:sha256:3bd6c92ab4b680b5f6a934d3e17fa5449b45506d3947f814f0da96bcc4d73e37:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjM3NDliZWM0N2I5NDE3M2JlMzJlODA3NjU5OTZjMTNjNjgzZGFiZmRkN2VhY2EzYWM1ZWY5MjA2MjQzMjliMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzg2OTUyN2Y3YmFmYzI2ODU1NWRmOTIxNzdiNzg2NmY1Zjk1MjNhOTU2YzE2MjZmODhiMjFlNTBmZTczNThlMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2U0NmJkNmNjYjUxZTY0MjlmMzNkMjIzNDQ0MjI4NTdiYmI2ZjAwNGZmN2YyYmRjZWM2OTcxODUwOGRkNTEzNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTFmYjg1YzA2MzJhMzc2YjZkNDM1ZjMwY2YxMmY3NDRlMjdjMGQ2NDYzMTk4Mjk4OWRmYTQyZGFiZDkxZmEwYyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7517594229124334988336a595737275",
+      "statement": "SessionSync is a client component that reads #access_token from URL fragments and POSTs to the session route so the server can set a first-party cookie, solving the problem that URL fragments are never sent to the server.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-react/src/next/sync.tsx#L51-L80",
+          "version": "repo-lines-v1:sha256:c7b4a99a8a35e6ab48428afbd965f32eeb6f9e9bdd9de29e99728427e8fdca76:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI1M2Q4ZGZmYWVkZWZlYWIxZWVhN2YzNjIzOTQyZDNkNzU0ZWUzMWY3NGQ5NzhiMWQ1NGQ4N2QyZGNjZTNmNzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY0YjM0YTNkNGE2MGY4OTdjMTFhMDc0YjhjYTE3MTYxNjdjYmQ0NWU1NTk0Njc0NzEzMjgyZWYwMzEwYmUyNzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.0",
+    "at": "2026-09-07T09:33:56.593Z"
+  }
+}

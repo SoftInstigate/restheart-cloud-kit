@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "pages": {
+    "/openwiki/architecture/overview.md": {
+      "pageVersion": "sha256:ea765ec92bbb8fd6a620fed9de378dc7210c71ae5f3ec2694515f92fab190e64",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "75d60e9c-1223-41c4-9cd3-006cab49c631",
+      "gitHead": "1260e6f066c4466c5e2630db38a9c750b1b65443",
+      "sourceFingerprint": "sha256:814007bc1b99b1c6e0bb153433bc4ffd0092d94a59ff3f4b2a87ee3bab32a44e"
+    },
+    "/openwiki/contributing/development.md": {
+      "pageVersion": "sha256:47e910b6a7e9ec2c8ab897807dc941e1c2cc40fe5bea1bf38543565eef4b5783",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "75d60e9c-1223-41c4-9cd3-006cab49c631",
+      "gitHead": "1260e6f066c4466c5e2630db38a9c750b1b65443",
+      "sourceFingerprint": "sha256:814007bc1b99b1c6e0bb153433bc4ffd0092d94a59ff3f4b2a87ee3bab32a44e"
+    },
+    "/openwiki/deployment/release.md": {
+      "pageVersion": "sha256:5833b9b1001a55f5217e100c478b872cb08678754fe03dabc44d1ef5ee885b3c",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "75d60e9c-1223-41c4-9cd3-006cab49c631",
+      "gitHead": "1260e6f066c4466c5e2630db38a9c750b1b65443",
+      "sourceFingerprint": "sha256:814007bc1b99b1c6e0bb153433bc4ffd0092d94a59ff3f4b2a87ee3bab32a44e"
+    },
+    "/openwiki/packages/kit-ng.md": {
+      "pageVersion": "sha256:41ceefcc9d6b5c67d7c3247944f3df83fc2b50315727f23889262e1766fb372c",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "75d60e9c-1223-41c4-9cd3-006cab49c631",
+      "gitHead": "1260e6f066c4466c5e2630db38a9c750b1b65443",
+      "sourceFingerprint": "sha256:814007bc1b99b1c6e0bb153433bc4ffd0092d94a59ff3f4b2a87ee3bab32a44e"
+    },
+    "/openwiki/packages/kit-react.md": {
+      "pageVersion": "sha256:2bdb916869a26e0091be4d78c8940512424ad4285003db9dc8f2fd3910c54887",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "75d60e9c-1223-41c4-9cd3-006cab49c631",
+      "gitHead": "1260e6f066c4466c5e2630db38a9c750b1b65443",
+      "sourceFingerprint": "sha256:814007bc1b99b1c6e0bb153433bc4ffd0092d94a59ff3f4b2a87ee3bab32a44e"
+    },
+    "/openwiki/packages/kit-vue.md": {
+      "pageVersion": "sha256:77bcd40029feadb504d258c77f07e3ac7bc7d25f5e3bc0b7c49b0bcfe253fc99",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "75d60e9c-1223-41c4-9cd3-006cab49c631",
+      "gitHead": "1260e6f066c4466c5e2630db38a9c750b1b65443",
+      "sourceFingerprint": "sha256:814007bc1b99b1c6e0bb153433bc4ffd0092d94a59ff3f4b2a87ee3bab32a44e"
+    },
+    "/openwiki/packages/kit.md": {
+      "pageVersion": "sha256:6ea09118c9c6afbbdbb0e23f929230b58b1f2531ae1a780df582001139e79bdc",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "75d60e9c-1223-41c4-9cd3-006cab49c631",
+      "gitHead": "1260e6f066c4466c5e2630db38a9c750b1b65443",
+      "sourceFingerprint": "sha256:814007bc1b99b1c6e0bb153433bc4ffd0092d94a59ff3f4b2a87ee3bab32a44e"
+    }
+  }
+}
