@@ -34,7 +34,10 @@ sources:
     resource: repo://packages/kit/src/__tests__/unit/payments.test.ts
   - id: openwiki-source-f5c174f35c5102ba81477e16
     resource: repo://packages/kit/vitest.unit.config.ts
-generated: { by: "openwiki/0.4.3", at: "2026-08-28T16:48:53.239Z" }
+generated: { by: "openwiki/0.5.1", at: "2026-09-13T09:39:41.844Z" }
+verified:
+  - by: openwiki/0.5.1
+    at: 2026-09-13T09:39:41.844Z
 ---
 
 # Testing Guide
@@ -53,7 +56,7 @@ RESTHeart Cloud Kit has four test tiers:
 | **Adapter unit** (`kit-react`, `kit-vue`, `kit-ng`) | Wiring: reactive state, guards, middleware, cookie bridge | None (mocks `@restheart-cloud/kit`) | Every push and PR |
 
 **Test Framework**: Vitest 4
-**Adapter test contract**: `docs/ADAPTER_CONTRACT.md`
+**Adapter test contract**: [`docs/ADAPTER_CONTRACT.md`](repo://docs/ADAPTER_CONTRACT.md)
 
 ## Environment Setup
 
@@ -604,6 +607,7 @@ export default defineConfig({
 - `include: ['src/__tests__/unit/**/*.test.ts']` — Runs only unit tests
 - `environment: 'node'` — Runs in Node.js environment
 - No backend or secrets required
+- CLI tests use the same transport mocking pattern as kit unit tests
 
 ### Test Files
 
@@ -776,11 +780,13 @@ npm run build   # adapters resolve @restheart-cloud/kit from its built dist
 npm test -w packages/kit-react -w packages/kit-vue -w packages/kit-ng
 ```
 
-**Note**: `kit-ng` uses Angular's experimental Vitest runner (requires Node ≥ 22.22.3). The others use Vitest directly.
+**Important**: The `npm run build` step is required because adapter tests mock `@restheart-cloud/kit`, which must be built first. This ensures adapters test against the actual compiled code, not the TypeScript sources.
+
+**Note**: `kit-ng` uses Angular's experimental Vitest runner (requires Node ≥ 22.22.3, as specified in the [development guide](/openwiki/contributing/development.md)). The others use Vitest directly.
 
 ### Adapter Test Contract
 
-All adapters implement the shared checklist in `docs/ADAPTER_CONTRACT.md`. The contract covers:
+All adapters implement the shared checklist in [`docs/ADAPTER_CONTRACT.md`](repo://docs/ADAPTER_CONTRACT.md). The contract covers five sections (A through E):
 
 | Surface | Tests | Status |
 |---------|-------|--------|
@@ -790,9 +796,18 @@ All adapters implement the shared checklist in `docs/ADAPTER_CONTRACT.md`. The c
 | **D. SSR extras** (next/nuxt subpaths) | Middleware refresh, protected paths, session routes, action token sinks, fragment bridge | ✅ D1–D9, D10 pending |
 | **E. Payments** (every SPA adapter) | Bootstrap without/with payments, login, switchTeam, logout, clearSession, canManageBilling, checkout 409, waitForSubscription, updateProfile/acceptConsents | ✅ all three |
 
+**Contract Sections**:
+- **A. Reactive contract**: Tests the core reactive state management (user, teams, authentication state)
+- **B. Guards**: Tests route protection (authGuard, publicGuard)
+- **C. Token lifecycle**: Tests automatic session clearing on 401 responses (currently only kit-ng)
+- **D. SSR extras**: Tests server-side rendering features (middleware, cookies, session routes) - D10 (fragment bridge) is pending
+- **E. Payments**: Tests Stripe subscription management (reactive state only)
+
+**Note**: Section E (Payments) is not applicable to SSR surfaces (`*/next` and `*/nuxt`) because they are session, cookie and middleware helpers that run before render and do not have reactive client state. Section C is only applicable to kit-ng as it uses an HTTP interceptor for token lifecycle management. Sections A and B are implemented for all SPA adapters (kit-react, kit-vue, kit-ng). Section D is only applicable to SSR surfaces (kit-react/next, kit-vue/nuxt).
+
 ### Payments Test Contract (Section E)
 
-The payments test contract (E1–E10) covers the reactive client state for Stripe subscriptions:
+The payments test contract (E1–E10) covers the reactive client state for Stripe subscriptions. This section is implemented for all three SPA adapters:
 
 | # | Scenario | Expected |
 |---|---|---|
@@ -814,26 +829,28 @@ The payments test contract (E1–E10) covers the reactive client state for Strip
 - E9 tests the polling mechanism for subscription activation
 - E10 tests that profile/consent updates don't trigger unnecessary subscription reloads
 
+**Rollout Status**: All three SPA adapters (kit-react, kit-vue, kit-ng) implement E1–E10. SSR surfaces (*/next, */nuxt) do not implement this section because they lack reactive client state.
+
 ### Test File Locations
 
-| Adapter | SPA tests | SSR tests |
-|---------|-----------|-----------|
-| `kit-react` | `src/__tests__/*.test.tsx` | `src/next/__tests__/*.test.ts` |
-| `kit-vue` | `src/__tests__/*.test.ts` | `src/nuxt/__tests__/*.test.ts` |
-| `kit-ng` | `src/*.spec.ts` | n/a |
+| Adapter | SPA tests | SSR tests | Test runner |
+|---------|-----------|-----------|-------------|
+| `kit-react` | `src/__tests__/*.test.tsx` | `src/next/__tests__/*.test.ts` | Vitest |
+| `kit-vue` | `src/__tests__/*.test.ts` | `src/nuxt/__tests__/*.test.ts` | Vitest |
+| `kit-ng` | `src/*.spec.ts` | n/a | Angular Vitest runner |
 
 ## CI/CD Integration
 
 ### GitHub Actions
 
-**Unit Tests** (adapter tests, every push/PR):
+**Unit Tests** (adapter and CLI tests, every push/PR):
 - Workflow: `.github/workflows/unit-tests.yml`
 - Runs on every push to `main` and every pull request
-- No secrets needed — adapters mock `@restheart-cloud/kit`
-- Scopes to `kit-react`, `kit-vue`, `kit-ng` (never `--workspaces`, which would also run kit's integration suite)
+- No secrets needed — adapters mock `@restheart-cloud/kit`, CLI tests mock clients
+- Scopes to `kit-react`, `kit-vue`, `kit-ng`, and `cli` (never `--workspaces`, which would also run kit's integration suite)
 
 ```yaml
-# Runs: npm ci → npm run build → npm test -w packages/kit-react -w packages/kit-vue -w packages/kit-ng
+# Runs: npm ci → npm run build → npm test -w packages/kit-react -w packages/kit-vue -w packages/kit-ng -w packages/cli
 ```
 
 **Integration Tests** (core tests, gated):
@@ -1016,9 +1033,8 @@ it('handles validation errors', async () => {
 3. **Parallel execution**: Currently disabled (sequential)
 4. **Local RESTHeart**: Use local instance for faster tests
 
-### Future Improvements
+### Current Limitations
 
-- [ ] Parallel test execution
-- [ ] Test data factories
-- [ ] Mock mode for unit tests
-- [ ] Performance benchmarks
+- **Sequential execution**: Integration tests run sequentially (no parallel execution)
+- **API bottleneck**: Integration test performance limited by API calls to RESTHeart Cloud
+- **No mock mode**: Integration tests require a live RESTHeart Cloud instance

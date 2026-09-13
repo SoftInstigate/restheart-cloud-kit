@@ -40,7 +40,11 @@ sources:
     resource: repo://packages/kit/src/payments.ts
   - id: openwiki-source-42dfd0defa8189243ef19509
     resource: repo://packages/kit/src/types.ts
-generated: { by: "openwiki/0.4.3", at: "2026-08-28T16:48:53.239Z" }
+
+verified:
+  - by: openwiki/0.5.1
+    at: 2026-09-13T09:39:41.844Z
+generated: { by: "openwiki/0.5.1", at: "2026-09-13T09:39:41.844Z" }
 ---
 
 # Payments & E-commerce
@@ -63,6 +67,8 @@ When `payments` is `false` or absent (the default), adapters never call `/stripe
 
 The `ownershipRole` config field (default `'owner'`) determines who can manage billing. It derives `canManageBilling` by comparing the current user's `team.role` against this value. **Must match the service's `accountsConfig.ownership-role`** — if the deployment overrides it (via `override-accounts-ownership-role`), hardcoding `'owner'` would show the billing button to the wrong people and hide it from the right ones.
 
+<a id="subscriptions"></a>
+
 ## Subscriptions
 
 ### Plans & subscription state
@@ -82,6 +88,8 @@ The team's subscription is readable by any team member via `getSubscription()` (
 Plans can declare seat modes: `capped` (fixed maximum), `per_seat` (billed per seat, optional ceiling), or `unlimited`. The licence functions (`getLicenses`, `grantLicense`, `revokeLicense`) all require `canManageBilling`.
 
 `grantLicense(userId)` returns `'granted'` (201) or `'already-licensed'` (200). It rejects with `status: 404` (no such member) or `status: 409` (no seat available), both distinguishable on `ApiError.status`.
+
+<a id="e-commerce"></a>
 
 ## Products & Orders
 
@@ -109,9 +117,11 @@ success-url: https://shop.example.com/order#order={ORDER_ID}&secret={ORDER_SECRE
 
 `readOrderRef(url?)` reads the fragment first, then the query string — because the fragment is the recommended placement. A fragment never leaves the browser: it is absent from access logs, proxy logs, and `Referer` headers, which matters because the secret is a bearer credential. `clearOrderRef()` strips the reference from the address bar immediately after reading.
 
+<a id="cart"></a>
+
 ## The Cart
 
-The cart is a **pure client-side data structure** — nothing in it talks to a server. It becomes an order in one call when `toOrderItems(lines)` is handed to `createOrder`.
+The cart is a **pure client-side data structure** — nothing in it talks to a server. It belongs to the browser, not to a session, and a shop that makes people sign in before they can put something in a basket loses most of them there. It becomes an order — which does need a config — when `toOrderItems(lines)` is handed to `createOrder`.
 
 Every cart function is pure and takes the lines it works on, returning a new array (never mutating the input). This means a cart can live in React state, a Vue ref, an Angular signal, or a plain variable. The framework packages wrap these pure functions; they do not reimplement them.
 
@@ -133,6 +143,8 @@ On the server, `localStorage` does not exist and the cart reads as empty. That i
 ### Converting to order items
 
 `toOrderItems(lines)` strips names, prices, and pictures — the service reads those from its own catalog. The chosen options do travel as `metadata`, because the service cannot infer them: a variant reference identifies which row of the catalog was bought, not which of its fields the seller wants to read on a packing slip.
+
+<a id="price-formatting"></a>
 
 ## Money Formatting
 
@@ -283,7 +295,7 @@ sequenceDiagram
 </RhAuthProvider>
 ```
 
-**Cart:** `RhCartProvider` wraps the app and provides `useCart()`. Independent of auth — a cart belongs to the browser, not a session.
+**Cart:** `RhCartProvider` wraps the app and provides `useCart()`. Independent of auth — a cart belongs to the browser, not a session. Two apps on the same origin can be kept apart by setting different `storageKey` props.
 
 ```tsx
 <RhCartProvider storageKey="my-shop">
@@ -303,9 +315,14 @@ export class MyComponent {
 }
 ```
 
-**Cart:** `RhCartService` is an injectable service. Storage key is configurable via `RH_CART_STORAGE_KEY` injection token.
+**Cart:** `RhCartService` is an injectable service. Storage key is configurable via `RH_CART_STORAGE_KEY` injection token. Independent of auth — a cart belongs to the browser, not a session. Two apps on the same origin can be kept apart by providing different storage keys.
 
 ```ts
+// In your app config or a shared module
+providers: [
+  { provide: RH_CART_STORAGE_KEY, useValue: 'my-shop' }
+]
+
 @Injectable({ providedIn: 'root' })
 export class MyComponent {
   private cart = inject(RhCartService);
@@ -324,10 +341,10 @@ app.use(rhAuth);
 app.use(rhPayments);
 ```
 
-**Cart:** `createRhCart(storageKey?)` returns a Vue plugin. Register with `app.use(rhCart)`, then access anywhere with `useCart()`.
+**Cart:** `createRhCart(storageKey?)` returns a Vue plugin. Register with `app.use(rhCart)`, then access anywhere with `useCart()`. Independent of auth — a cart belongs to the browser, not a session. Two apps on the same origin can be kept apart by passing different storage keys.
 
 ```ts
-const rhCart = createRhCart();
+const rhCart = createRhCart('my-shop');
 app.use(rhCart);
 ```
 

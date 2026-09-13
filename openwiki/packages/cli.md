@@ -26,7 +26,10 @@ sources:
     resource: repo://packages/cli/src/setup.ts
   - id: openwiki-source-e5bdf5324e38ac0fd72f905f
     resource: repo://packages/cli/src/types.ts
-generated: { by: "openwiki/0.4.3", at: "2026-08-28T16:48:53.239Z" }
+generated: { by: "openwiki/0.5.1", at: "2026-09-13T09:39:41.844Z" }
+verified:
+  - by: openwiki/0.5.1
+    at: 2026-09-13T09:39:41.844Z
 ---
 
 # @restheart-cloud/cli
@@ -103,7 +106,7 @@ A step receives `{ service, admin, srvId }` — both clients, because plugin ins
 | `failed` | The apply threw, or ran and left the check still failing. |
 | `skipped` | An earlier step failed, so this one was not attempted. |
 
-### Setup Runner Flow
+## Setup Runner
 
 ```mermaid
 flowchart TD
@@ -183,7 +186,7 @@ Do not diff, do not strip "empty-looking" fields, do not normalise — any of th
 
 A blank or absent secret is **not** redacted, because "not configured" is information you need, and turning it into bullets would erase it.
 
-## Session Management and Credential Resolution
+## Session Management
 
 ```mermaid
 flowchart TD
@@ -265,13 +268,17 @@ A `.ts` setup needs a runtime that can load one — Node 22.18+ strips types on 
 
 `--dry-run` in a pull-request check and a full run on merge gives you a deploy **gate**: a misconfigured Stripe key fails the pipeline before it can report success.
 
-## Admin Client
+## Clients
+
+The CLI provides two clients — one for the admin node, one for the service node — because RESTHeart Cloud separates management and data planes. The admin client handles plugin lifecycle and credential minting; the service client handles collections, indexes, permissions, users, and schemas. A setup step receives both, since a real configuration crosses both planes.
+
+### Admin Client
 
 `createAdminClient(config)` creates a client over the admin node (`cloud-api.restheart.com`), taking the core's `AuthConfig` plus an optional `env` source for `fromEnv` resolution.
 
 The client manages its own token in a closure (not `localStorage`, which does not exist in Node), so two clients in one process cannot overwrite each other's session. It silences the core's stderr error logging and reports failures itself, in sentences.
 
-### Methods
+#### Methods
 
 | Method | Purpose |
 |---|---|
@@ -294,15 +301,15 @@ The client manages its own token in a closure (not `localStorage`, which does no
 
 `installPlugin` takes no configuration — the server builds the initial document itself and ignores a body, so configuring is always a second step. Free plugins only; a paid one answers `400` and points at `/purchase`, which moves money and is deliberately out of reach.
 
-## Service Client
+### Service Client
 
 `createServiceClient(admin, srvId)` creates a client over a service node, derived from the admin client because that is where its token comes from.
 
-### Lazy Token Minting and Renewal
+#### Lazy Token Minting and Renewal
 
 `/jwt` mints a **fifteen-minute** token, and a run that installs a plugin, waits for its `init`, and then writes permissions can outlive that. So the client owns it: fetched lazily, cached, renewed a minute before expiry, shared between concurrent callers, never returned. A caller handed a token would die mid-run with a `401` that reads like a permissions problem, against a service left half-configured.
 
-### Methods
+#### Methods
 
 | Check | Apply |
 |---|---|
