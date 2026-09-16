@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:139d26f861d03a7936358093029e641f5a9b068de6a4276734945597427230c9",
+  "claims": [
+    {
+      "id": "claim_405e96080ae643619963331c7ec6afdc",
+      "statement": "Bearer mode stores JWT in localStorage (key: rh_access_token) and attaches it via Authorization: Bearer header, while cookie mode uses RESTHeart's HttpOnly JWT cookie that only works with same-origin deployments.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/auth.ts#L221-L258",
+          "version": "repo-lines-v1:sha256:2fa74f1f2d97e0101e43dd650453e54d9aea46afc09ad2383a8bab43aeb600bc:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmZGQyN2NjZjYyY2NlZjc3ZTEwMTY1OTNmNTQyM2ZmMTU2OWFiMDU3NzhmZWI4Y2NiMTlhZTBkOTljMjBjZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE4NjUyMjE0NWY2ODdjN2I5ZWJmMWIxNzI4ZTExNjA3OTgyMzBiZjlkNGI4NjRjM2JiMDFjZjQ4MDRhOTAyNDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyNWNjYTYxZmVkZDI2NGJiOGUzMTBkZTFkYzc0YmI4NmJmNzhhOTA1MzMwZjVkZmNhN2Q2YTYwZWU2MTBhZTgifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/client.ts#L5-L81",
+          "version": "repo-lines-v1:sha256:ef983b46f190dc8ddfb1d5f8f0caf597db8b9b79e2875bb905f2f593fda33836:eyJzZWxlY3RlZExpbmVDb3VudCI6NzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxMmM4ZjM3MmJiODk5MGNjOWY5ZWYzNGEyNTM5MDY1YTU5YjBlNjFiZGU2ODUzODhlMjE0ZTQ4YTg1MDQxMjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE3MzA1Y2I2ODE0NDhkNTk3MGFkZDI2ZDEyYmRlMmU5MDQ1OGE2NzJmZTYwNjMzODRhNmE1YzI1ZmQwMWY4MWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhNTE0NDQ1MzFmOWY3YmZhYzIyNzljNzliN2Y1ZGY4NTI4YjQ4YmZlMWNiZWVlMzk2ZDVlYThiYzVmYzQyZTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fd45b3117e654cd19d752651f19d7802",
+      "statement": "The login endpoint (POST /token) returns the JWT in the Auth-Token response header, while auto-login endpoints (activate, resetPassword, switchTeam) can return it in the JSON response body (access_token field) when delivery=body is specified.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/auth.ts#L237-L249",
+          "version": "repo-lines-v1:sha256:a8a90a85b0fd4795db546192b4f41c20b625f92201a9aec3b33386b222b63029:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhNjhiYzVlYjQ2ZmJjZDdiMjc4MmI2YjkxNGE0OWJlZjYxNDczMzhhNjY3MGZmMTZjMjZlYjA3NWY4ZTM3ODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY4NDcwNTI3ZTVjN2EwNzYwYWY3ZDE1MTQ5ZjA5YjBlYjY4OTZlYjczNzY5NjM2ZWUwZjFkZjQwNGY2NDY4OGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhlY2UyNTIwYTNiM2Y2YTc0YjdhMjQ0OTMwODE2NDliMTljODdiNTc0MThhMzA0MDUwZDI5ZThjMmFlMWVjMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFjZWJlMmUxOWIyZmJiNmM4MzcxNGJkZjYwYzI0YTQ2MDdlYTIxZDM3OWJjZTc0NTljMDRmMzBkNmJjMDFiYjcifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/auth.ts#L80-L105",
+          "version": "repo-lines-v1:sha256:adafa41b88ea12ae36baec02687bcac132b8aa1d43639b9ff6f338db22d6adcc:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEyMzEwN2U3NjZjMTRhZWYwODg1NmFmNzY0ODBmMTIzMzU5MGM1MzA5YjdkNDM2ZjU2NTRhMmE5YTQzZGI5OGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZmM2U2Y2Y2ZDQ0NjI4N2VkNjdjODU0ZjhiMTliNWJlYjc0MjMxZjQ2NTE3MzMzOTNiZDBkYzY2MjBkZjEyMmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c1c4ce282b7f47779a095f3ba57197eb",
+      "statement": "SSR frameworks (Next.js, Nuxt) use first-party cookies (rh_session) on their own domain to store the same JWT that SPAs keep in localStorage, then send it as a Bearer token to RESTHeart's API server-to-server.",
+      "evidence": [
+        {
+          "resource": "repo://docs/ADAPTERS.md#L74-L99",
+          "version": "repo-lines-v1:sha256:9319d025979737b203501285ef685c0e792a1cb92eb3210a839538dae790a5e4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3MDFiYzdmMzllMGZmNThjMTZlM2RhOTBhMGU4NjdhZGJiOWI1OWNiYzJjMDllZWY4NzQ0ZWY2ODBlYWMyNTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YzA2YzU2MWQ1YzMyNzM0MzY4NTI2OGE0NmIzMzkxZjM5OThlZWU4OTBkMmJlNTFmMGQyMWNjNGE1M2FlNmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwYzMxNWUyMDdkZTAxM2YwZjJiMzRhYTlkNTU4OGIyYjUxNDE0ZTlmMzM4YjhjNTU5MDAzM2Y1MzM1MjlmOGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2ZmRlZjU4MTYwMzdlYjk5N2VkNmU4MmFkNzg5Y2EwZmVkNWZkMDhhMjk3ZGM0NmVlMzhkNDQ0ODI2ZThjZGMifQ"
+        },
+        {
+          "resource": "repo://packages/kit-react/src/next/cookies.ts#L1-L71",
+          "version": "repo-lines-v1:sha256:22d8a76c44a172e4161a9fde24ecfb2bdbf5d92b2b84494245dcffe90761c071:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4YjY1ZjAwYTc3MjVmMjVkOGZmNDBiNzM0YWYwNmMwZjJlMmQ0MDJiOTYwOTlmMzIwNTNiYzMzYzZmOTA1MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/kit-vue/src/nuxt/cookies.ts#L1-L61",
+          "version": "repo-lines-v1:sha256:fddabdecca6e94a7d63b32e1c0e728b55c081bcf9a88cfb4956f4bc29b85170a:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNlODQzNmM1YTQ3ZmI2NDhkZGVkYjAzMWZjZDg4ODFlMjQzMTZmNzFiMjEzZWYxM2MyZDc2ZGZlZTY5Mzg2YzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_569fd5f1dff94c94b8ff236719e4f1b5",
+      "statement": "The AuthConfig interface supports pluggable getToken/setToken sources and sinks, allowing SSR runtimes to read tokens from request cookies and capture tokens for writing to response cookies without touching localStorage.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/auth.ts#L107-L119",
+          "version": "repo-lines-v1:sha256:ff8dba32d9d79469dea52c944ad2ae524c679fdc34a7380e98ff6ca8123e277d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiMTljOTAzMzBmODZkZTJhZjUwZjNhZDcyZTAxMDg0YTBkNGE2NzNhYTljNzMyOGIxNDg2OTQ0NDNjNTg4ODkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU3ZmJmOTMxMzQyZTZmYzNkOWQzODhhN2YwZDdlMDg4ZGQ3M2VhZGFjMzgzNjAxZjM4YWI3Mjg3ZTljZmQ4MmUifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/types.ts#L8-L32",
+          "version": "repo-lines-v1:sha256:561cfbe51e98cf4a491b5dc3edb5233f1133a90e0b1dce9f92519b3cf7d24d23:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1YzM5YmFjMGMwMWY0ZDNiYWMzMDIzM2M4Y2VlODRlNzFlYzk2MGFlODY5YjFlM2M2NmM5YmExZjFlMjI0ZDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM2YzM3ZjJhNDA2ZjA5MmExOGMwMTMyMDlhY2NhZjQ3NDJjOTZjMWNmZTQxZjYyMzlmZWMwOTUwYmUyMzcxNGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU1ZTJiYTZhZTdlMjMxZWE2NmI3ZWExODY2ZmNkOGUzNTMwNzM5ODMyYTZkNmNiMzUxNWRiYmM0N2E0MjQ4MWQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c2b596ed407040809c4e83d7f58f7eb5",
+      "statement": "Proactive token refresh occurs at 80% of token TTL (e.g., 12 minutes for a 15-minute token) via GET /token?renew=true, with the new token stored in localStorage and the refresh timer rescheduled.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/auth.ts#L13-L35",
+          "version": "repo-lines-v1:sha256:88bd6f5cd6c35c7f570a673506b86d7c70301cdc247ace6b622ceb056272ac38:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhiY2RhYzUxNjU0NjgxNmEzOTU5MDI2ZmRkZmE1ZGU3MDBhZmZkMDNkNjBiMDI1MTZkMmY5Mjk4NGM2ZTRjZTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ2YzAwM2E1ZjFiZTViNWI3YTlmY2VhYzVjZTg4N2QxMzAyMzExNWVkMjQ4Y2Y1MWE0ZmMzMzU5ZDc3YjEzNTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM2YmQwZTk3YjAzNTA4NWEzNzdiOWU5OGQ2NTA1NjY1MjE4OTkzNzZjMmVkZTVhOWU4NTNlYjY2ZTI4NDUwOWIifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/auth.ts#L53-L70",
+          "version": "repo-lines-v1:sha256:ddea6f28f5bdf9e536f0d4fd9b10069853633564d1b56bc2a73b00872688d3e3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFmMzhjNjEzODhhN2JhMTk5MjM2NDk5YTcwOGQ3NWU0MWU0ZmMxYTg5ZGVlNGU5YWJkNDU0MzMyMjM2MDBiMzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMyMTYyNjU3MzhiODdjMzAxMjQzMDViNmZlNDlmZDZmZjI2ZDBkMmNjNjFmZWEzNjA4ZmEwMjQ3N2MwNTE4OTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg0Mjk2MzdkMmNmY2FiYjhjY2I5YmNhMmZkZTVlNTRiODk5NzRmZTIyODQ3ZDM1ODZkMGY0Yzc2NzU3NzZlZTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3952ec928afb452281de775477e6eb51",
+      "statement": "SSR middleware (Next.js rhAuthMiddleware, Nuxt rhAuthServerMiddleware) handles proactive refresh by decoding the JWT's exp/iat claims, calling /token?renew past 80% threshold, and rewriting the Set-Cookie header.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-react/src/next/middleware.ts#L87-L137",
+          "version": "repo-lines-v1:sha256:82c4cef879a07c7549b91951bc2153cc22fa85ca99dc1452851367853cfb0181:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzNzQ5YmVjNDdiOTQxNzNiZTMyZTgwNzY1OTk2YzEzYzY4M2RhYmZkZDdlYWNhM2FjNWVmOTIwNjI0MzI5YjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNlNDZiZDZjY2I1MWU2NDI5ZjMzZDIyMzQ0NDIyODU3YmJiNmYwMDRmZjdmMmJkY2VjNjk3MTg1MDhkZDUxMzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/kit-vue/src/nuxt/middleware.ts#L78-L115",
+          "version": "repo-lines-v1:sha256:e8c2d46a68dea8f12741c7315ca21bbd401a71541166b0ea18d172c963ba7452:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJkODA3YmE3NWVlNzM0MjU4ZjhhODQ0OGQ1MGI3ZmE5ZmMwZDFkMmU0Y2RlZjRmMTZjZmU4MDhkMWE0M2YwNTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiNWMzMzEyMzY4NzA5NDFkODAyMmQ4MDc3ZDE5ZjVlYTU0NDNkNGEyNjFjZjU2YjA3YWU4ZmZlMzg4MGI4ZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_aedc96338871402f9994e951e13e6bf9",
+      "statement": "The Angular interceptor (rhAuthInterceptor) handles 401 responses by clearing the token and session, and sets the No-Auth-Challenge header to suppress RESTHeart's WWW-Authenticate challenge that would trigger browser Basic Auth popups.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit-ng/src/auth.interceptor.ts#L39-L89",
+          "version": "repo-lines-v1:sha256:14c675cc82beff676ed80748396113057eb0561e1186693fdf4f4363bb840b4f:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJjZDEwYTZjMTgyZTE1MTk5NzdmMzZjMGRkYzhiMTI4ODI3NjY3ZWE2NmYwMWJjMGQ2NzQ4OTNmZGQyNjZjNzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMxN2M5YjUxM2FiMjhkMmQ2Mzc4MjcwMWVjZjdiNzRmYzY5YzZlNDM0YTEzYzVjMWE2OTk4YTMwMTBiYjNjYjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/kit/src/client.ts#L153-L156",
+          "version": "repo-lines-v1:sha256:1a843ee3595dc02eb3c8235d980abd301b8b86e9bd0344bf5b00e881f57af36a:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMThlYjVmMWE4MTc2OTRhZTAyZGMzMjk3ZmNjMDExODhhZTk4Y2YyYzdjYmVlMDdhMzNmNzVmZmE4YTE1MjZmNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWViOWI5MmVkZTU5ZWNjMTQ0MmVkZTIwY2NiMDM1ZmFhMDkwODhiNTk5M2RiOTNkMTczMDc3MWI0ZDYwNjdlNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDJlMzY5NWUxZTdmZmQ3MjJlZWM2Zjk4NDRlZWM2OWExYjMwZDRkMzRmYzk4ZWZhYzQ1MjUyNjA0MjYzMmVkMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTY4NzAwMzQ5MGIxNzdkYmYyYTQyOWMxYWE5ODQ0YTcxYzBjZmE3MWNhNzhlZmM4MjA1Mzg3MTExMWE2NDU3MSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_d57583322c1248a3aeb59e0d6046dc24",
+      "statement": "apiFetch in the core kit uses a pluggable token source (config.getToken or localStorage default) and always sets credentials: 'include' to support cookie-mode sessions.",
+      "evidence": [
+        {
+          "resource": "repo://packages/kit/src/client.ts#L141-L176",
+          "version": "repo-lines-v1:sha256:7c0ded650beb6d292a3f7041d21d13bfa7d11f2d1882b738febdf14e2665d5c3:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhlNTlmNDA0MGJhZGE5M2JjMzcwMjRhZDQ0YTIxOGZhYTNhNjE5ODUzYWQ5MGUyYzg3YjM0Y2Q1OWJiZmE0YTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyZDExY2FmNDNlOTdlZjM2OWU2YmVlZDFhMjY4YmQwNTgzOGYyOWI5ZGQyNTRiZjY5YmE2NDg4NDE0NzIzNGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY0M2I0NzI4ODZhMTMzMTZiOGNjY2IwYjhlNjFiZTAxODM5ODIwYmJkYjI5NDMyMjM5ZDIzNTg4Y2JkMGNlYWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg4MzVlYTFhY2QxYzI1ZjhiNzM2Y2IwZWU1MGRhMTU4Y2NiMjI1ZjBhZDk4YzY1NzVlOWI0MDUzMDUxYjUzNTYifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.2",
+    "at": "2026-09-16T09:25:02.160Z"
+  }
+}
