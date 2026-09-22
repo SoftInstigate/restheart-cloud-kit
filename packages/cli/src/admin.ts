@@ -2,11 +2,11 @@ import { apiFetch, login } from '@restheart-cloud/kit';
 import type { AuthConfig, UserInfo } from '@restheart-cloud/kit';
 import { resolveEnvRefs, defaultEnv, type EnvSource } from './env.js';
 import type {
-  CatalogPlugin,
+  CatalogFeature,
   ConfigSchema,
+  FeatureConfig,
   MutationResult,
-  PluginConfig,
-  ServicePlugins,
+  ServiceFeatures,
   ServiceToken,
 } from './types.js';
 
@@ -43,57 +43,80 @@ export interface AdminClient {
    */
   verifyToken(): Promise<void>;
 
-  /** The marketplace catalog — `GET /plugins`. Includes each plugin's `config_schema`. */
-  pluginCatalog(): Promise<CatalogPlugin[]>;
+  /** The marketplace catalog — `GET /plugins`. Includes each feature's `config_schema`. */
+  featureCatalog(): Promise<CatalogFeature[]>;
 
-  /** Installed *and* available plugins for a service — `GET /plugins-mgmt/{srvId}`. */
-  listPlugins(srvId: string): Promise<ServicePlugins>;
+  /** Installed *and* available features for a service — `GET /plugins-mgmt/{srvId}`. */
+  listFeatures(srvId: string): Promise<ServiceFeatures>;
 
-  /** Whether `pluginId` is installed and not uninstalled. The check `installPlugin` needs. */
-  isPluginInstalled(srvId: string, pluginId: string): Promise<boolean>;
+  /** Whether `featureId` is installed and not uninstalled. The check `installFeature` needs. */
+  isFeatureInstalled(srvId: string, featureId: string): Promise<boolean>;
 
   /**
-   * A plugin's `config_schema`, or `null` when the catalog does not carry one.
+   * A feature's `config_schema`, or `null` when the catalog does not carry one.
    *
-   * Reachable for an *uninstalled* plugin too, because `GET /plugins-mgmt/{srvId}`
+   * Reachable for an *uninstalled* feature too, because `GET /plugins-mgmt/{srvId}`
    * returns the whole catalog under `available` — which is what lets a setup be
    * validated before a run rather than four steps into it.
    */
-  configSchema(srvId: string, pluginId: string): Promise<ConfigSchema | null>;
+  configSchema(srvId: string, featureId: string): Promise<ConfigSchema | null>;
 
-  /** A plugin's stored configuration, with its secrets replaced by {@link REDACTED}. */
-  getPluginConfig(srvId: string, pluginId: string): Promise<PluginConfig>;
+  /** A feature's stored configuration, with its secrets replaced by {@link REDACTED}. */
+  getFeatureConfig(srvId: string, featureId: string): Promise<FeatureConfig>;
 
   /**
-   * Replace a plugin's configuration.
+   * Replace a feature's configuration.
    *
    * The server replaces the *whole* document and restores the stored value for
    * any field still holding the redaction placeholder, so passing back what
-   * `getPluginConfig` returned — placeholders untouched — leaves the tenant's
+   * `getFeatureConfig` returned — placeholders untouched — leaves the tenant's
    * secrets intact.
    *
    * This is where `fromEnv` markers become values: resolved into a copy while
    * the body is serialised, and nowhere else.
    */
-  updatePluginConfig(srvId: string, pluginId: string, config: PluginConfig): Promise<MutationResult>;
+  updateFeatureConfig(srvId: string, featureId: string, config: FeatureConfig): Promise<MutationResult>;
 
   /**
-   * Install a plugin. The server builds the initial configuration itself and
-   * ignores any body, so configuring one is a second step — `updatePluginConfig`.
+   * Install a feature. The server builds the initial configuration itself and
+   * ignores any body, so configuring one is a second step — `updateFeatureConfig`.
    *
-   * Free plugins only: a paid one answers `400` and points at `/purchase`, which
+   * Free features only: a paid one answers `400` and points at `/purchase`, which
    * moves money and is deliberately out of this package's reach.
    */
-  installPlugin(srvId: string, pluginId: string): Promise<MutationResult>;
-  uninstallPlugin(srvId: string, pluginId: string): Promise<MutationResult>;
-  enablePlugin(srvId: string, pluginId: string): Promise<MutationResult>;
-  disablePlugin(srvId: string, pluginId: string): Promise<MutationResult>;
+  installFeature(srvId: string, featureId: string): Promise<MutationResult>;
+  uninstallFeature(srvId: string, featureId: string): Promise<MutationResult>;
+  enableFeature(srvId: string, featureId: string): Promise<MutationResult>;
+  disableFeature(srvId: string, featureId: string): Promise<MutationResult>;
 
-  /** Run a plugin's own initialisation — stripe's collections, indexes and products. */
-  initPlugin(srvId: string, pluginId: string, mode?: string): Promise<Record<string, unknown>>;
+  /** Run a feature's own initialisation — stripe's collections, indexes and products. */
+  initFeature(srvId: string, featureId: string, mode?: string): Promise<Record<string, unknown>>;
 
   /** Validate a stored configuration against the real provider. */
-  testPlugin(srvId: string, pluginId: string): Promise<MutationResult>;
+  testFeature(srvId: string, featureId: string): Promise<MutationResult>;
+
+  /** @deprecated Use {@link featureCatalog}. */
+  pluginCatalog(): Promise<CatalogFeature[]>;
+  /** @deprecated Use {@link listFeatures}. */
+  listPlugins(srvId: string): Promise<ServiceFeatures>;
+  /** @deprecated Use {@link isFeatureInstalled}. */
+  isPluginInstalled(srvId: string, featureId: string): Promise<boolean>;
+  /** @deprecated Use {@link getFeatureConfig}. */
+  getPluginConfig(srvId: string, featureId: string): Promise<FeatureConfig>;
+  /** @deprecated Use {@link updateFeatureConfig}. */
+  updatePluginConfig(srvId: string, featureId: string, config: FeatureConfig): Promise<MutationResult>;
+  /** @deprecated Use {@link installFeature}. */
+  installPlugin(srvId: string, featureId: string): Promise<MutationResult>;
+  /** @deprecated Use {@link uninstallFeature}. */
+  uninstallPlugin(srvId: string, featureId: string): Promise<MutationResult>;
+  /** @deprecated Use {@link enableFeature}. */
+  enablePlugin(srvId: string, featureId: string): Promise<MutationResult>;
+  /** @deprecated Use {@link disableFeature}. */
+  disablePlugin(srvId: string, featureId: string): Promise<MutationResult>;
+  /** @deprecated Use {@link initFeature}. */
+  initPlugin(srvId: string, featureId: string, mode?: string): Promise<Record<string, unknown>>;
+  /** @deprecated Use {@link testFeature}. */
+  testPlugin(srvId: string, featureId: string): Promise<MutationResult>;
 
   /** A service-admin JWT and the service's URL — `GET /srvs-mgmt/{srvId}/jwt`. */
   serviceToken(srvId: string): Promise<ServiceToken>;
@@ -165,11 +188,52 @@ export function createAdminClient(config: AdminClientConfig): AdminClient {
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
 
-  const listPlugins = (srvId: string) =>
-    json<ServicePlugins>(`/plugins-mgmt/${encodeURIComponent(srvId)}`);
+  const listFeatures = (srvId: string) =>
+    json<ServiceFeatures>(`/plugins-mgmt/${encodeURIComponent(srvId)}`);
 
-  const pluginPath = (srvId: string, pluginId: string) =>
-    `/plugins-mgmt/${encodeURIComponent(srvId)}/${encodeURIComponent(pluginId)}`;
+  // the admin node's path still says plugins: a server-side name, not a word the caller reads
+  const featurePath = (srvId: string, featureId: string) =>
+    `/plugins-mgmt/${encodeURIComponent(srvId)}/${encodeURIComponent(featureId)}`;
+
+  const featureCatalog = () => json<CatalogFeature[]>('/plugins');
+
+  const isFeatureInstalled = async (srvId: string, featureId: string) => {
+    const { installed } = await listFeatures(srvId);
+    return installed.some(p => p.plugin_id === featureId);
+  };
+
+  const getFeatureConfig = (srvId: string, featureId: string) =>
+    json<FeatureConfig>(`${featurePath(srvId, featureId)}/config`);
+
+  // `async` deliberately: `resolveEnvRefs` throws on a missing variable, and
+  // an otherwise-Promise-returning method that throws synchronously is a trap
+  // — a caller using `.catch()` rather than `try`/`await` would miss it.
+  const updateFeatureConfig = async (srvId: string, featureId: string, featureConfig: FeatureConfig) =>
+    json<MutationResult>(`${featurePath(srvId, featureId)}/config`, {
+      method: 'PATCH',
+      body: JSON.stringify(resolveEnvRefs(featureConfig, env)),
+    });
+
+  const installFeature = (srvId: string, featureId: string) =>
+    post(`${featurePath(srvId, featureId)}/install`);
+
+  const uninstallFeature = (srvId: string, featureId: string) =>
+    json<MutationResult>(featurePath(srvId, featureId), { method: 'DELETE' });
+
+  const enableFeature = (srvId: string, featureId: string) =>
+    post(`${featurePath(srvId, featureId)}/enable`);
+
+  const disableFeature = (srvId: string, featureId: string) =>
+    post(`${featurePath(srvId, featureId)}/disable`);
+
+  const initFeature = (srvId: string, featureId: string, mode?: string) =>
+    post<Record<string, unknown>>(
+      `${featurePath(srvId, featureId)}/init`,
+      mode === undefined ? undefined : { mode }
+    );
+
+  const testFeature = (srvId: string, featureId: string) =>
+    post(`${featurePath(srvId, featureId)}/test`);
 
   return {
     config: cfg,
@@ -182,51 +246,39 @@ export function createAdminClient(config: AdminClientConfig): AdminClient {
     },
 
     async verifyToken() {
-      await json<CatalogPlugin[]>('/plugins');
+      await json<CatalogFeature[]>('/plugins');
     },
 
-    pluginCatalog: () => json<CatalogPlugin[]>('/plugins'),
+    featureCatalog,
+    listFeatures,
+    isFeatureInstalled,
 
-    listPlugins,
-
-    async isPluginInstalled(srvId, pluginId) {
-      const { installed } = await listPlugins(srvId);
-      return installed.some(p => p.plugin_id === pluginId);
+    async configSchema(srvId, featureId) {
+      const { available } = await listFeatures(srvId);
+      return available.find(p => p._id === featureId)?.config_schema ?? null;
     },
 
-    async configSchema(srvId, pluginId) {
-      const { available } = await listPlugins(srvId);
-      return available.find(p => p._id === pluginId)?.config_schema ?? null;
-    },
+    getFeatureConfig,
+    updateFeatureConfig,
+    installFeature,
+    uninstallFeature,
+    enableFeature,
+    disableFeature,
+    initFeature,
+    testFeature,
 
-    getPluginConfig: (srvId, pluginId) =>
-      json<PluginConfig>(`${pluginPath(srvId, pluginId)}/config`),
-
-    // `async` deliberately: `resolveEnvRefs` throws on a missing variable, and
-    // an otherwise-Promise-returning method that throws synchronously is a trap
-    // — a caller using `.catch()` rather than `try`/`await` would miss it.
-    async updatePluginConfig(srvId, pluginId, pluginConfig) {
-      return json<MutationResult>(`${pluginPath(srvId, pluginId)}/config`, {
-        method: 'PATCH',
-        body: JSON.stringify(resolveEnvRefs(pluginConfig, env)),
-      });
-    },
-
-    installPlugin: (srvId, pluginId) => post(`${pluginPath(srvId, pluginId)}/install`),
-
-    uninstallPlugin: (srvId, pluginId) =>
-      json<MutationResult>(pluginPath(srvId, pluginId), { method: 'DELETE' }),
-
-    enablePlugin: (srvId, pluginId) => post(`${pluginPath(srvId, pluginId)}/enable`),
-    disablePlugin: (srvId, pluginId) => post(`${pluginPath(srvId, pluginId)}/disable`),
-
-    initPlugin: (srvId, pluginId, mode) =>
-      post<Record<string, unknown>>(
-        `${pluginPath(srvId, pluginId)}/init`,
-        mode === undefined ? undefined : { mode }
-      ),
-
-    testPlugin: (srvId, pluginId) => post(`${pluginPath(srvId, pluginId)}/test`),
+    // the former names, kept for setups written against them
+    pluginCatalog: featureCatalog,
+    listPlugins: listFeatures,
+    isPluginInstalled: isFeatureInstalled,
+    getPluginConfig: getFeatureConfig,
+    updatePluginConfig: updateFeatureConfig,
+    installPlugin: installFeature,
+    uninstallPlugin: uninstallFeature,
+    enablePlugin: enableFeature,
+    disablePlugin: disableFeature,
+    initPlugin: initFeature,
+    testPlugin: testFeature,
 
     serviceToken: (srvId) =>
       json<ServiceToken>(`/srvs-mgmt/${encodeURIComponent(srvId)}/jwt`),

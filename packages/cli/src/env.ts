@@ -2,13 +2,13 @@
  * Secrets in a setup that lives in git.
  *
  * A setup file is committed alongside the code it configures, and a step that
- * configures the `stripe` plugin needs a live secret key. `fromEnv` is how the
+ * configures the `stripe` feature needs a live secret key. `fromEnv` is how the
  * setup names one without holding it: the setup carries a marker, and the marker
  * becomes a value in exactly one place — while the admin client serialises the
  * request body that carries it.
  *
  * ```ts
- * apply: ({ admin, srvId }) => admin.updatePluginConfig(srvId, 'stripe', {
+ * apply: ({ admin, srvId }) => admin.updateFeatureConfig(srvId, 'stripe', {
  *   'secret-key': fromEnv('STRIPE_SECRET_KEY'),
  *   'success-url': 'https://shop.example.com/checkout/done',
  * }),
@@ -32,7 +32,7 @@ export interface EnvRef {
  * A reference to an environment variable, resolved at apply time.
  *
  * Typed as `string` on purpose. A config value is a string as far as the caller
- * is concerned, and threading `string | EnvRef` through every plugin config
+ * is concerned, and threading `string | EnvRef` through every feature config
  * shape would push the marker into the type of every field it could ever be
  * used for — for a substitution that has already happened by the time the
  * server sees it.

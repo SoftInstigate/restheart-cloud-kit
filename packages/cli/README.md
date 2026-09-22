@@ -4,7 +4,7 @@ Set up a RESTHeart Cloud service from a file committed to git.
 
 A developer who forks a starter gets working code and an unconfigured service. What follows is
 clicking: create the catalog collection, add an index, write the ACL permission that lets a guest
-`POST` an order, install the `stripe` plugin, fill in its keys, set the success URL. None of that
+`POST` an order, install the `stripe` feature, fill in its keys, set the success URL. None of that
 is in version control, none of it can be re-run against a second service, and the failure mode is
 quiet — a missing anonymous `GET /catalog` permission shows up as *an empty shop, no error*.
 
@@ -35,7 +35,7 @@ npx @restheart-cloud/cli setup --srv ea820b
 ```
 
 ```
-[1/6] · stripe plugin installed
+[1/6] · stripe feature installed
 [2/6] + stripe products mode configured
 [3/6] + stripe collections and indexes initialised
 [4/6] + guests may read the catalog
@@ -115,7 +115,7 @@ export default defineSetup('Blog', [
 That shape gives idempotency, resumability, a dry run and a progress report for free, because they
 are all the same thing seen from different angles.
 
-A step receives `{ service, admin, srvId }` — both clients, because plugin install, config and
+A step receives `{ service, admin, srvId }` — both clients, because feature install, config and
 init are admin-node operations while collections and permissions are service-node ones.
 
 | State | Meaning |
@@ -128,7 +128,7 @@ init are admin-node operations while collections and permissions are service-nod
 
 The runner **re-checks after applying**, so a step that silently did nothing is reported failed
 rather than green. A real run halts on a failure, because configuration has real dependencies —
-no index before its collection, no plugin config before the plugin is installed. A dry run does
+no index before its collection, no feature config before the feature is installed. A dry run does
 not halt: it changed nothing, and being told all of what is missing is the point.
 
 ## Secrets
@@ -138,7 +138,7 @@ A setup lives in git. `fromEnv` is how it names a secret without holding one:
 ```ts
 step('stripe configured', {
   check: async ({ admin, srvId }) => …,
-  apply: ({ admin, srvId }) => admin.updatePluginConfig(srvId, 'stripe', {
+  apply: ({ admin, srvId }) => admin.updateFeatureConfig(srvId, 'stripe', {
     'secret-key': fromEnv('STRIPE_SECRET_KEY'),
     'success-url': 'https://shop.example.com/shop/order',
   }),
@@ -160,8 +160,8 @@ restores the stored value for any field still holding that placeholder.
 So read-modify-write is safe exactly as long as you pass the placeholder through untouched:
 
 ```ts
-const config = await admin.getPluginConfig(srvId, 'stripe');
-await admin.updatePluginConfig(srvId, 'stripe', { ...config, 'success-url': next });
+const config = await admin.getFeatureConfig(srvId, 'stripe');
+await admin.updateFeatureConfig(srvId, 'stripe', { ...config, 'success-url': next });
 ```
 
 Do not diff, do not strip "empty-looking" fields, do not normalise — any of those writes bullets
@@ -277,19 +277,21 @@ earlier wants `npx tsx`.
 
 Over `cloud-api.restheart.com`, taking the core's `AuthConfig` plus an optional `env`.
 
-`login`, `pluginCatalog`, `listPlugins`, `isPluginInstalled`, `configSchema`, `getPluginConfig`,
-`updatePluginConfig`, `installPlugin`, `uninstallPlugin`, `enablePlugin`, `disablePlugin`,
-`initPlugin`, `testPlugin`, `serviceToken`.
+`login`, `featureCatalog`, `listFeatures`, `isFeatureInstalled`, `configSchema`, `getFeatureConfig`,
+`updateFeatureConfig`, `installFeature`, `uninstallFeature`, `enableFeature`, `disableFeature`,
+`initFeature`, `testFeature`, `serviceToken`.
 
-`installPlugin` takes no configuration — the server builds the initial document itself and ignores
-a body, so configuring is always a second step. Free plugins only; a paid one answers `400` and
+The former `…Plugin…` names (`installPlugin`, `getPluginConfig`, …) still work, deprecated.
+
+`installFeature` takes no configuration — the server builds the initial document itself and ignores
+a body, so configuring is always a second step. Free features only; a paid one answers `400` and
 points at `/purchase`, which moves money and is deliberately out of reach.
 
 ### `createServiceClient(admin, srvId)`
 
 Over the service node, derived from the admin client because that is where its token comes from.
 
-`/jwt` mints a **fifteen-minute** token, and a run that installs a plugin, waits for its `init` and
+`/jwt` mints a **fifteen-minute** token, and a run that installs a feature, waits for its `init` and
 then writes permissions can outlive that. So the client owns it: fetched lazily, cached, renewed a
 minute before expiry, shared between concurrent callers, never returned. A caller handed a token
 would die mid-run with a `401` that reads like a permissions problem, against a service left
@@ -321,7 +323,7 @@ so could a local page.
   money by accident is not a wizard.
 - **A hosted configuration page.** Ruled out by the `originVetoer`. A local page served *by* the
   CLI would talk to the CLI's own process, and is a reasonable later addition.
-- **Editing arbitrary RESTHeart configuration.** Only plugin config.
+- **Editing arbitrary RESTHeart configuration.** Only feature config.
 
 ## Licence
 

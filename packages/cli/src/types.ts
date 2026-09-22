@@ -21,8 +21,11 @@ export function isRedacted(value: unknown): boolean {
   return value === REDACTED;
 }
 
-/** A plugin's configuration document, as stored and as sent back. */
-export type PluginConfig = Record<string, unknown>;
+/** A feature's configuration document, as stored and as sent back. */
+export type FeatureConfig = Record<string, unknown>;
+
+/** @deprecated Use {@link FeatureConfig}. */
+export type PluginConfig = FeatureConfig;
 
 /**
  * A JSON Schema, as the marketplace catalog carries it.
@@ -41,7 +44,7 @@ export interface ConfigSchema {
 }
 
 /** An entry of the marketplace catalog — the `plugins` collection on the admin node. */
-export interface CatalogPlugin {
+export interface CatalogFeature {
   _id: string;
   name?: string;
   description?: string;
@@ -49,22 +52,29 @@ export interface CatalogPlugin {
   [key: string]: unknown;
 }
 
-/** A plugin as installed on a service, from the service's own configuration document. */
-export interface InstalledPlugin {
+/** A feature as installed on a service, from the service's own configuration document. */
+export interface InstalledFeature {
   plugin_id: string;
   status?: string;
   enabled?: boolean;
   installed_at?: unknown;
-  config?: PluginConfig;
+  config?: FeatureConfig;
   [key: string]: unknown;
 }
 
 /** The body of `GET /plugins-mgmt/{srvId}`. */
-export interface ServicePlugins {
+export interface ServiceFeatures {
   service_id: string;
-  installed: InstalledPlugin[];
-  available: CatalogPlugin[];
+  installed: InstalledFeature[];
+  available: CatalogFeature[];
 }
+
+/** @deprecated Use {@link CatalogFeature}. */
+export type CatalogPlugin = CatalogFeature;
+/** @deprecated Use {@link InstalledFeature}. */
+export type InstalledPlugin = InstalledFeature;
+/** @deprecated Use {@link ServiceFeatures}. */
+export type ServicePlugins = ServiceFeatures;
 
 /** The body of `GET /srvs-mgmt/{srvId}/jwt`. */
 export interface ServiceToken {

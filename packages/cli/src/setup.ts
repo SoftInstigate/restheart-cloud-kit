@@ -6,7 +6,7 @@ import { isApiError } from './http.js';
 /**
  * What a step is handed.
  *
- * Both clients, not just the service one: a real setup configures plugins, and
+ * Both clients, not just the service one: a real setup configures features, and
  * install, config and init are admin-node operations. `srvId` rides along so a
  * step body never has to close over the value the runner was given.
  */
@@ -48,7 +48,7 @@ export interface StepResult {
    * Why it failed, when it did.
    *
    * A message, never a value: the run's report is the thing most likely to end
-   * up in a CI log, and a step that configures a plugin has a secret in its
+   * up in a CI log, and a step that configures a feature has a secret in its
    * arguments.
    */
   error?: string;
@@ -95,7 +95,7 @@ export interface RunOptions {
    *
    * **Name the steps.** `true` forces all of them, and that is usually the
    * wrong tool: an apply written to run once may not survive running twice —
-   * installing a plugin answers `409` the second time — and a step that seeds
+   * installing a feature answers `409` the second time — and a step that seeds
    * sample data will seed it again over whatever is there now. A check exists
    * partly to keep those from happening.
    *
@@ -122,8 +122,8 @@ export function defineSetup(name: string, steps: Step[]): Setup {
  * Set a service up.
  *
  * Sequential, and a failure stops the rest. That is not caution, it is what
- * configuration is like: there is no index before its collection and no plugin
- * config before the plugin is installed, and a runner that carried on past a
+ * configuration is like: there is no index before its collection and no feature
+ * config before the feature is installed, and a runner that carried on past a
  * failed install would report five further failures that all have one cause.
  *
  * A dry run is the exception — it runs every check, because the point of asking
@@ -142,7 +142,7 @@ export async function runSetup(setup: Setup, opts: RunOptions): Promise<SetupRep
     admin,
     srvId,
     // Lazy all the way down — the client mints no token until a step asks it
-    // to, so a setup of nothing but plugin steps never touches the service node.
+    // to, so a setup of nothing but feature steps never touches the service node.
     service: opts.service ?? createServiceClient(admin, srvId),
   };
 
@@ -156,7 +156,7 @@ export async function runSetup(setup: Setup, opts: RunOptions): Promise<SetupRep
    * The re-check after an apply, allowed a moment to become true.
    *
    * An apply and its check do not always speak to the same process. Installing
-   * or initialising a plugin runs on the **admin node**, which writes to the
+   * or initialising a feature runs on the **admin node**, which writes to the
    * tenant's database directly; the check then asks the **service node**, which
    * caches collection metadata for one second by default
    * (`local-cache-ttl`). So a step that genuinely worked can be observed as
@@ -164,7 +164,7 @@ export async function runSetup(setup: Setup, opts: RunOptions): Promise<SetupRep
    * `stripe collections and indexes initialised` did.
    *
    * The cache is not the whole lag, and sizing this to it was the mistake. An
-   * apply like `initPlugin` returns once the admin node has *triggered* the
+   * apply like `initFeature` returns once the admin node has *triggered* the
    * work; the service node then creates collections, builds indexes and
    * installs a schema on its own time. Three seconds covered the cache and not
    * the job, so `stripe collections and indexes initialised` still reported
@@ -216,7 +216,7 @@ export async function runSetup(setup: Setup, opts: RunOptions): Promise<SetupRep
         await s.apply(ctx);
         // Re-checked rather than trusted. An apply that returned without doing
         // anything — a PUT the server answered 200 to and ignored, a config
-        // write that landed on the wrong plugin — would otherwise be reported
+        // write that landed on the wrong feature — would otherwise be reported
         // green, and the run would carry on building on top of it.
         state = (await recheck(s, ctx)) ? 'applied' : 'failed';
         if (state === 'failed') error = 'applied, but the check still fails';

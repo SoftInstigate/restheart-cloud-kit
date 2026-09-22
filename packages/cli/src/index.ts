@@ -1,7 +1,11 @@
 export { REDACTED, isRedacted } from './types.js';
 export type {
-  PluginConfig,
+  FeatureConfig,
   ConfigSchema,
+  CatalogFeature,
+  InstalledFeature,
+  ServiceFeatures,
+  PluginConfig,
   CatalogPlugin,
   InstalledPlugin,
   ServicePlugins,
