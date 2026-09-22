@@ -166,10 +166,10 @@ export function createServiceClient(admin: AdminClient, srvId: string): ServiceC
       await send(upsert(`/users/${seg(id)}`), { method: 'PUT', body: body(doc) });
     },
 
-    schemaExists: (coll) => existsOr404(() => send(`/_schemas/${seg(coll)}`)),
+    schemaExists: (coll) => existsOr404(() => send(`/schemas/${seg(coll)}`)),
 
     async putSchema(coll, schema) {
-      await send(upsert(`/_schemas/${seg(coll)}`), { method: 'PUT', body: body(schema) });
+      await send(upsert(`/schemas/${seg(coll)}`), { method: 'PUT', body: body(schema) });
     },
 
     fetch: send,

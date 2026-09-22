@@ -141,7 +141,7 @@ describe('service client', () => {
       'PUT /catalog/_indexes/sku_unique': { status: 201 },
       'PUT /acl/catalog-read-anon?wm=upsert': { status: 201 },
       'PUT /users/robot?wm=upsert': { status: 201 },
-      'PUT /_schemas/orders?wm=upsert': { status: 201 },
+      'PUT /schemas/orders?wm=upsert': { status: 201 },
     });
     const service = createServiceClient(admin, 'ea820b');
 
@@ -156,7 +156,7 @@ describe('service client', () => {
       'PUT /catalog/_indexes/sku_unique',
       'PUT /acl/catalog-read-anon?wm=upsert',
       'PUT /users/robot?wm=upsert',
-      'PUT /_schemas/orders?wm=upsert',
+      'PUT /schemas/orders?wm=upsert',
     ]);
     expect(calls[1]!.body).toEqual({ keys: { sku: 1 }, ops: { unique: true } });
   });
