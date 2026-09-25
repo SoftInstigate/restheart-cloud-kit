@@ -4,8 +4,8 @@ title: Architecture Overview
 description: Technical architecture of the RESTHeart Cloud Kit monorepo, including package structure, layering, payments subsystem, CLI tooling, and design principles.
 tags: [architecture, monorepo, design, layering, payments, cli]
 verified:
-  - by: openwiki/0.5.0
-    at: 2026-09-07T09:33:56.593Z
+  - by: openwiki/0.6.0
+    at: 2026-09-25T09:43:51.410Z
 sources:
   - id: openwiki-source-e7a0b8cb7be6a8386aa66fdb
     resource: repo://docs/ADAPTER_CONTRACT.md
@@ -41,7 +41,7 @@ sources:
     resource: repo://packages/kit/src/payments.ts
   - id: openwiki-source-42dfd0defa8189243ef19509
     resource: repo://packages/kit/src/types.ts
-generated: { by: "openwiki/0.5.0", at: "2026-09-07T09:33:56.593Z" }
+generated: { by: "openwiki/0.6.0", at: "2026-09-25T09:43:51.410Z" }
 ---
 
 # Architecture Overview
@@ -220,7 +220,7 @@ The monorepo follows a strict layered architecture:
 - Not a framework adapter — it is a standalone operational tool
 
 **Key abstractions**:
-- `AdminClient` — authenticates against the admin node (`cloud-api.restheart.com`), manages plugins, mints service tokens
+- `AdminClient` — authenticates against the admin node (`cloud-api.restheart.com`), manages features (install, configure, init, test), mints service tokens; deprecated plugin method aliases remain for backward compatibility
 - `ServiceClient` — authenticates against a service node, manages collections, indexes, permissions, users, and schemas; token is cached and renewed automatically
 - `Setup` / `Step` — declarative, idempotent configuration: each step has a `check` (is it already done?) and an `apply` (make it so); `runSetup` executes them sequentially, halting on failure
 

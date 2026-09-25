@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:a84973f3ac299024c15beee26ff913f90988c3a1b9241c9412091e1ade0a5c1a",
+  "pageVersion": "sha256:6c70fa76c5919cee92a28e68baca584121b2bc0d39c3c1b5c979684fea816d97",
   "claims": [
     {
       "id": "claim_e7ebb7e508804f9f92901818b0fa82a0",
@@ -80,7 +80,7 @@
     },
     {
       "id": "claim_8459e17c3ef44c8e90d795e3a687bfab",
-      "statement": "CLI unit tests cover five modules: admin client (plugin management, configuration, env ref resolution), env (fromEnv resolution, validation), service client (token management, collection/index operations, document writes), session (file storage, token resolution, session clearing), and setup runner (step execution, dry runs, force mode, progress reporting).",
+      "statement": "CLI unit tests cover five modules: admin client (plugin management, configuration, env ref resolution), env (fromEnv resolution, validation), service client (token minting/reuse, renewal near expiry, shared mint, 404-as-false vs 403-as-throw, index existence via collection listing, write paths with wm=upsert, idempotent re-runs, fromEnv resolution in service client bodies), session (file storage, token resolution, session clearing), and setup runner (step execution, dry runs, force mode, progress reporting).",
       "evidence": [
         {
           "resource": "repo://packages/cli/src/__tests__/unit/admin.test.ts",
@@ -92,7 +92,7 @@
         },
         {
           "resource": "repo://packages/cli/src/__tests__/unit/service.test.ts",
-          "version": "repo-file-v1:sha256:4cd712a49cb6659669156e9c2d4ce05d1c04ad783cd9b6ac63da999e0777e275"
+          "version": "repo-file-v1:sha256:8c6ca47c35a1546d608d93c0d41bed1378989c2da082743bbc19e01e07c46ada"
         },
         {
           "resource": "repo://packages/cli/src/__tests__/unit/session.test.ts",
@@ -218,7 +218,7 @@
     }
   ],
   "verification": {
-    "by": "openwiki/0.5.1",
-    "at": "2026-09-13T09:39:41.844Z"
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-25T09:43:51.410Z"
   }
 }

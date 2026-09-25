@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:ea765ec92bbb8fd6a620fed9de378dc7210c71ae5f3ec2694515f92fab190e64",
+  "pageVersion": "sha256:c8cb186a2dcccfa29261ddb0e84ea69957e627adbd185fa1c31bb32e23628477",
   "claims": [
     {
       "id": "claim_6f93d57989544af49c8650048226eefb",
@@ -36,11 +36,11 @@
     },
     {
       "id": "claim_38249586080a411984b27433f956e7ff",
-      "statement": "The CLI's AdminClient authenticates against the admin node (cloud-api.restheart.com), manages plugins (install, configure, init, test), mints service tokens, and stores credentials in a closure rather than localStorage to support Node.js and avoid cross-client token collision.",
+      "statement": "The CLI's AdminClient authenticates against the admin node (cloud-api.restheart.com), manages features using feature-based primary method names (installFeature, getFeatureConfig, updateFeatureConfig, initFeature, testFeature, etc.) with deprecated plugin method aliases for backward compatibility, mints service tokens, and stores credentials in a closure rather than localStorage to support Node.js and avoid cross-client token collision.",
       "evidence": [
         {
           "resource": "repo://packages/cli/src/admin.ts#L131-L236",
-          "version": "repo-lines-v1:sha256:c24e0d02c7931797fd41445b62296813a6cc24cd04cb127e111f127623e45b3f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI4OTBlNDczZjkxMjU3MzkxYzBhNzBmZmIxZjFiMmIzMjhmOGY5MThkMmZkZDAwMjkyOGMxNTVkZjE5MGJkZDI5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyYjM1YmQ1NWRiNTk0YTgzODVkODMxYjE5YjVmMTgwZWFiZThmMWY0ZGJjYmI5NTM4NGE3YjNiY2ZmMjZkNTgzIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "version": "repo-lines-v1:sha256:ff808d2612186d5151bd3804c2fb74d50108cc4d8ce33a60344662d0824ac7e7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTM1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI4OTBlNDczZjkxMjU3MzkxYzBhNzBmZmIxZjFiMmIzMjhmOGY5MThkMmZkZDAwMjkyOGMxNTVkZjE5MGJkZDI5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyYjM1YmQ1NWRiNTk0YTgzODVkODMxYjE5YjVmMTgwZWFiZThmMWY0ZGJjYmI5NTM4NGE3YjNiY2ZmMjZkNTgzIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         },
         {
           "resource": "repo://packages/cli/src/cli.ts#L18-L18",
@@ -64,15 +64,15 @@
     },
     {
       "id": "claim_2d8b7076953f4976b6db33d29370588f",
-      "statement": "The CLI's setup runner (runSetup) executes steps sequentially, halting on failure. Each step has a check (is it already done?) and an apply (make it so). After applying, it re-checks with exponential backoff up to 15 seconds to handle admin-node/service-node propagation lag. Dry runs execute all checks without applying. The force option skips checks but still verifies the result.",
+      "statement": "The CLI's setup runner (runSetup) executes steps sequentially, halting on failure. Each step has a check (is it already done?) and an apply (make it so). After applying, it re-checks with specific backoff delays of [0, 300, 700, 2000, 4000, 8000] ms (totaling 15 seconds) to handle admin-node/service-node propagation lag. Dry runs execute all checks without applying. The force option skips checks but still verifies the result via re-check.",
       "evidence": [
         {
           "resource": "repo://packages/cli/src/setup.ts#L108-L246",
-          "version": "repo-lines-v1:sha256:5e9c3c2f5a4f4bc312466076c355a39c0d82d1404bb32db5615aec3e3168155f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTM5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1NThkNDc3ZmFmMWM3YzRjZGI1YzM1ZWY1NWQ0YjZkZDFmMTFjN2ExMjBhNzBjOTNjNWM0ZThjYjQ1ZDFiYTk1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI4ZTlhNTUwMTU1OTViMWJjMjgyZDBmYzI0ZWUwNWY1YTYwNjkwMDM5ZTQ1YTZmYTY4YWEzNjAxMmRhMDY4MjcyIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiNGFmOTFmY2NlYzk5MWM0ZTEyYTFiYjA2NjQ0YjM3OTMzZDYwZDA5ZjhkMzg2NTJkNDBiNjlkYzI5Y2I4N2MxIn0"
+          "version": "repo-lines-v1:sha256:06581a6826f7a04f4cf50d4aeac5365f7c77a2f509cc9ec696fe4c5178320589:eyJzZWxlY3RlZExpbmVDb3VudCI6MTM5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1NThkNDc3ZmFmMWM3YzRjZGI1YzM1ZWY1NWQ0YjZkZDFmMTFjN2ExMjBhNzBjOTNjNWM0ZThjYjQ1ZDFiYTk1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI4ZTlhNTUwMTU1OTViMWJjMjgyZDBmYzI0ZWUwNWY1YTYwNjkwMDM5ZTQ1YTZmYTY4YWEzNjAxMmRhMDY4MjcyIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiNGFmOTFmY2NlYzk5MWM0ZTEyYTFiYjA2NjQ0YjM3OTMzZDYwZDA5ZjhkMzg2NTJkNDBiNjlkYzI5Y2I4N2MxIn0"
         },
         {
           "resource": "repo://packages/cli/src/setup.ts#L155-L189",
-          "version": "repo-lines-v1:sha256:20313f7492339f3f54245381fa26a4ab4d06a621d000ba01dbc0e16e869e2a51:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUwMjkwYWE4OGQ1MmQ1NzM5ZDkzMTQyNTJhNGFjYWNkMjFiYmYxYTdhZjc4ZTFjZDZiYWE1NDUzNTM3MTk2NmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2MWQzZmU2ZTM5NjZjMmY2OGI5ZDc1Mzg0OTQyYjYzY2YxZjU0NDI0OGI3M2ZlMzdmMmY4OTMxY2JlMDQ5MTQifQ"
+          "version": "repo-lines-v1:sha256:68c2c0559fce01323f31ca3e1f68f9455169209a3709573d4ca32f8bb558f517:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUwMjkwYWE4OGQ1MmQ1NzM5ZDkzMTQyNTJhNGFjYWNkMjFiYmYxYTdhZjc4ZTFjZDZiYWE1NDUzNTM3MTk2NmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2MWQzZmU2ZTM5NjZjMmY2OGI5ZDc1Mzg0OTQyYjYzY2YxZjU0NDI0OGI3M2ZlMzdmMmY4OTMxY2JlMDQ5MTQifQ"
         }
       ]
     },
@@ -234,11 +234,11 @@
     },
     {
       "id": "claim_60578e0314a646bca24b8da1785b1447",
-      "statement": "The CLI resolves fromEnv markers (secrets referencing environment variables) at serialization time — in updatePluginConfig and in ServiceClient's body helper — not earlier, so a marker never reaches JSON.stringify as a raw object.",
+      "statement": "The CLI resolves fromEnv markers (secrets referencing environment variables) at serialization time — in updateFeatureConfig and in ServiceClient's body helper — not earlier, so a marker never reaches JSON.stringify as a raw object.",
       "evidence": [
         {
-          "resource": "repo://packages/cli/src/admin.ts#L205-L213",
-          "version": "repo-lines-v1:sha256:de155c9eb2d02ab2d5e1d09e4fda0326eb61b57649636b90ec3fa79749f003b0:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2QyYWU5YTU0NWQ0YzRlMjhiMGRkZDBkYzhlNWYyYWY1YzI0MzRlZGNlN2FmZjJkMDVlOTdiZDRhOTM0ODc4NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWYwY2RiOTcyYTdiZmI3ZWQyNDZmOWZmNjcyMzg1ZTU1ZjQ5NjhmYzExMDQzZGM1YjY4NGQ1MWRmYTMxZGJjYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTIyNDUyY2E4MTJjZjExZGMxYjg0OGI3MGQ5NjIyOTM1NDZkMDg2MDBjMzhkYjJiOTNjMmVhMDNhMWRmYTVjMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjkwNzcxZmQ3OTg5YTIzMjFkOGNkOGY5M2MxNTU3NDcwOTI5OTZmZjhjMmI3MjY2NzNkZTY5NDlhOTAyY2JmOSJ9"
+          "resource": "repo://packages/cli/src/admin.ts#L205-L215",
+          "version": "repo-lines-v1:sha256:a44a98d096952ea3bd3ff459a2edcfcbaf4e63a0beaf3dbed6b5d721fa643fc2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmNzFiNjhhYjlhOTIyZTNmNWUxNWE4YjVkNjY3NThmNTEyOTZhZWQ4YzA1ZTdkMTZlZjA4YjlkZTc3YjgyMmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyZDExY2FmNDNlOTdlZjM2OWU2YmVlZDFhMjY4YmQwNTgzOGYyOWI5ZGQyNTRiZjY5YmE2NDg4NDE0NzIzNGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRlZjA1ZTU2MWIzOGU0OTBmYWVjMDlhNmM1YzNhNzdhNmY2NWFiZThkYWYxYjAxZDIwMmJmOTRhMTZjN2Q2MzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM1YmVkZjcwMTE2ZWU1ZjVlNjZkMWMyMzQxN2E2ZDcxMTIwZDVkNDY1OGFiMGRmMzlmMjQ2Y2IxMTdhYWU5YzgifQ"
         },
         {
           "resource": "repo://packages/cli/src/service.ts#L91-L103",
@@ -258,7 +258,7 @@
     }
   ],
   "verification": {
-    "by": "openwiki/0.5.0",
-    "at": "2026-09-07T09:33:56.593Z"
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-25T09:43:51.410Z"
   }
 }

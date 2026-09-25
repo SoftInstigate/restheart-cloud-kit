@@ -26,15 +26,15 @@ sources:
     resource: repo://packages/cli/src/setup.ts
   - id: openwiki-source-e5bdf5324e38ac0fd72f905f
     resource: repo://packages/cli/src/types.ts
-generated: { by: "openwiki/0.5.1", at: "2026-09-13T09:39:41.844Z" }
+generated: { by: "openwiki/0.6.0", at: "2026-09-25T09:43:51.410Z" }
 verified:
-  - by: openwiki/0.5.1
-    at: 2026-09-13T09:39:41.844Z
+  - by: openwiki/0.6.0
+    at: 2026-09-25T09:43:51.410Z
 ---
 
 # @restheart-cloud/cli
 
-The `@restheart-cloud/cli` package provides both a command-line tool (`rhc`) and a library for configuring RESTHeart Cloud services from a declarative setup file committed to version control. It turns manual console clicks — creating collections, writing ACL permissions, installing and configuring plugins — into a repeatable, idempotent, dry-runnable script.
+The `@restheart-cloud/cli` package provides both a command-line tool (`rhc`) and a library for configuring RESTHeart Cloud services from a declarative setup file committed to version control. It turns manual console clicks — creating collections, writing ACL permissions, installing and configuring features — into a repeatable, idempotent, dry-runnable script.
 
 ## Installation
 
@@ -64,13 +64,13 @@ This is **not a fourth adapter**. There is no reactive state, no session to rest
 | File | Responsibility |
 |---|---|
 | `src/cli.ts` | CLI entrypoint — `rhc login`, `rhc logout`, `rhc setup` commands, argument parsing, setup file loading, progress rendering |
-| `src/admin.ts` | Admin-node client (`createAdminClient`) — plugin management, service token minting, `fromEnv` resolution during serialization |
+| `src/admin.ts` | Admin-node client (`createAdminClient`) — feature management, service token minting, `fromEnv` resolution during serialization |
 | `src/service.ts` | Service-node client (`createServiceClient`) — collection, index, permission, user, and schema CRUD; lazy token minting with automatic renewal |
 | `src/setup.ts` | Setup runner — `step`, `defineSetup`, `runSetup`; sequential execution with check/apply halves, recheck backoff, dry-run, force |
 | `src/session.ts` | Token persistence — `~/.config/restheart/session.json` (mode 0600), `RH_CLOUD_TOKEN` env var precedence |
 | `src/env.ts` | Secret handling — `fromEnv` markers, `resolveEnvRefs`, `MissingEnvError`; Symbol.for identity for cross-version interop |
 | `src/http.ts` | Low-level HTTP helpers — `request` (service-node fetch), `existsOr404`, `isApiError` |
-| `src/types.ts` | Shared types — `PluginConfig`, `ConfigSchema`, `CatalogPlugin`, `InstalledPlugin`, `ServiceToken`, `REDACTED`, `isRedacted` |
+| `src/types.ts` | Shared types — `FeatureConfig`, `ConfigSchema`, `CatalogFeature`, `InstalledFeature`, `ServiceToken`, `REDACTED`, `isRedacted` |
 | `src/index.ts` | Library public API — re-exports from all modules |
 
 ## The Step Model
@@ -94,7 +94,7 @@ export default defineSetup('Blog', [
 
 That shape gives idempotency, resumability, a dry run, and a progress report for free, because they are all the same thing seen from different angles.
 
-A step receives `{ service, admin, srvId }` — both clients, because plugin install, config, and init are admin-node operations while collections and permissions are service-node ones.
+A step receives `{ service, admin, srvId }` — both clients, because feature install, config, and init are admin-node operations while collections and permissions are service-node ones.
 
 ### Step States
 
@@ -133,15 +133,15 @@ flowchart TD
 
 The setup runner flow: check → apply → recheck with exponential backoff.
 
-The runner **re-checks after applying**, so a step that silently did nothing is reported failed rather than green. A real run halts on a failure, because configuration has real dependencies — no index before its collection, no plugin config before the plugin is installed. A dry run does not halt: it changed nothing, and being told all of what is missing is the point.
+The runner **re-checks after applying**, so a step that silently did nothing is reported failed rather than green. A real run halts on a failure, because configuration has real dependencies — no index before its collection, no feature config before the feature is installed. A dry run does not halt: it changed nothing, and being told all of what is missing is the point.
 
 ### Recheck Backoff
 
-The re-check after an apply uses exponential backoff (delays of 0, 300ms, 700ms, 2s, 4s, 8s — up to ~15 seconds total). This handles the case where an apply and its check speak to different processes: installing a plugin runs on the admin node, which writes to the tenant's database; the check then asks the service node, which caches collection metadata. A step that genuinely worked can be observed as not-yet-done, and the backoff buys a slow one the time to finish without turning a wrong step into a passing one.
+The re-check after an apply uses exponential backoff (delays of 0, 300ms, 700ms, 2s, 4s, 8s — up to ~15 seconds total). This handles the case where an apply and its check speak to different processes: installing a feature runs on the admin node, which writes to the tenant's database; the check then asks the service node, which caches collection metadata. A step that genuinely worked can be observed as not-yet-done, and the backoff buys a slow one the time to finish without turning a wrong step into a passing one.
 
 ### Force Mode
 
-`--force` skips the check but not the recheck verification. Named steps can be forced individually (`--force catalog`), matching by case-insensitive substring. Bare `--force` forces all steps, which is usually the wrong tool: an apply written to run once may not survive running twice — installing a plugin answers `409` the second time.
+`--force` skips the check but not the recheck verification. Named steps can be forced individually (`--force catalog`), matching by case-insensitive substring. Bare `--force` forces all steps, which is usually the wrong tool: an apply written to run once may not survive running twice — installing a feature answers `409` the second time.
 
 ## Secrets with `fromEnv`
 
@@ -150,7 +150,7 @@ A setup lives in git. `fromEnv` is how it names a secret without holding one:
 ```ts
 step('stripe configured', {
   check: async ({ admin, srvId }) => /* ... */,
-  apply: ({ admin, srvId }) => admin.updatePluginConfig(srvId, 'stripe', {
+  apply: ({ admin, srvId }) => admin.updateFeatureConfig(srvId, 'stripe', {
     'secret-key': fromEnv('STRIPE_SECRET_KEY'),
     'success-url': 'https://shop.example.com/shop/order',
   }),
@@ -167,19 +167,19 @@ The marker carries:
 - A `toString()` that prints `fromEnv(VAR_NAME)` — the variable name, never a value
 - A `toJSON()` that throws — the backstop against `JSON.stringify` on an unresolved marker, which would otherwise succeed and quietly emit `{"name":"STRIPE_SECRET_KEY"}` where the secret should be
 
-Resolution happens at serialization time, inside `resolveEnvRefs`, which walks the value tree replacing markers with environment values. Both the admin client (`updatePluginConfig`) and the service client (`body()` helper) resolve markers on the way out. A dry run never calls `apply`, so markers are never resolved.
+Resolution happens at serialization time, inside `resolveEnvRefs`, which walks the value tree replacing markers with environment values. Both the admin client (`updateFeatureConfig`) and the service client (`body()` helper) resolve markers on the way out. A dry run never calls `apply`, so markers are never resolved.
 
 `MissingEnvError` collects *every* missing variable before throwing, so a pipeline that is short three secrets learns all three from one run.
 
-### Reading Plugin Config Back
+### Reading Feature Config Back
 
 `GET .../config` replaces every `format: password` field with a fixed-width `••••••••` — fixed width because a secret's length is still a leak. `PATCH` replaces the *whole* document and restores the stored value for any field still holding that placeholder.
 
 So read-modify-write is safe exactly as long as you pass the placeholder through untouched:
 
 ```ts
-const config = await admin.getPluginConfig(srvId, 'stripe');
-await admin.updatePluginConfig(srvId, 'stripe', { ...config, 'success-url': next });
+const config = await admin.getFeatureConfig(srvId, 'stripe');
+await admin.updateFeatureConfig(srvId, 'stripe', { ...config, 'success-url': next });
 ```
 
 Do not diff, do not strip "empty-looking" fields, do not normalise — any of those writes bullets over the real key. `REDACTED` and `isRedacted()` are exported so you can *recognise* one; nothing in this package ever produces one.
@@ -270,7 +270,7 @@ A `.ts` setup needs a runtime that can load one — Node 22.18+ strips types on 
 
 ## Clients
 
-The CLI provides two clients — one for the admin node, one for the service node — because RESTHeart Cloud separates management and data planes. The admin client handles plugin lifecycle and credential minting; the service client handles collections, indexes, permissions, users, and schemas. A setup step receives both, since a real configuration crosses both planes.
+The CLI provides two clients — one for the admin node, one for the service node — because RESTHeart Cloud separates management and data planes. The admin client handles feature lifecycle and credential minting; the service client handles collections, indexes, permissions, users, and schemas. A setup step receives both, since a real configuration crosses both planes.
 
 ### Admin Client
 
@@ -285,21 +285,23 @@ The client manages its own token in a closure (not `localStorage`, which does no
 | `login(email, password)` | Authenticate as the RESTHeart Cloud account |
 | `useToken(token)` | Set a personal access token (no round trip) |
 | `verifyToken()` | Cheap authenticated read (`GET /plugins`) to validate the credential |
-| `pluginCatalog()` | Marketplace catalog with `config_schema` for each plugin |
-| `listPlugins(srvId)` | Installed and available plugins for a service |
-| `isPluginInstalled(srvId, pluginId)` | Whether a plugin is installed (derived from `listPlugins`) |
-| `configSchema(srvId, pluginId)` | A plugin's schema from the `available` list (works for uninstalled plugins) |
-| `getPluginConfig(srvId, pluginId)` | Stored config with secrets replaced by `REDACTED` |
-| `updatePluginConfig(srvId, pluginId, config)` | Replace config; resolves `fromEnv` markers during serialization |
-| `installPlugin(srvId, pluginId)` | Install a free plugin (server builds initial config; no body accepted) |
-| `uninstallPlugin(srvId, pluginId)` | Remove a plugin |
-| `enablePlugin` / `disablePlugin` | Toggle a plugin |
-| `initPlugin(srvId, pluginId, mode?)` | Run a plugin's own initialization |
-| `testPlugin(srvId, pluginId)` | Validate config against the real provider |
+| `featureCatalog()` | Marketplace catalog with `config_schema` for each feature |
+| `listFeatures(srvId)` | Installed and available features for a service |
+| `isFeatureInstalled(srvId, featureId)` | Whether a feature is installed (derived from `listFeatures`) |
+| `configSchema(srvId, featureId)` | A feature's schema from the `available` list (works for uninstalled features) |
+| `getFeatureConfig(srvId, featureId)` | Stored config with secrets replaced by `REDACTED` |
+| `updateFeatureConfig(srvId, featureId, config)` | Replace config; resolves `fromEnv` markers during serialization. Deliberately async so that `resolveEnvRefs` throws are caught by the caller's catch handler. |
+| `installFeature(srvId, featureId)` | Install a free feature (server builds initial config; no body accepted) |
+| `uninstallFeature(srvId, featureId)` | Remove a feature |
+| `enableFeature` / `disableFeature` | Toggle a feature |
+| `initFeature(srvId, featureId, mode?)` | Run a feature's own initialization |
+| `testFeature(srvId, featureId)` | Validate config against the real provider |
 | `serviceToken(srvId)` | Mint a service-admin JWT and get the service URL |
 | `fetch(path, init?)` | Escape hatch for uncovered admin endpoints |
 
-`installPlugin` takes no configuration — the server builds the initial document itself and ignores a body, so configuring is always a second step. Free plugins only; a paid one answers `400` and points at `/purchase`, which moves money and is deliberately out of reach.
+> **Deprecated aliases**: The old plugin-based names (`pluginCatalog`, `listPlugins`, `isPluginInstalled`, `getPluginConfig`, `updatePluginConfig`, `installPlugin`, `uninstallPlugin`, `enablePlugin`, `disablePlugin`, `initPlugin`, `testPlugin`) are still exported as aliases for backward compatibility with existing setup files.
+
+`installFeature` takes no configuration — the server builds the initial document itself and ignores a body, so configuring is always a second step. Free features only; a paid one answers `400` and points at `/purchase`, which moves money and is deliberately out of reach.
 
 ### Service Client
 
@@ -307,7 +309,7 @@ The client manages its own token in a closure (not `localStorage`, which does no
 
 #### Lazy Token Minting and Renewal
 
-`/jwt` mints a **fifteen-minute** token, and a run that installs a plugin, waits for its `init`, and then writes permissions can outlive that. So the client owns it: fetched lazily, cached, renewed a minute before expiry, shared between concurrent callers, never returned. A caller handed a token would die mid-run with a `401` that reads like a permissions problem, against a service left half-configured.
+`/jwt` mints a **fifteen-minute** token, and a run that installs a feature, waits for its `init`, and then writes permissions can outlive that. So the client owns it: fetched lazily, cached, renewed a minute before expiry, shared between concurrent callers, never returned. A caller handed a token would die mid-run with a `401` that reads like a permissions problem, against a service left half-configured.
 
 #### Methods
 
@@ -349,4 +351,4 @@ Both platforms mask a registered secret in their own logs, but that is their saf
 - **Creating services.** Provisioning is the console's job; this configures one that exists. `rhc new free|shared` is specified but not built.
 - **Billing.** `/purchase`, `/cancel`, and `/invoices` move money. A wizard that can spend your money by accident is not a wizard.
 - **A hosted configuration page.** Ruled out by the `originVetoer`. A local page served *by* the CLI would talk to the CLI's own process, and is a reasonable later addition.
-- **Editing arbitrary RESTHeart configuration.** Only plugin config.
+- **Editing arbitrary RESTHeart configuration.** Only feature config.

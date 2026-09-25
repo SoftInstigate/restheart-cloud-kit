@@ -34,10 +34,10 @@ sources:
     resource: repo://packages/kit/src/__tests__/unit/payments.test.ts
   - id: openwiki-source-f5c174f35c5102ba81477e16
     resource: repo://packages/kit/vitest.unit.config.ts
-generated: { by: "openwiki/0.5.1", at: "2026-09-13T09:39:41.844Z" }
+generated: { by: "openwiki/0.6.0", at: "2026-09-25T09:43:51.410Z" }
 verified:
-  - by: openwiki/0.5.1
-    at: 2026-09-13T09:39:41.844Z
+  - by: openwiki/0.6.0
+    at: 2026-09-25T09:43:51.410Z
 ---
 
 # Testing Guide
@@ -645,10 +645,10 @@ export default defineConfig({
 - Service client shares one mint between calls that start together
 - Service client answers a check with false on 404 and throws on anything else
 - Service client finds an index in the collection listing
-- Service client writes through the paths RESTHeart expects
-- Service client re-running a document write is not an error
-- Service client resolves fromEnv on the way out, like the admin client does
-- Service client fails naming the variable rather than writing an object
+- Service client writes through the paths RESTHeart expects (documents use `?wm=upsert` to create on first write; collections and indexes omit it)
+- Service client re-running a document write is not an error (idempotent upsert)
+- Service client resolves `fromEnv` markers in service client bodies (e.g. user passwords)
+- Service client fails naming the variable rather than writing an unresolved object
 
 #### session.test.ts
 
