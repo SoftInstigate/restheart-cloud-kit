@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:3a5d5b009d848ed9bde0c77f9f0560233435c67fa66cf5286b9d031a9214d2f1",
+  "pageVersion": "sha256:7167a8a08d8d668b9ecf54a7c74ac526c783e1e852e800419708a02e1f98db83",
   "claims": [
     {
       "id": "claim_acd1c970ec6249f5854fc444f6b659e0",
-      "statement": "The @restheart-cloud/cli package ships both a CLI binary (rhc) and a library (defineSetup, step, fromEnv, createAdminClient, createServiceClient, runSetup) for idempotent, file-driven configuration of RESTHeart Cloud services.",
+      "statement": "The @restheart-cloud/cli package ships both a CLI binary (rhc) and a library for idempotent, file-driven configuration of RESTHeart Cloud services. The library exports include REDACTED, isRedacted, fromEnv, isEnvRef, resolveEnvRefs, defaultEnv, MissingEnvError, createAdminClient, createServiceClient, isApiError, TOKEN_VAR, sessionPath, readSession, writeSession, clearSession, resolveToken, step, defineSetup, runSetup, and all associated types.",
       "evidence": [
         {
           "resource": "repo://packages/cli/package.json",
@@ -12,7 +12,7 @@
         },
         {
           "resource": "repo://packages/cli/src/index.ts",
-          "version": "repo-file-v1:sha256:0917831eb60535f35123caa2233e3986b4ae6db7217cff4506d0477b632e6166"
+          "version": "repo-file-v1:sha256:8a1bc0f4a8c19eb7447cb2cc0061b45932f1a152be1b6f6aec7cb1f4d92b77d1"
         }
       ]
     },
@@ -36,7 +36,7 @@
       "evidence": [
         {
           "resource": "repo://packages/cli/src/env.ts#L21-L63",
-          "version": "repo-lines-v1:sha256:1687cf58c64a2459739b7eb69c414f8f660cc1bc93096cdf46ff29612e11b8bd:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1YjVkMjMyZmUwYjY2MWYzOWZmYTgwMzA0NDc4ZmFiYTdiMzAxM2FjMDhmZTdiZjNiZjZhY2IxOGI3ZWQ5MDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcyYTU2M2Y3OWU1ZDllYzlhOGIzMmYzZGQxMDQ1MmM1ZjkxNTNmMzg3MTViMmM2YmVjYWE3MGJiOTYxODhhM2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1YWFjYTNkZjJlYTYwNDZlNjZmMjA5NWU2ZWFiZmE0ZTUwZDVmODg4NTE3MWM2ODg4NTBhMmQzZGY1MmEyNzQifQ"
+          "version": "repo-lines-v1:sha256:641475f6dfeeab03e19180e37e8b489a3b10018d57f4e82b5ae619163c50df2f:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1YjVkMjMyZmUwYjY2MWYzOWZmYTgwMzA0NDc4ZmFiYTdiMzAxM2FjMDhmZTdiZjNiZjZhY2IxOGI3ZWQ5MDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcyYTU2M2Y3OWU1ZDllYzlhOGIzMmYzZGQxMDQ1MmM1ZjkxNTNmMzg3MTViMmM2YmVjYWE3MGJiOTYxODhhM2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1YWFjYTNkZjJlYTYwNDZlNjZmMjA5NWU2ZWFiZmE0ZTUwZDVmODg4NTE3MWM2ODg4NTBhMmQzZGY1MmEyNzQifQ"
         }
       ]
     },
@@ -52,11 +52,11 @@
     },
     {
       "id": "claim_1c1f208c575e470992c7248435da96f2",
-      "statement": "Resolution of fromEnv markers happens at serialization time inside the admin client's updatePluginConfig and the service client's body() helper — never before, and a dry run never calls apply so markers are never resolved.",
+      "statement": "Resolution of fromEnv markers happens at serialization time inside the admin client's updateFeatureConfig and the service client's body() helper — never before, and a dry run never calls apply so markers are never resolved. The updateFeatureConfig method is deliberately async so that resolveEnvRefs throws are caught by the caller's catch handler.",
       "evidence": [
         {
-          "resource": "repo://packages/cli/src/admin.ts#L208-L213",
-          "version": "repo-lines-v1:sha256:9202a5f24477b0be69cecbc3414cf94faae73941f76c5be911297117878f7354:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzRiYjg4ODBlYTcxYTE1YTI4ODBlYTFkYjdhMzI5OTUyYzYwN2RjZjA5MTQ5MTRmZjMzZTVhMjJiNjY1NDZiZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWYwY2RiOTcyYTdiZmI3ZWQyNDZmOWZmNjcyMzg1ZTU1ZjQ5NjhmYzExMDQzZGM1YjY4NGQ1MWRmYTMxZGJjYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmQ0MDVkM2QzYjc2M2M2Yzg0Y2ExYWVlY2IyMTkwODIzNTgyNzJkYWI3Y2FhMDgwNzUzNDY3ZGM2ZjQxNjkwMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjkwNzcxZmQ3OTg5YTIzMjFkOGNkOGY5M2MxNTU3NDcwOTI5OTZmZjhjMmI3MjY2NzNkZTY5NDlhOTAyY2JmOSJ9"
+          "resource": "repo://packages/cli/src/admin.ts#L208-L215",
+          "version": "repo-lines-v1:sha256:3b29d235b853d4bc7f1ae47f05d156a18c3a2f8b863b84f1cc209b7a16da3034:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODZiNTJjNjljYzRlOGMzNmIyMDUyYTQ1NmU0NDk3YTI4ZGQxMWI1Y2M4N2U3ZDNkNjFkOGVkMzZmYTQxNThlYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjJkMTFjYWY0M2U5N2VmMzY5ZTZiZWVkMWEyNjhiZDA1ODM4ZjI5YjlkZDI1NGJmNjliYTY0ODg0MTQ3MjM0YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGMzYTNjNTYxNjUzY2FiZjM0NDgyMGM3M2U2ZjA4ZmM5MjQ1ZGRhMzcyZDA3NTQ5ZDQzOTY1YWM2NTU4OTAzZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzViZWRmNzAxMTZlZTVmNWU2NmQxYzIzNDE3YTZkNzExMjBkNWQ0NjU4YWIwZGYzOWYyNDZjYjExN2FhZTljOCJ9"
         },
         {
           "resource": "repo://packages/cli/src/service.ts#L101-L102",
@@ -118,11 +118,11 @@
     },
     {
       "id": "claim_67d9bb3035f2444cbf485a9f62ec589d",
-      "statement": "The admin client (createAdminClient) manages its own token in a closure rather than localStorage, silences the core's stderr logging, and provides methods for plugin lifecycle (install, config, init, enable, disable, uninstall, test), service token minting, and a generic fetch escape hatch.",
+      "statement": "The admin client (createAdminClient) manages its own token in a closure rather than localStorage, silences the core's stderr logging, and provides methods for feature lifecycle (featureCatalog, listFeatures, isFeatureInstalled, configSchema, getFeatureConfig, updateFeatureConfig, installFeature, uninstallFeature, enableFeature, disableFeature, initFeature, testFeature), service token minting, and a generic fetch escape hatch. Deprecated aliases for the old plugin-based names are also exported.",
       "evidence": [
         {
           "resource": "repo://packages/cli/src/admin.ts#L131-L236",
-          "version": "repo-lines-v1:sha256:c24e0d02c7931797fd41445b62296813a6cc24cd04cb127e111f127623e45b3f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI4OTBlNDczZjkxMjU3MzkxYzBhNzBmZmIxZjFiMmIzMjhmOGY5MThkMmZkZDAwMjkyOGMxNTVkZjE5MGJkZDI5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyYjM1YmQ1NWRiNTk0YTgzODVkODMxYjE5YjVmMTgwZWFiZThmMWY0ZGJjYmI5NTM4NGE3YjNiY2ZmMjZkNTgzIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "version": "repo-lines-v1:sha256:ff808d2612186d5151bd3804c2fb74d50108cc4d8ce33a60344662d0824ac7e7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTM1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI4OTBlNDczZjkxMjU3MzkxYzBhNzBmZmIxZjFiMmIzMjhmOGY5MThkMmZkZDAwMjkyOGMxNTVkZjE5MGJkZDI5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyYjM1YmQ1NWRiNTk0YTgzODVkODMxYjE5YjVmMTgwZWFiZThmMWY0ZGJjYmI5NTM4NGE3YjNiY2ZmMjZkNTgzIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
@@ -160,7 +160,7 @@
         },
         {
           "resource": "repo://packages/cli/src/setup.ts#L132-L246",
-          "version": "repo-lines-v1:sha256:79d7863541f64517364a50ca4daf0b90a997f6035a35408ad84b02e9f991cda0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjNGUzNzFiMWYzMmFmZGI1NDk4MDY2ODMwY2ZlYjllN2VlZDdjNGQ1OWU1MWE3ZjE3MzM5Yjg4NzAxMGUxOTE4IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIwZDY0Y2E1YTRjYmFkNjc1Y2I1Y2NiMGI4NzI4ZTBmYTc2ZjUyZmIyZTIwYjNiNjgwYTI2OTA0MTJlY2JlNDJlIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiNGFmOTFmY2NlYzk5MWM0ZTEyYTFiYjA2NjQ0YjM3OTMzZDYwZDA5ZjhkMzg2NTJkNDBiNjlkYzI5Y2I4N2MxIn0"
+          "version": "repo-lines-v1:sha256:b5d0a41acef56dbd8289842c75c7fbaa672daadcedf85b7922be139b94897b7c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjNGUzNzFiMWYzMmFmZGI1NDk4MDY2ODMwY2ZlYjllN2VlZDdjNGQ1OWU1MWE3ZjE3MzM5Yjg4NzAxMGUxOTE4IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIwZDY0Y2E1YTRjYmFkNjc1Y2I1Y2NiMGI4NzI4ZTBmYTc2ZjUyZmIyZTIwYjNiNjgwYTI2OTA0MTJlY2JlNDJlIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiNGFmOTFmY2NlYzk5MWM0ZTEyYTFiYjA2NjQ0YjM3OTMzZDYwZDA5ZjhkMzg2NTJkNDBiNjlkYzI5Y2I4N2MxIn0"
         },
         {
           "resource": "repo://packages/cli/src/setup.ts#L19-L30",
@@ -174,7 +174,7 @@
       "evidence": [
         {
           "resource": "repo://packages/cli/src/setup.ts#L155-L189",
-          "version": "repo-lines-v1:sha256:20313f7492339f3f54245381fa26a4ab4d06a621d000ba01dbc0e16e869e2a51:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUwMjkwYWE4OGQ1MmQ1NzM5ZDkzMTQyNTJhNGFjYWNkMjFiYmYxYTdhZjc4ZTFjZDZiYWE1NDUzNTM3MTk2NmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2MWQzZmU2ZTM5NjZjMmY2OGI5ZDc1Mzg0OTQyYjYzY2YxZjU0NDI0OGI3M2ZlMzdmMmY4OTMxY2JlMDQ5MTQifQ"
+          "version": "repo-lines-v1:sha256:68c2c0559fce01323f31ca3e1f68f9455169209a3709573d4ca32f8bb558f517:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUwMjkwYWE4OGQ1MmQ1NzM5ZDkzMTQyNTJhNGFjYWNkMjFiYmYxYTdhZjc4ZTFjZDZiYWE1NDUzNTM3MTk2NmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2MWQzZmU2ZTM5NjZjMmY2OGI5ZDc1Mzg0OTQyYjYzY2YxZjU0NDI0OGI3M2ZlMzdmMmY4OTMxY2JlMDQ5MTQifQ"
         }
       ]
     },
@@ -188,7 +188,7 @@
         },
         {
           "resource": "repo://packages/cli/src/setup.ts#L207-L223",
-          "version": "repo-lines-v1:sha256:0aa175e07939395b71d0d0f469ac830acb4b7e5f09f7d2b5b5241de8811218f8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZGY4N2E0NzMxNmM3MDhjNTUwMjA5OGU5YWY2YzQ0NTM0ZWI4MGJlYWRjZjYwNjMwMjhlZmNhODU5MzdhYmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNhZWZiMTQ0YmE2ZTJjMmJlOWM2Yjg3M2Y0NTQ0MTVhZDk5MmNhYTgwMzA5M2Y1NjRhZWNmNGU4ZDg0ZDY5M2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNlYTFhY2M4YzJkYzU3ZTYxOWYzMTk3ZGJlNGE3N2ZlOWUzNjAxZmIyMzQyNTc2OTg5NWEwMWVmYjFlYzAxNzIifQ"
+          "version": "repo-lines-v1:sha256:a042fc38de673e835b4faa06883c26531ac461dfab0360a88a25daa329169e2b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZGY4N2E0NzMxNmM3MDhjNTUwMjA5OGU5YWY2YzQ0NTM0ZWI4MGJlYWRjZjYwNjMwMjhlZmNhODU5MzdhYmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNhZWZiMTQ0YmE2ZTJjMmJlOWM2Yjg3M2Y0NTQ0MTVhZDk5MmNhYTgwMzA5M2Y1NjRhZWNmNGU4ZDg0ZDY5M2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNlYTFhY2M4YzJkYzU3ZTYxOWYzMTk3ZGJlNGE3N2ZlOWUzNjAxZmIyMzQyNTc2OTg5NWEwMWVmYjFlYzAxNzIifQ"
         }
       ]
     },
@@ -256,7 +256,7 @@
     }
   ],
   "verification": {
-    "by": "openwiki/0.5.1",
-    "at": "2026-09-13T09:39:41.844Z"
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-25T09:43:51.410Z"
   }
 }

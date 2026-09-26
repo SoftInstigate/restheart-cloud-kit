@@ -30,7 +30,10 @@ sources:
     resource: repo://packages/kit/src/payments.ts
   - id: openwiki-source-42dfd0defa8189243ef19509
     resource: repo://packages/kit/src/types.ts
-generated: { by: "openwiki/0.4.3", at: "2026-08-28T16:48:53.239Z" }
+verified:
+  - by: openwiki/0.6.0
+    at: 2026-09-25T09:43:51.410Z
+generated: { by: "openwiki/0.6.0", at: "2026-09-25T09:43:51.410Z" }
 ---
 
 # RESTHeart Cloud Kit
@@ -42,64 +45,52 @@ A TypeScript SDK for adding authentication to frontend applications that use [RE
 RESTHeart Cloud Kit provides the same speed on the frontend that RESTHeart Cloud gives you on the backend. It's a monorepo containing:
 
 - **`@restheart-cloud/kit`** — Framework-agnostic core with zero dependencies. Handles all authentication logic: signup, login, email verification, password reset, team management, and multi-team switching. Also provides payments (subscriptions, Checkout, Billing Portal, seat licences), e-commerce (product catalog, orders, guest checkout), a client-side cart, and price formatting.
-- **`@restheart-cloud/cli`** — The `rhc` command-line tool. Configures a RESTHeart Cloud service from a plan committed to git — collections, indexes, permissions and plugins, applied idempotently from a terminal or a CI pipeline.
+- **`@restheart-cloud/cli`** — The `rhc` command-line tool. Configures a RESTHeart Cloud service from a plan committed to git — collections, indexes, permissions and features, applied idempotently from a terminal or a CI pipeline.
 - **`@restheart-cloud/kit-ng`** — Angular adapter with signals, route guards, and HTTP interceptor. Wraps the core kit.
 - **`@restheart-cloud/kit-react`** — React adapter with context, hooks, and route guards. Includes a `/next` subpath for Next.js SSR support (middleware, route handlers, server actions).
 - **`@restheart-cloud/kit-vue`** — Vue adapter with composables and navigation guards. Includes a `/nuxt` subpath for Nuxt SSR support.
 
 ## Architecture Overview
 
+```mermaid
+graph TB
+    subgraph "Your Frontend App"
+        subgraph "Framework Adapters"
+            kit-ng["kit-ng (Angular)"]
+            kit-react["kit-react (React)"]
+            kit-vue["kit-vue (Vue)"]
+        end
+        
+        kit["Core Kit (@restheart-cloud/kit)"]
+        
+        kit-ng --> kit
+        kit-react --> kit
+        kit-vue --> kit
+    end
+    
+    subgraph "RESTHeart Cloud Backend"
+        backend["MongoDB + REST API + Auth + Stripe"]
+    end
+    
+    subgraph "CLI (rhc)"
+        cli["@restheart-cloud/cli"]
+        setup["Setup Runner"]
+        cli --> setup
+    end
+    
+    kit --> backend
+    setup --> backend
+    
+    style kit fill:#e1f5ff
+    style cli fill:#fff3e0
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                      Your Frontend App                               │
-├─────────────────────────────────────────────────────────────────────┤
-│  Framework Adapters (reactive wrappers)                             │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
-│  │  kit-ng      │  │  kit-react   │  │  kit-vue     │              │
-│  │  (Angular)   │  │  (React)     │  │  (Vue)       │              │
-│  │  signals,    │  │  hooks,      │  │  composables,│              │
-│  │  guards,     │  │  context,    │  │  navigation  │              │
-│  │  interceptor │  │  guards      │  │  guards      │              │
-│  │              │  │  + /next     │  │  + /nuxt     │              │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘              │
-│         │                 │                 │                       │
-│         └─────────────────┼─────────────────┘                       │
-│                           ▼                                         │
-│  @restheart-cloud/kit (Core)                                        │
-│  ┌───────────────────────────────────────────────────────────────┐  │
-│  │  • Auth flows (register, login, verify, logout)               │  │
-│  │  • Token management (localStorage, proactive refresh)         │  │
-│  │  • Team operations (switch, create, manage members)           │  │
-│  │  • Password reset & profile updates                           │  │
-│  │  • Payments (subscriptions, Checkout, Portal, licences)       │  │
-│  │  • E-commerce (catalog, orders, guest checkout)               │  │
-│  │  • Cart (client-side, pure functions, localStorage)           │  │
-│  │  • Price formatting (minor units → locale-aware display)      │  │
-│  │  • Pluggable token source/sink (for SSR runtimes)             │  │
-│  └───────────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│              RESTHeart Cloud Backend                                 │
-│  • MongoDB database                                                  │
-│  • REST API                                                          │
-│  • Authentication & multi-tenancy                                    │
-│  • Stripe integration (subscriptions & products)                     │
-│  • Managed infrastructure                                            │
-└─────────────────────────────────────────────────────────────────────┘
 
-┌─────────────────────────────────────────────────────────────────────┐
-│  @restheart-cloud/cli (rhc)                                          │
-│  ┌───────────────────────────────────────────────────────────────┐  │
-│  │  • Setup runner (check → apply → re-check, sequential)        │  │
-│  │  • Admin & service clients                                    │  │
-│  │  • Session management (PAT login, env var, ~/.config/restheart)│  │
-│  │  • Env refs (fromEnv — secrets in committed setup files)      │  │
-│  │  • Dry-run, force, progress events, JSON report               │  │
-│  └───────────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────┘
-```
+The architecture follows a layered pattern:
+- **Core** (`kit`): All network calls, token operations, business rules
+- **Adapters** (`kit-ng`, `kit-react`, `kit-vue`): Reactive wrappers, framework-specific integration
+- **SSR subpaths** (`kit-react/next`, `kit-vue/nuxt`): Server-side token management via pluggable token source/sink
+- **CLI** (`cli`): Declarative service configuration, independent of the frontend kit
+- **Principle**: An adapter that reimplements an API call or token computation is a bug
 
 ## Quick Navigation
 
@@ -139,6 +130,7 @@ Use this table to find the right starting point for common change types:
 | Invitations | [Core Kit](packages/kit.md#invitation-flows) | `packages/kit/src/invite.ts` | `invite`, `activate`, `acceptInvite`, `listInvitations` | `packages/kit/src/__tests__/integration/invite.test.ts` | `npm test -w packages/kit` |
 | Password reset | [Core Kit](packages/kit.md#password-management) | `packages/kit/src/password.ts` | `forgotPassword`, `resetPassword` | `packages/kit/src/__tests__/integration/password.test.ts` | `npm test -w packages/kit` |
 | Profile updates | [Core Kit](packages/kit.md#profile-management) | `packages/kit/src/profile.ts` | `updateProfile`, `updateUser`, `changePassword` | `packages/kit/src/__tests__/integration/profile.test.ts` | `npm test -w packages/kit` |
+<!-- openwiki: broken internal link [packages/kit.md#consents-gating] heading anchor "consents-gating" does not exist in "packages/kit.md". Fix the href or restore the target, then delete this comment. -->
 | Consents gating | [Core Kit — Consents](packages/kit.md#consents-gating) | `packages/kit/src/consents.ts` | `acceptConsents` | `packages/kit/src/__tests__/integration/consents.test.ts` | `npm test -w packages/kit` |
 | Payments (subscriptions, Checkout, Portal, licences) | [Payments & E-commerce](concepts/payments.md#subscriptions) | `packages/kit/src/payments.ts` | `getPlans`, `getSubscription`, `createCheckoutSession`, `openBillingPortal`, `getLicenses`, `grantLicense`, `revokeLicense`, `waitForSubscription` | `packages/kit/src/__tests__/unit/payments.test.ts` | `npm test -w packages/kit` |
 <!-- openwiki: broken internal link [concepts/payments.md#e-commerce] heading anchor "e-commerce" does not exist in "concepts/payments.md". Fix the href or restore the target, then delete this comment. -->
@@ -147,11 +139,8 @@ Use this table to find the right starting point for common change types:
 | Cart (client-side, localStorage) | [Payments & E-commerce](concepts/payments.md#cart) | `packages/kit/src/cart.ts` | `addToCart`, `setCartQuantity`, `removeFromCart`, `cartTotals`, `toOrderItems`, `loadCart`, `saveCart`, `clearStoredCart` | `packages/kit/src/__tests__/unit/cart.test.ts` | `npm test -w packages/kit` |
 <!-- openwiki: broken internal link [concepts/payments.md#price-formatting] heading anchor "price-formatting" does not exist in "concepts/payments.md". Fix the href or restore the target, then delete this comment. -->
 | Price formatting | [Payments & E-commerce](concepts/payments.md#price-formatting) | `packages/kit/src/money.ts` | `formatPrice` | `packages/kit/src/__tests__/unit/money.test.ts` | `npm test -w packages/kit` |
-<!-- openwiki: broken internal link [packages/cli.md#setup-runner] heading anchor "setup-runner" does not exist in "packages/cli.md". Fix the href or restore the target, then delete this comment. -->
 | CLI setup runner (rhc setup, defineSetup, step, fromEnv) | [CLI](packages/cli.md#setup-runner) | `packages/cli/src/setup.ts`, `packages/cli/src/cli.ts`, `packages/cli/src/env.ts` | `defineSetup`, `step`, `runSetup`, `fromEnv`, `resolveEnvRefs` | `packages/cli/src/__tests__/unit/setup.test.ts`, `env.test.ts` | `npm test -w packages/cli` |
-<!-- openwiki: broken internal link [packages/cli.md#session-management] heading anchor "session-management" does not exist in "packages/cli.md". Fix the href or restore the target, then delete this comment. -->
 | CLI session & credentials (login, logout, PAT) | [CLI](packages/cli.md#session-management) | `packages/cli/src/session.ts`, `packages/cli/src/cli.ts` | `resolveToken`, `writeSession`, `clearSession`, `TOKEN_VAR` | `packages/cli/src/__tests__/unit/session.test.ts` | `npm test -w packages/cli` |
-<!-- openwiki: broken internal link [packages/cli.md#clients] heading anchor "clients" does not exist in "packages/cli.md". Fix the href or restore the target, then delete this comment. -->
 | CLI admin & service clients | [CLI](packages/cli.md#clients) | `packages/cli/src/admin.ts`, `packages/cli/src/service.ts` | `createAdminClient`, `createServiceClient` | `packages/cli/src/__tests__/unit/admin.test.ts`, `service.test.ts` | `npm test -w packages/cli` |
 | Angular adapter (signals, guards, interceptor) | [Angular Adapter](packages/kit-ng.md) | `packages/kit-ng/src/auth.service.ts`, `auth.guard.ts`, `auth.interceptor.ts` | `RhAuthService`, `authGuard`, `provideRhAuth` | `packages/kit-ng/src/*.spec.ts` | `npm test -w packages/kit-ng` |
 | React adapter (hooks, context, guards) | [React Adapter](packages/kit-react.md) | `packages/kit-react/src/context.tsx`, `guards.tsx` | `useAuth`, `RhAuthProvider`, `AuthGuard` | `packages/kit-react/src/__tests__/` | `npm test -w packages/kit-react` |
@@ -282,6 +271,7 @@ Applications can gate access behind a user's acceptance of terms of service, pri
 2. An ACL permission on `PATCH /users/{userId}` — scoped with `bson-request-whitelist` — exempts the one call that records the acceptance.
 3. `acceptConsents()` calls `updateUser()` then `renewToken()` so the guard sees the updated claims.
 
+<!-- openwiki: broken internal link [packages/kit.md#consents-gating] heading anchor "consents-gating" does not exist in "packages/kit.md". Fix the href or restore the target, then delete this comment. -->
 **Key invariant**: the server decides which versions are stamped and when — the client body carries only the whitelisted key. See [Core Kit — Consents Gating](packages/kit.md#consents-gating) for the full API.
 
 ### Payments & Subscriptions
@@ -311,7 +301,11 @@ The `@restheart-cloud/cli` package provides the `rhc` command for configuring RE
 
 **Key symbols**: `defineSetup` declares a setup, `step` declares a step, `runSetup` executes it, `fromEnv` references secrets without holding them (resolved at apply time, never printed or logged).
 
-**Credentials**: personal access tokens (PATs) issued at cloud.restheart.com, stored under `~/.config/restheart` by `rhc login`, or set via `RH_CLOUD_TOKEN` in pipelines. See [CLI](packages/cli.md) for the full reference.
+**Key invariant**: after an apply, the runner re-checks with exponential backoff up to 15 seconds to handle admin-node/service-node cache lag. A step that silently did nothing is reported failed rather than green.
+
+**Exit codes**: 0 = every step satisfied or applied, 1 = a step failed, 2 = a dry run found work outstanding (configuration drift, not an error).
+
+**Credentials**: personal access tokens (PATs) starting with `rhc_live_`, carrying the `cli` role. Stored 0600 under `~/.config/restheart` by `rhc login`, or set via `RH_CLOUD_TOKEN` in pipelines. The env var always wins over a stored session. See [CLI](packages/cli.md) for the full reference.
 
 ### Framework Adapter Pattern
 
@@ -388,13 +382,13 @@ if (ref) {
 import { defineSetup, step, fromEnv } from '@restheart-cloud/cli';
 
 export default defineSetup('My Shop', [
-  step('stripe plugin installed', {
-    check: ({ admin, srvId }) => admin.getPlugin(srvId, 'stripe').then(p => p !== null),
-    apply: ({ admin, srvId }) => admin.installPlugin(srvId, 'stripe'),
+  step('stripe feature installed', {
+    check: ({ admin, srvId }) => admin.isFeatureInstalled(srvId, 'stripe'),
+    apply: ({ admin, srvId }) => admin.installFeature(srvId, 'stripe'),
   }),
-  step('stripe plugin configured', {
-    check: ({ admin, srvId }) => admin.getPluginConfig(srvId, 'stripe').then(c => c?.['secret-key'] != null),
-    apply: ({ admin, srvId }) => admin.updatePluginConfig(srvId, 'stripe', {
+  step('stripe feature configured', {
+    check: ({ admin, srvId }) => admin.getFeatureConfig(srvId, 'stripe').then(c => c?.['secret-key'] != null),
+    apply: ({ admin, srvId }) => admin.updateFeatureConfig(srvId, 'stripe', {
       'secret-key': fromEnv('STRIPE_SECRET_KEY'),
       'success-url': 'https://shop.example.com/order#order={ORDER_ID}&secret={ORDER_SECRET}',
     }),
